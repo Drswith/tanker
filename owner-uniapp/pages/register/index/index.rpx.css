@@ -1,454 +1,206 @@
-/* 注册页面主容器 */
-.register-page {
-  background-color: rgba(255, 255, 255, 1);
+/* 认证页面主容器 */
+.auth-page {
   position: relative;
-  width: 750rpx;
-  height: 2180rpx;
-  overflow: hidden;
-  padding-top: 0;
-  padding-bottom: 556rpx;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-/* 头部背景区域 */
-.header-background {
-  background: url(https://lanhu-oss-2537-2.lanhuapp.com/SketchPnge867d1f52eba3a5addbc9c040eaa453c96b34e6f7345cf9d84fe1666f014fbdb)
-    100% no-repeat;
+  background: linear-gradient(326deg, #FFD100 0%, #FFA500 100%);
   background-size: 100% 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 /* 头部Logo */
 .header-logo {
   width: 650rpx;
   height: 514rpx;
-  margin: -104rpx -244rpx 1214rpx 344rpx;
+  position: absolute;
+  top: -104rpx;
+  right: -244rpx;
 }
 
 /* 表单容器 */
 .form-container {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 30px 30px 0px 0px;
+  background-color: #fff;
+  border-radius: 60rpx 60rpx 0 0;
   position: absolute;
   left: 0;
   top: 330rpx;
-  width: 750rpx;
-  height: 1850rpx;
-  padding: 0 30rpx 82rpx 32rpx;
-}
-
-/* 状态栏 */
-.status-bar {
-  margin: -302rpx 0 0 32rpx;
-}
-
-/* 状态栏时间 */
-.status-time {
-  overflow-wrap: break-word;
-  color: rgba(255, 255, 255, 1);
-  font-size: 30rpx;
-  letter-spacing: -0.30000001192092896px;
-  font-family: SFProText-Semibold;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 36rpx;
-}
-
-/* 信号图标 */
-.signal-icon {
-  width: 34rpx;
-  height: 22rpx;
-  margin: 8rpx 0 6rpx 462rpx;
-}
-
-/* WiFi图标 */
-.wifi-icon {
-  width: 30rpx;
-  height: 22rpx;
-  margin: 6rpx 0 8rpx 10rpx;
-}
-
-/* 电池图标 */
-.battery-icon {
-  width: 48rpx;
-  height: 22rpx;
-  margin: 6rpx 0 8rpx 10rpx;
+  width: 100%;
+  padding: 90rpx 32rpx 82rpx 32rpx;
 }
 
 /* 页面标题 */
 .page-title {
-  overflow-wrap: break-word;
-  color: rgba(255, 255, 255, 1);
+  color: #fff;
   font-size: 48rpx;
   font-family: PingFangSC-Semibold;
   font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
   line-height: 66rpx;
-  margin: 106rpx 496rpx 0 0;
+  position: absolute;
+  left: 32rpx;
+  top: 170rpx;
+}
+
+/* uView 表单自定义样式 - 使用深度选择器 */
+.form-item-custom {
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+}
+
+.form-item-custom ::v-deep .u-form-item__body,
+.form-item-custom ::v-deep .u-form-item__body__left,
+.form-item-custom ::v-deep .u-form-item__body__right {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 表单项间距调整 */
+.form-item-custom:not(:first-child) {
+  margin-top: 48rpx !important;
+}
+
+/* 通用标签样式 */
+.field-label {
+  color: rgba(77, 78, 70, 1);
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  line-height: 44rpx;
 }
 
 /* 必填字段标签容器 */
 .field-label-required {
-  width: 114rpx;
   height: 44rpx;
-  overflow-wrap: break-word;
-  font-size: 0;
   font-family: PingFangSC-Semibold;
   font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
   line-height: 44rpx;
-  margin: 184rpx 574rpx 0 0;
+  display: flex;
+  align-items: center;
 }
 
 /* 必填标识星号 */
 .required-asterisk {
-  overflow-wrap: break-word;
-  color: rgba(255, 0, 0, 1);
+  color: #f00;
   font-size: 32rpx;
   font-family: PingFangSC-Semibold;
   font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
   line-height: 44rpx;
 }
 
-/* 字段标签 */
-.field-label {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 44rpx;
-}
-
-/* 输入框容器 */
+/* 通用输入框样式 */
 .input-field {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
+  background-color: #fff;
+  border-radius: 16rpx;
   border: 1.5px solid rgba(238, 238, 238, 1);
   margin: 16rpx 2rpx 0 0;
-  padding: 11.1rpx 223.1rpx 11.1rpx 18.1rpx;
+  width: 100%;
+  padding: 12rpx 18rpx;
 }
 
-/* 输入框占位符 */
-.input-placeholder {
-  overflow-wrap: break-word;
-  color: rgba(153, 153, 153, 1);
-  font-size: 28rpx;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-/* 验证码标签 */
-.verification-code-label {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 44rpx;
-  margin: 48rpx 592rpx 0 0;
-}
-
-/* 验证码输入容器 */
-.verification-input-container {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
-  width: 686rpx;
-  border: 1.5px solid rgba(238, 238, 238, 1);
-  margin: 16rpx 2rpx 0 0;
-  padding: 11.1rpx 14.1rpx 11.1rpx 18.1rpx;
-}
-
-/* 验证码占位符 */
-.verification-placeholder {
-  overflow-wrap: break-word;
-  color: rgba(153, 153, 153, 1);
-  font-size: 28rpx;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
+/* 带按钮的输入框（验证码） */
+.input-field--with-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* 获取验证码按钮 */
 .get-code-btn {
-  overflow-wrap: break-word;
   color: rgba(255, 171, 0, 1);
   font-size: 28rpx;
   font-family: PingFangSC-Medium;
   font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
+  line-height: 48rpx;
+  cursor: pointer;
 }
 
-/* 邀请码标签 */
-.invitation-code-label {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 44rpx;
-  margin: 16rpx 592rpx 0 0;
+/* 上传容器 */
+.upload-container {
+  margin-top: 16rpx;
 }
 
-/* 邀请码输入框 */
-.invitation-input-field {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
-  border: 1.5px solid rgba(238, 238, 238, 1);
-  margin: 16rpx 2rpx 0 0;
-  padding: 11.1rpx 237.1rpx 11.1rpx 18.1rpx;
+/* 上传行 */
+.upload-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
 }
 
-/* 邀请码占位符 */
-.invitation-placeholder {
-  overflow-wrap: break-word;
-  color: rgba(153, 153, 153, 1);
-  font-size: 28rpx;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
+/* 上传项包装器 */
+.upload-item-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 公司名称必填标签容器 */
-.company-name-label-required {
-  width: 146rpx;
-  height: 44rpx;
-  overflow-wrap: break-word;
-  font-size: 0;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 44rpx;
-  margin: 48rpx 542rpx 0 0;
-}
-
-/* 公司输入框 */
-.company-input-field {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
-  border: 1.5px solid rgba(238, 238, 238, 1);
-  margin: 16rpx 2rpx 0 0;
-  padding: 11.1rpx 223.1rpx 11.1rpx 18.1rpx;
-}
-
-/* 公司占位符 */
-.company-placeholder {
-  overflow-wrap: break-word;
-  color: rgba(153, 153, 153, 1);
-  font-size: 28rpx;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-/* 联系人必填标签容器 */
-.contact-label-required {
-  width: 114rpx;
-  height: 44rpx;
-  overflow-wrap: break-word;
-  font-size: 0;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 44rpx;
-  margin: 48rpx 574rpx 0 0;
-}
-
-/* 联系人输入框 */
-.contact-input-field {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
-  border: 1.5px solid rgba(238, 238, 238, 1);
-  margin: 16rpx 2rpx 0 0;
-  padding: 11.1rpx 209.1rpx 11.1rpx 18.1rpx;
-}
-
-/* 联系人占位符 */
-.contact-placeholder {
-  overflow-wrap: break-word;
-  color: rgba(153, 153, 153, 1);
-  font-size: 28rpx;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-/* 地址标签 */
-.address-label {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 44rpx;
-  margin: 48rpx 560rpx 0 0;
-}
-
-/* 地址输入框 */
-.address-input-field {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
-  border: 1.5px solid rgba(238, 238, 238, 1);
-  margin: 16rpx 2rpx 0 0;
-  padding: 11.1rpx 223.1rpx 11.1rpx 18.1rpx;
-}
-
-/* 地址占位符 */
-.address-placeholder {
-  overflow-wrap: break-word;
-  color: rgba(153, 153, 153, 1);
-  font-size: 28rpx;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-/* 营业执照上传标签 */
-.license-upload-label {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 44rpx;
-  margin: 48rpx 496rpx 0 0;
-}
-
-/* 营业执照上传容器 */
-.license-upload-container {
-  width: 686rpx;
-  margin: 16rpx 2rpx 0 0;
-}
-
-/* 营业执照正面上传 */
-.license-front-upload {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
-  border: 1.5px 2 rgba(238, 238, 238, 1);
-  padding: 23.1rpx 31.1rpx 23.1rpx 32.1rpx;
-}
-
-/* 上传项目容器 */
-.upload-item {
+/* 自定义上传插槽 */
+.upload-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border: 1.5px dashed rgba(238, 238, 238, 1);
+  border-radius: 16rpx;
+  width: 320rpx;
+  height: 200rpx;
+  padding: 23rpx 31rpx 23rpx 32rpx;
 }
 
 /* 上传图标 */
 .upload-icon {
   width: 48rpx;
   height: 48rpx;
-  align-self: center;
 }
 
-/* 营业执照正面上传文字 */
-.upload-text-front {
-  overflow-wrap: break-word;
+/* 上传插槽文字 */
+.upload-slot-text {
   color: rgba(153, 153, 153, 1);
   font-size: 24rpx;
   font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
   line-height: 34rpx;
   margin-top: 24rpx;
+  text-align: center;
 }
 
-/* 营业执照反面上传 */
-.license-back-upload {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
-  border: 1.5px 2 rgba(238, 238, 238, 1);
-  padding: 23.1rpx 31.1rpx 23.1rpx 32.1rpx;
+/* 按钮容器 */
+.btn-container {
+  background: linear-gradient( 326deg, #FFD100 0%, #FFA500 100%);
+  border-radius: 48rpx;
+  margin-top: 80rpx;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 营业执照反面上传文字 */
-.upload-text-back {
-  overflow-wrap: break-word;
-  color: rgba(153, 153, 153, 1);
-  font-size: 24rpx;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 34rpx;
-  margin-top: 24rpx;
-}
-
-/* 注册按钮容器 */
-.register-btn-container {
-  background: url(https://lanhu-oss-2537-2.lanhuapp.com/SketchPnge970a70f1c9c6ab0cfe327d25a84d3a0aebc95e8bd94dcb8feb1b7af52cf8a02)
-    100% no-repeat;
-  background-size: 100% 100%;
-  margin: 80rpx 2rpx 0 0;
-  padding: 26rpx 280rpx 26rpx 278rpx;
-}
-
-/* 注册按钮文字 */
-.register-btn-text {
-  overflow-wrap: break-word;
-  color: rgba(255, 255, 255, 1);
+/* 按钮文字 */
+.btn-text {
+  color: #fff;
   font-size: 32rpx;
   font-family: PingFangSC-Semibold;
   font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
   line-height: 44rpx;
 }
 
 /* 登录链接容器 */
-.login-link-container {
-  width: 234rpx;
+.link-container {
   height: 36rpx;
-  overflow-wrap: break-word;
-  font-size: 0;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
   line-height: 36rpx;
-  margin: 32rpx 238rpx 0 216rpx;
+  margin: 32rpx auto auto;
+  cursor: pointer;
 }
 
-/* 登录前缀文字 */
-.login-prefix-text {
-  overflow-wrap: break-word;
+/* 登录文字样式 */
+.prefix-text {
   color: rgba(153, 153, 153, 1);
   font-size: 26rpx;
   font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
   line-height: 36rpx;
 }
 
-/* 登录链接文字 */
-.login-link-text {
-  overflow-wrap: break-word;
+.link-text {
   color: rgba(255, 158, 0, 1);
   font-size: 26rpx;
   font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
   line-height: 36rpx;
 }
