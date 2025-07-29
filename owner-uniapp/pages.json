@@ -22,7 +22,7 @@
       }
     },
     {
-      "path": "pages/login/phone/index",
+      "path": "pages/login/sms/index",
       "style": {
         "navigationBarTitleText": "登录",
         "navigationStyle": "custom"
