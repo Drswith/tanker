@@ -1,22 +1,3 @@
-/* 认证页面主容器 */
-.auth-page {
-  position: relative;
-  background: linear-gradient(326deg, #FFD100 0%, #FFA500 100%);
-  background-size: 100% 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
-
-/* 头部Logo */
-.header-logo {
-  width: 650rpx;
-  height: 514rpx;
-  position: absolute;
-  top: -104rpx;
-  right: -244rpx;
-}
-
 /* 表单容器 */
 .form-container {
   background-color: #fff;
