@@ -18,7 +18,7 @@
 			11业主核验不通过12 已评价(用于前端查询) 13确认收货后待邮寄gps 14已邮寄 
 			15后台确认收到gps订单结束 16已提交资料待退款 17已退款已取消 -->
 			<scroll-view class="order" scroll-y @scroll="onScroll">
-				<view class="card" v-for="(item, index) in orderDataList" ::key="index">
+				<view class="card" v-for="(item, index) in orderDataList" :key="index">
 					<view class="treetop" v-if="currentTab == 1"
 						style="background: linear-gradient(to right, #0975FF, #62CBFD);"><text>待接单</text></view>
 					<view class="treetop" v-if="currentTab == 0"
