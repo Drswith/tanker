@@ -98,10 +98,6 @@ export default {
   </view>
 </template>
 
-<style lang="scss" scoped>
-.live{
-  width: 100%;
-  height: 100%;
-  padding: 0 20rpx;
-}
+<style scoped>
+@import './index.rpx.css';
 </style>

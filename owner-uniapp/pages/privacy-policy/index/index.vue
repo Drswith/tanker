@@ -46,8 +46,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum
   </view>
 </template>
 
-<style lang="scss" scoped>
-.container {
-  padding: 40rpx;
-}
+<style scoped>
+@import './index.rpx.css';
 </style>

@@ -1,0 +1,463 @@
+.page {
+  background-color: rgba(247, 248, 250, 1);
+  position: relative;
+  width: 750rpx;
+  height: 1624rpx;
+  overflow: hidden;
+}
+
+.section_1 {
+  background: url(https://lanhu-oss-2537-2.lanhuapp.com/SketchPnga95e7697e321e1448d85521e94b492c3131c51f01489ec372ae6e0b9aa882bf0)
+    100% no-repeat;
+  background-size: 100% 100%;
+  position: relative;
+  margin: 0 26rpx 0 76rpx;
+  padding: 28rpx 4rpx 202rpx 0;
+}
+
+.group_1 {
+  margin-left: -12rpx;
+}
+
+.text_1 {
+  overflow-wrap: break-word;
+  color: rgba(255, 255, 255, 1);
+  font-size: 30rpx;
+  letter-spacing: -0.30000001192092896px;
+  font-family: SFProText-Semibold;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 36rpx;
+}
+
+.thumbnail_1 {
+  width: 34rpx;
+  height: 22rpx;
+  margin: 8rpx 0 6rpx 462rpx;
+}
+
+.thumbnail_2 {
+  width: 30rpx;
+  height: 22rpx;
+  margin: 6rpx 0 8rpx 10rpx;
+}
+
+.image_1 {
+  width: 48rpx;
+  height: 22rpx;
+  margin: 6rpx 0 8rpx 10rpx;
+}
+
+.group_2 {
+  width: 566rpx;
+  margin: 66rpx 2rpx 0 76rpx;
+}
+
+.text-group_15 {
+}
+
+.text_2 {
+  overflow-wrap: break-word;
+  color: rgba(51, 51, 51, 1);
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 44rpx;
+  margin-right: 12rpx;
+}
+
+.text_3 {
+  overflow-wrap: break-word;
+  color: rgba(153, 153, 153, 1);
+  font-size: 24rpx;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 34rpx;
+  margin-top: 16rpx;
+}
+
+.thumbnail_3 {
+  width: 16rpx;
+  height: 32rpx;
+  margin: 30rpx 0 32rpx 0;
+}
+
+.section_4 {
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 4px;
+  position: absolute;
+  left: -44rpx;
+  top: 272rpx;
+  width: 686rpx;
+  height: 240rpx;
+  padding: 32rpx 42rpx 26rpx 32rpx;
+}
+
+.text_4 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 44rpx;
+  margin-right: 484rpx;
+}
+
+.list_4 {
+  width: 606rpx;
+  height: 106rpx;
+  margin: 32rpx 0 0 6rpx;
+}
+
+.image-text_32 {
+  margin-right: 58rpx;
+}
+
+.label_1 {
+  width: 54rpx;
+  height: 56rpx;
+  margin: 0 8rpx 0 10rpx;
+}
+
+.text-group_2 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 24rpx;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 34rpx;
+  margin-top: 16rpx;
+}
+
+.image-wrapper_1 {
+  background-color: rgba(216, 216, 216, 1);
+  border-radius: 50%;
+  height: 96rpx;
+  width: 96rpx;
+  position: absolute;
+  left: -44rpx;
+  top: 128rpx;
+}
+
+.label_2 {
+  width: 96rpx;
+  height: 96rpx;
+}
+
+.section_5 {
+  background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/d0e791982d524819901b94d7cc0a02b5_mergeImage.png);
+  border-radius: 48px;
+  position: relative;
+  width: 686rpx;
+  align-self: center;
+  margin-top: 110rpx;
+  padding: 0 48rpx 0 124rpx;
+}
+
+.text-wrapper_5 {
+  margin: 24rpx 0 34rpx 0;
+}
+
+.text_5 {
+  overflow-wrap: break-word;
+  color: rgba(255, 255, 255, 1);
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 44rpx;
+  margin-right: 50rpx;
+}
+
+.text_6 {
+  overflow-wrap: break-word;
+  color: rgba(255, 255, 255, 1);
+  font-size: 24rpx;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 34rpx;
+  margin-top: 24rpx;
+}
+
+.text-wrapper_2 {
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 24px;
+  margin: 80rpx 0 24rpx 38rpx;
+  padding: 10rpx 24rpx 12rpx 24rpx;
+}
+
+.text_7 {
+  overflow-wrap: break-word;
+  color: rgba(255, 158, 0, 1);
+  font-size: 24rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 34rpx;
+}
+
+.image_2 {
+  width: 148rpx;
+  height: 160rpx;
+  margin-left: 6rpx;
+}
+
+.image_3 {
+  position: absolute;
+  left: -32rpx;
+  top: -26rpx;
+  width: 174rpx;
+  height: 202rpx;
+}
+
+.section_6 {
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 4px;
+  width: 686rpx;
+  align-self: center;
+  margin-top: 24rpx;
+  padding: 32rpx 462rpx 48rpx 32rpx;
+}
+
+.text_8 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 44rpx;
+  margin-right: 64rpx;
+}
+
+.image-text_33 {
+  width: 176rpx;
+  margin: 48rpx 0 0 16rpx;
+}
+
+.thumbnail_4 {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.text-group_3 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 40rpx;
+}
+
+.image-text_34 {
+  width: 176rpx;
+  margin: 62rpx 0 0 16rpx;
+}
+
+.thumbnail_5 {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.text-group_4 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 40rpx;
+}
+
+.image-text_35 {
+  width: 176rpx;
+  margin: 64rpx 0 0 16rpx;
+}
+
+.thumbnail_6 {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.text-group_5 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 40rpx;
+}
+
+.image-text_36 {
+  width: 176rpx;
+  margin: 64rpx 0 0 16rpx;
+}
+
+.thumbnail_9 {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.text-group_14 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 40rpx;
+}
+
+.image-text_37 {
+  width: 176rpx;
+  margin: 64rpx 0 0 16rpx;
+}
+
+.thumbnail_7 {
+  width: 40rpx;
+  height: 38rpx;
+  margin-bottom: 2rpx;
+}
+
+.text-group_6 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 40rpx;
+}
+
+.image-text_38 {
+  width: 176rpx;
+  margin: 64rpx 0 0 16rpx;
+}
+
+.thumbnail_8 {
+  width: 40rpx;
+  height: 34rpx;
+  margin: 2rpx 0 4rpx 0;
+}
+
+.text-group_7 {
+  overflow-wrap: break-word;
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 40rpx;
+}
+
+.section_7 {
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 8px 8px 0px 0px;
+  width: 750rpx;
+  margin-top: 52rpx;
+  padding: 22rpx 76rpx 12rpx 74rpx;
+}
+
+.image-text_39 {
+}
+
+.label_3 {
+  width: 46rpx;
+  height: 46rpx;
+  margin: 0 4rpx 0 6rpx;
+}
+
+.text-group_8 {
+  overflow-wrap: break-word;
+  color: rgba(153, 153, 153, 1);
+  font-size: 28rpx;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 40rpx;
+  margin-top: 8rpx;
+}
+
+.image-text_40 {
+  margin: 2rpx 0 2rpx 0;
+}
+
+.label_4 {
+  width: 44rpx;
+  height: 42rpx;
+  align-self: center;
+}
+
+.text-group_9 {
+  overflow-wrap: break-word;
+  color: rgba(153, 153, 153, 1);
+  font-size: 24rpx;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 34rpx;
+  margin-top: 14rpx;
+}
+
+.image-text_41 {
+  margin-bottom: 2rpx;
+}
+
+.image_4 {
+  width: 38rpx;
+  height: 42rpx;
+  margin: 0 30rpx 0 28rpx;
+}
+
+.text-group_10 {
+  overflow-wrap: break-word;
+  color: rgba(255, 158, 0, 1);
+  font-size: 24rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 34rpx;
+  margin-top: 16rpx;
+}
+
+.image-text_42 {
+  margin-bottom: 2rpx;
+}
+
+.image_5 {
+  width: 40rpx;
+  height: 46rpx;
+  align-self: center;
+}
+
+.text-group_11 {
+  overflow-wrap: break-word;
+  color: rgba(153, 153, 153, 1);
+  font-size: 24rpx;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 34rpx;
+  margin-top: 12rpx;
+}
