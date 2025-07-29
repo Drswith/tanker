@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "paths": {
+      "@/common/*": ["common/*"],
+      "@/components/*": ["components/*"],
+      "@/pages/*": ["pages/*"],
+      "@/utils/*": ["utils/*"]
+    },
+    "types": [
+      "@dcloudio/types",
+      "miniprogram-api-typings",
+      "mini-types"
+    ],
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipDefaultLibCheck": false
+  },
+  "include": [
+    "common/**/*",
+    "components/**/*",
+    "pages/**/*",
+    "utils/**/*",
+    "App.vue",
+    "main.js",
+    "pages.json",
+    "manifest.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "uni_modules/**/*",
+    "unpackage/**/*"
+  ],
+  "vueCompilerOptions": {
+    "target": 2
+  }
+}

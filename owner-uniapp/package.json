@@ -1,1 +1,27 @@
-{}
+{
+  "name": "owner-uniapp",
+  "version": "1.0.0",
+  "author": "",
+  "keywords": [],
+  "scripts": {
+    "dev": "echo \"Error: 请使用 HBuilderX 开发项目\" && exit 1",
+    "build": "echo \"Error: 请使用 HBuilderX 构建项目\" && exit 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.15.0",
+    "@antfu/ni": "^0.21.12",
+    "@dcloudio/types": "^3.0.4",
+    "@uni-helper/eslint-config": "^0.4.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-format": "^1.0.1",
+    "mini-types": "*",
+    "miniprogram-api-typings": "*",
+    "typescript": "^5.7.2"
+  },
+  "resolutions": {
+    "**/eslint-processor-vue-blocks/@vue/compiler-sfc": "^3.3.0",
+    "@babel/runtime": "~7.17.9"
+  }
+}
