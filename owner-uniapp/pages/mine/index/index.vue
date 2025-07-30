@@ -1,31 +1,33 @@
 <script>
+import { userApi } from '@/api/user'
+
 export default {
   data() {
     return {
       orderStatusList: [
         {
           icon:
-            'https://lanhu-oss-2537-2.lanhuapp.com/SketchPng2397a309bfdd2c470c051fc9eada3e75220596728e7d57a7b2f91c006287a40e',
+            '/static/images/mine-wait.png',
           label: '待接单',
         },
         {
           icon:
-            'https://lanhu-oss-2537-2.lanhuapp.com/SketchPng55dd74827c169a5be51f7fbe1ddb7773f0d19ecc56d59a8dd77b557c79516c13',
+            '/static/images/mine-sign.png',
           label: '待签署',
         },
         {
           icon:
-            'https://lanhu-oss-2537-2.lanhuapp.com/SketchPng90a751f8f31d31d87d05a10a63776a29c64f099c85a269f2b87ba72977afdfec',
+            '/static/images/mine-signed.png',
           label: '待签署',
         },
         {
           icon:
-            'https://lanhu-oss-2537-2.lanhuapp.com/SketchPngb4be2172c087f0f90da85b3ae34ad4f5bdc4289502591f377baa2a08946d9d5a',
+            '/static/images/mine-trans.png',
           label: '运输中',
         },
         {
           icon:
-            'https://lanhu-oss-2537-2.lanhuapp.com/SketchPng8075be52a3e8361eecafb11cbee4ad9c489246763981c610d0b03436ecd4a344',
+            '/static/images/mine-finished.png',
           label: '已完成',
         },
       ],
