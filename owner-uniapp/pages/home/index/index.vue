@@ -1,5 +1,5 @@
 <script>
-import { orderApi } from '@/api'
+import { mapApi, orderApi } from '@/api'
 // #ifdef H5
 let mapObj = null // 地图实例
 let agriculture = null // 图标样式实例
@@ -134,11 +134,12 @@ export default {
     // 获取地图坐标数据
     async getMap() {
       try {
-        const maps = await this.httpApi.usageMapCoordinates({})
-        this.latitude = Number(maps.data[0]?.position[0]) || this.latitude
-        this.longitude = Number(maps.data[0]?.position[1]) || this.longitude
+        const data = await mapApi.getCoordinates({})
+        console.log('地图坐标数据', data)
+        this.latitude = Number(data[0]?.position[0]) || this.latitude
+        this.longitude = Number(data[0]?.position[1]) || this.longitude
 
-        this.iconItem = maps.data.map((item, index) => {
+        this.iconItem = data.map((item, index) => {
           const position = [
             Number(item.position[0]),
             Number(item.position[1]),
@@ -173,7 +174,6 @@ export default {
     // 获取订单数据
     async getData() {
       try {
-        // const data = await this.httpApi.usageCurrentOrder({
         const data = await orderApi.getCurrentOrder({
           page: this.page,
           size: this.size,
