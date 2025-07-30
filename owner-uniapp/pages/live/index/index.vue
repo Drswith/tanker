@@ -15,26 +15,6 @@ export default {
           name: '实况1',
           src: 'https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/2minute-demo.mp4',
         },
-        {
-          id: 2,
-          name: '实况2',
-          src: 'https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/2minute-demo.mp4',
-        },
-        {
-          id: 3,
-          name: '实况3',
-          src: 'https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/2minute-demo.mp4',
-        },
-        {
-          id: 4,
-          name: '实况4',
-          src: 'https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/2minute-demo.mp4',
-        },
-        {
-          id: 5,
-          name: '实况5',
-          src: 'https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/2minute-demo.mp4',
-        },
       ],
     }
   },
