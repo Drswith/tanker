@@ -1,0 +1,91 @@
+/* 合并登录页面特有样式 */
+
+/* 登录方式切换链接 */
+.login-switch-links {
+  width: 100%;
+  margin-top: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.switch-link {
+  font-size: 28rpx;
+  color: #FF9500;
+  font-weight: 400;
+  line-height: 40rpx;
+  text-decoration: none;
+}
+
+/* 获取验证码按钮 */
+.get-code-btn {
+  color: #FF9500;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 40rpx;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 忘记密码 */
+.forgot-password-container {
+  margin-bottom: 32rpx;
+}
+
+.forgot-password-link {
+  font-size: 28rpx;
+  color: #999999;
+  font-weight: 400;
+  line-height: 40rpx;
+}
+
+/* 协议条款 */
+.agreement-container {
+  margin-top: 48rpx;
+  align-items: flex-start;
+}
+
+.radio-container {
+  margin-right: 16rpx;
+  margin-top: 2rpx;
+}
+
+.radio-icon {
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid #CCCCCC;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.radio-icon.checked {
+  border-color: #FF9500;
+  background-color: #FF9500;
+}
+
+.radio-dot {
+  width: 16rpx;
+  height: 16rpx;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+}
+
+.agreement-text-container {
+  flex: 1;
+  align-items: flex-start;
+}
+
+.agreement-text {
+  font-size: 22rpx;
+  color: #999999;
+  line-height: 34rpx;
+}
+
+.agreement-link {
+  font-size: 22rpx;
+  color: #FF9500;
+  line-height: 34rpx;
+  margin-left: 8rpx;
+}
+

@@ -215,7 +215,7 @@ export default {
     // 跳转到登录页面
     navigateToLogin() {
       uni.navigateTo({
-        url: '/pages/login/phone/index',
+        url: '/pages/login/index/index',
       })
     },
   },
@@ -224,16 +224,13 @@ export default {
 
 <template>
   <view class="auth-page flex-col">
-    <!--  -->
-    <view class="header-background flex-col">
+    <!-- 头部 -->
+    <view class="header-container flex-col">
       <image
         class="header-logo"
         referrerpolicy="no-referrer"
         src="https://lanhu-oss-2537-2.lanhuapp.com/SketchPnga446dcdee06ac078a46859047640a4fe59b44edf2314c730c3a1a8bdd1ac9bb3"
       />
-    </view>
-
-    <view class="header-container">
       <text class="page-title">
         完善资料
       </text>
@@ -532,5 +529,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
+@import '@/static/css/auth.scss';
 @import './index.rpx.css';
 </style>
