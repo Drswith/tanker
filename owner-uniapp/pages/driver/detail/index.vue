@@ -35,10 +35,39 @@ export default {
     this.routeParams.mode = options.mode || 'view'
     this.pageState.isEditMode = this.routeParams.mode === 'edit'
 
-    this.loadDriverDetail()
+    // 如果有传递的司机数据，直接使用
+    if (options.driverData) {
+      try {
+        const driverData = JSON.parse(decodeURIComponent(options.driverData))
+        this.mapDriverData(driverData)
+      } catch (error) {
+        console.error('解析司机数据失败:', error)
+        this.loadDriverDetail()
+      }
+    } else {
+      this.loadDriverDetail()
+    }
   },
 
   methods: {
+    // 映射司机数据
+    mapDriverData(driverData) {
+      this.driverDetail = {
+        id: driverData.id,
+        name: driverData.realName || driverData.nickname || '未知',
+        phone: driverData.mobile || '未知',
+        rating: driverData.score || 0,
+        orderCount: 0, // 接口暂无此字段，设为默认值
+        avatar: driverData.avatar || '/static/images/default-avatar.png',
+        plateNumber: driverData.carNumber || '未知',
+        vehicleType: driverData.type || '未知',
+        vehicleWeight: driverData.carLoad ? `${driverData.carLoad}吨` : '未知',
+        vehiclePhoto: driverData.imgList && driverData.imgList.length > 0 ? driverData.imgList[0] : '/static/images/fallback-image.png',
+        // 保留原始数据
+        originalData: driverData
+      }
+    },
+
     // 加载司机详情
     async loadDriverDetail() {
       try {

@@ -1,31 +1,11 @@
 <script>
+import { driverApi } from '@/api/driver'
+
 export default {
   data() {
     return {
       // 司机列表数据
-      driverList: [
-        {
-          id: 1,
-          name: '章鱼哥',
-          phone: '195****1234',
-          rating: 5.0,
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 2,
-          name: '海绵宝宝',
-          phone: '195****1234',
-          rating: 5.0,
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 3,
-          name: '红红',
-          phone: '195****1234',
-          rating: 5.0,
-          avatar: '/static/images/default-avatar.png',
-        },
-      ],
+      driverList: [],
 
       // 页面状态
       pageState: {
@@ -43,11 +23,27 @@ export default {
     async loadDriverList() {
       try {
         this.pageState.isLoading = true
-        // TODO: 调用获取司机列表接口
-        // const response = await this.httpApi.getDriverList();
-        // this.driverList = response.data;
+        const data = await driverApi.getDriverList()
+        console.log('司机列表数据:', data)
+
+        // 将接口数据映射到页面显示格式
+        if (data && Array.isArray(data)) {
+          this.driverList = data.map(driver => ({
+            id: driver.id,
+            name: driver.realName || driver.nickname || '未知',
+            phone: driver.mobile || '未知',
+            rating: driver.score || 0,
+            avatar: driver.avatar || '/static/images/default-avatar.png',
+            // 保留原始数据用于详情页面
+            originalData: driver,
+          }))
+        }
+        else {
+          this.driverList = []
+        }
       }
       catch (error) {
+        console.error('加载司机列表失败:', error)
         uni.showToast({
           title: '加载失败，请重试',
           icon: 'none',
@@ -60,22 +56,30 @@ export default {
 
     // 编辑司机
     editDriver(driver) {
-      uni.navigateTo({
-        url: `/pages/driver/detail/index?id=${driver.id}&mode=edit`,
+      uni.showToast({
+        title: '缺少api接口',
+        icon: 'none',
       })
+      // uni.navigateTo({
+      //   url: `/pages/driver/detail/index?id=${driver.id}&mode=edit&driverData=${encodeURIComponent(JSON.stringify(driver.originalData))}`,
+      // })
     },
 
     // 删除司机
     deleteDriver(driver) {
-      uni.showModal({
-        title: '确认删除',
-        content: `确定要删除司机"${driver.name}"吗？`,
-        success: (res) => {
-          if (res.confirm) {
-            this.confirmDeleteDriver(driver)
-          }
-        },
+      uni.showToast({
+        title: '缺少api接口',
+        icon: 'none',
       })
+      // uni.showModal({
+      //   title: '确认删除',
+      //   content: `确定要删除司机"${driver.name}"吗？`,
+      //   success: (res) => {
+      //     if (res.confirm) {
+      //       this.confirmDeleteDriver(driver)
+      //     }
+      //   },
+      // })
     },
 
     // 确认删除司机
@@ -106,7 +110,7 @@ export default {
     // 查看司机详情
     viewDriverDetail(driver) {
       uni.navigateTo({
-        url: `/pages/driver/detail/index?id=${driver.id}`,
+        url: `/pages/driver/detail/index?id=${driver.id}&driverData=${encodeURIComponent(JSON.stringify(driver.originalData))}`,
       })
     },
   },
@@ -115,8 +119,15 @@ export default {
 
 <template>
   <view class="driver-list-page">
+    <!-- 加载状态 -->
+    <view v-if="pageState.isLoading" class="loading-container">
+      <text class="loading-text">
+        加载中...
+      </text>
+    </view>
+
     <!-- 司机列表 -->
-    <view class="driver-list-container">
+    <view v-else-if="driverList.length > 0" class="driver-list-container">
       <view
         v-for="driver in driverList"
         :key="driver.id"
@@ -168,6 +179,13 @@ export default {
           </view>
         </view>
       </view>
+    </view>
+
+    <!-- 空数据状态 -->
+    <view v-else class="empty-container">
+      <text class="empty-text">
+        暂无司机数据
+      </text>
     </view>
   </view>
 </template>
@@ -275,5 +293,31 @@ export default {
 .delete-btn {
   background-color: #ff4757;
   color: #fff;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 空数据状态 */
+.empty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
 }
 </style>
