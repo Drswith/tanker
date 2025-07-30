@@ -8,6 +8,27 @@
       }
     },
     {
+      "path": "pages/driver/list/index",
+      "style": {
+        "navigationBarTitleText": "我的司机",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/driver/add/index",
+      "style": {
+        "navigationBarTitleText": "新增司机",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/driver/detail/index",
+      "style": {
+        "navigationBarTitleText": "司机信息",
+        "navigationStyle": "default"
+      }
+    },
+    {
       "path": "pages/invite/index/index",
       "style": {
         "navigationBarTitleText": "邀请好友",
@@ -18,7 +39,7 @@
       "path": "pages/invite-record/index/index",
       "style": {
         "navigationBarTitleText": "邀请记录",
-        "navigationStyle": "custom"
+        "navigationStyle": "default"
       }
     },
     {
