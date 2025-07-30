@@ -10,11 +10,11 @@ import { UniAxios } from './uniAxios'
 const http = new UniAxios({
   baseURL: baseUrl,
   timeout: 60000,
-  showLoading: true,
+  showLoading: false,
   loadingText: '加载中...',
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 })
 
 // 添加请求拦截器 - 处理token
@@ -32,7 +32,7 @@ http.interceptors.request.use(
     if (config.method === 'GET' && config.preventCache !== false) {
       config.data = {
         ...config.data,
-        _t: Date.now()
+        _t: Date.now(),
       }
     }
 
@@ -40,7 +40,7 @@ http.interceptors.request.use(
     if (process.env.NODE_ENV === 'development') {
       console.log(`[HTTP Request] ${config.method?.toUpperCase()} ${config.url}`, {
         data: config.data,
-        headers: config.headers
+        headers: config.headers,
       })
     }
 
@@ -49,7 +49,7 @@ http.interceptors.request.use(
   (error) => {
     console.error('[HTTP Request Error]', error)
     return Promise.reject(error)
-  }
+  },
 )
 
 // 添加响应拦截器 - 处理业务逻辑
@@ -68,19 +68,19 @@ http.interceptors.response.use(
       if (data.code === 401) {
         uni.showToast({
           title: data.errMsg || '请先登录!',
-          icon: 'none'
+          icon: 'none',
         })
-        
+
         // 清除本地token
         uni.removeStorageSync('token')
-        
+
         // 延迟跳转到登录页
         setTimeout(() => {
           uni.navigateTo({
-            url: '/pages/login/index/index'
+            url: '/pages/login/index/index',
           })
         }, 800)
-        
+
         return Promise.reject(new Error(data.errMsg || '未授权'))
       }
 
@@ -88,7 +88,7 @@ http.interceptors.response.use(
       if (data.code === 403) {
         uni.showToast({
           title: data.errMsg || '没有权限访问',
-          icon: 'none'
+          icon: 'none',
         })
         return Promise.reject(new Error(data.errMsg || '禁止访问'))
       }
@@ -97,7 +97,7 @@ http.interceptors.response.use(
       if (data.code === 404) {
         uni.showToast({
           title: data.errMsg || '请求的资源不存在',
-          icon: 'none'
+          icon: 'none',
         })
         return Promise.reject(new Error(data.errMsg || '资源不存在'))
       }
@@ -106,7 +106,7 @@ http.interceptors.response.use(
       if (data.code === 500) {
         uni.showToast({
           title: data.errMsg || '服务器内部错误',
-          icon: 'none'
+          icon: 'none',
         })
         return Promise.reject(new Error(data.errMsg || '服务器错误'))
       }
@@ -116,7 +116,7 @@ http.interceptors.response.use(
         const errorMsg = data.errMsg || data.message || '请求失败'
         uni.showToast({
           title: errorMsg,
-          icon: 'none'
+          icon: 'none',
         })
         return Promise.reject(new Error(errorMsg))
       }
@@ -135,7 +135,7 @@ http.interceptors.response.use(
     if (!error.response) {
       uni.showToast({
         title: '网络连接失败，请检查网络',
-        icon: 'none'
+        icon: 'none',
       })
       return Promise.reject(new Error('网络连接失败'))
     }
@@ -184,29 +184,29 @@ http.interceptors.response.use(
 
     uni.showToast({
       title: message,
-      icon: 'none'
+      icon: 'none',
     })
 
     return Promise.reject(error)
-  }
+  },
 )
 
 // 创建不同配置的实例
-export const httpWithoutLoading = http.create({
-  showLoading: false
+export const httpWithLoading = http.create({
+  showLoading: true,
 })
 
 export const httpFormData = http.create({
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  }
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
 })
 
 export const httpUpload = http.create({
   headers: {
-    'Content-Type': 'multipart/form-data'
+    'Content-Type': 'multipart/form-data',
   },
-  timeout: 120000 // 上传文件超时时间更长
+  timeout: 120000, // 上传文件超时时间更长
 })
 
 // 便捷方法
@@ -215,7 +215,7 @@ export const request = {
   get(url, params = {}, config = {}) {
     return http.get(url, {
       data: params,
-      ...config
+      ...config,
     })
   },
 
@@ -249,32 +249,34 @@ export const request = {
         formData,
         header: {
           ...httpUpload.defaults.headers,
-          Authorization: uni.getStorageSync('token')
+          Authorization: uni.getStorageSync('token'),
         },
         success: (res) => {
           try {
             const data = JSON.parse(res.data)
             if (data.code === 200) {
               resolve(data.data)
-            } else {
+            }
+            else {
               uni.showToast({
                 title: data.errMsg || '上传失败',
-                icon: 'none'
+                icon: 'none',
               })
               reject(new Error(data.errMsg || '上传失败'))
             }
-          } catch (error) {
+          }
+          catch (error) {
             reject(new Error('响应数据解析失败'))
           }
         },
         fail: (error) => {
           uni.showToast({
             title: '上传失败',
-            icon: 'none'
+            icon: 'none',
           })
           reject(error)
         },
-        ...config
+        ...config,
       })
 
       // 返回上传任务，支持进度监听和取消
@@ -290,7 +292,7 @@ export const request = {
   // 展开响应
   spread(callback) {
     return UniAxios.spread(callback)
-  }
+  },
 }
 
 // 默认导出

@@ -6,17 +6,7 @@ import { request } from '@/utils/http'
 export const userApi = {
   // 登录
   login(data) {
-    return request.post('/api/usage/login', data)
-  },
-
-  // 获取用户信息
-  getUserInfo() {
-    return request.get('/api/user/info')
-  },
-
-  // 更新用户信息
-  updateUserInfo(data) {
-    return request.put('/api/user/info', data)
+    return request.post('/api/auth/login', data)
   },
 }
 
