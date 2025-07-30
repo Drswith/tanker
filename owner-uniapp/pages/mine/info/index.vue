@@ -1,4 +1,6 @@
 <script>
+import { userApi } from '@/api/user'
+
 export default {
   data() {
     return {
@@ -7,15 +9,10 @@ export default {
         avatar: '', // 头像
         contactPerson: '秦泰', // 联系人姓名
         phoneNumber: '19512344321', // 手机号
-        companyName: '穿石科技', // 公司全称
-        companyShortName: '穿石', // 公司简称
-        companyAddress: '浙江省xxxxxxxxx', // 公司地址
-        businessLicense: '', // 营业执照
       },
 
       // 上传文件列表
       avatarFileList: [],
-      licenseFileList: [],
 
       // 页面状态
       pageState: {
@@ -25,7 +22,7 @@ export default {
       // 常量配置
       constants: {
         PHONE_REGEX: /^1[3-9]\d{9}$/, // 手机号正则
-        REQUIRED_FIELDS: ['contactPerson', 'phoneNumber', 'companyName'], // 必填字段
+        REQUIRED_FIELDS: ['contactPerson', 'phoneNumber'], // 必填字段
       },
 
       // 表单验证规则
@@ -55,28 +52,33 @@ export default {
             trigger: ['blur', 'change'],
           },
         ],
-        companyName: [
-          {
-            required: true,
-            message: '请输入公司全称',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        companyShortName: [
-          {
-            required: false,
-            message: '请输入公司简称',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        companyAddress: [
-          {
-            required: false,
-            message: '请输入公司地址',
-            trigger: ['blur', 'change'],
-          },
-        ],
       },
+    }
+  },
+
+  onLoad(options) {
+    // 接收传递过来的用户数据
+    if (options.userData) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(options.userData))
+        // 适配用户数据到表单字段
+        this.formData = {
+          avatar: userData.avatar || '',
+          contactPerson: userData.nickname || userData.username || '',
+          phoneNumber: userData.mobile || '',
+        }
+
+        // 如果有头像，设置头像文件列表
+        if (userData.avatar) {
+          this.avatarFileList = [{
+            url: userData.avatar,
+            name: 'avatar',
+          }]
+        }
+      }
+      catch (error) {
+        console.error('解析用户数据失败:', error)
+      }
     }
   },
 
@@ -100,25 +102,6 @@ export default {
       this.formData.avatar = ''
     },
 
-    // 营业执照上传后处理
-    afterReadLicense(event) {
-      const { file } = event
-      this.licenseFileList = [file]
-      this.formData.businessLicense = file.url || file.path
-
-      // TODO: 上传到服务器
-      uni.showToast({
-        title: '营业执照上传成功',
-        icon: 'success',
-      })
-    },
-
-    // 删除营业执照
-    deleteLicense() {
-      this.licenseFileList = []
-      this.formData.businessLicense = ''
-    },
-
     // 表单验证
     validateForm() {
       return this.$refs.uForm.validate()
@@ -134,20 +117,24 @@ export default {
 
         this.pageState.isLoading = true
 
-        // TODO: 调用保存信息接口
-        // await this.httpApi.saveUserInfo(this.formData);
+        // 构建更新数据，映射表单字段到接口字段
+        const updateData = {
+          avatar: this.formData.avatar,
+          nickname: this.formData.contactPerson,
+          mobile: this.formData.phoneNumber,
+        }
+
+        // 调用更新用户信息接口
+        await userApi.updateMyProfile(updateData)
 
         uni.showToast({
           title: '保存成功',
           icon: 'success',
         })
-
-        // 延迟返回上一页
-        setTimeout(() => {
-          this.navigateBack()
-        }, 1500)
+        this.navigateBack()
       }
       catch (error) {
+        console.error('更新用户信息失败:', error)
         uni.showToast({
           title: error.message || '保存失败，请重试',
           icon: 'none',
@@ -267,125 +254,6 @@ export default {
               maxlength="11"
               type="number"
             />
-          </view>
-        </u-form-item>
-
-        <!-- 公司全称 -->
-        <u-form-item
-          prop="companyName"
-          :border-bottom="false"
-          class="form-item-custom"
-        >
-          <template #label>
-            <text class="field-label">
-              公司全称
-            </text>
-          </template>
-          <view class="input-field flex-col">
-            <u--input
-              v-model="formData.companyName"
-              placeholder="穿石科技"
-              placeholder-style="color: #999999; font-size: 28rpx;"
-              border="none"
-              :custom-style="{
-                backgroundColor: 'transparent',
-                padding: '0',
-                fontSize: '28rpx',
-                lineHeight: '40rpx',
-              }"
-            />
-          </view>
-        </u-form-item>
-
-        <!-- 公司简称 -->
-        <u-form-item
-          prop="companyShortName"
-          :border-bottom="false"
-          class="form-item-custom"
-        >
-          <template #label>
-            <text class="field-label">
-              公司简称
-            </text>
-          </template>
-          <view class="input-field flex-col">
-            <u--input
-              v-model="formData.companyShortName"
-              placeholder="穿石"
-              placeholder-style="color: #999999; font-size: 28rpx;"
-              border="none"
-              :custom-style="{
-                backgroundColor: 'transparent',
-                padding: '0',
-                fontSize: '28rpx',
-                lineHeight: '40rpx',
-              }"
-            />
-          </view>
-        </u-form-item>
-
-        <!-- 公司地址 -->
-        <u-form-item
-          prop="companyAddress"
-          :border-bottom="false"
-          class="form-item-custom"
-        >
-          <template #label>
-            <text class="field-label">
-              公司地址
-            </text>
-          </template>
-          <view class="input-field flex-col">
-            <u--input
-              v-model="formData.companyAddress"
-              placeholder="浙江省xxxxxxxxx"
-              placeholder-style="color: #999999; font-size: 28rpx;"
-              border="none"
-              :custom-style="{
-                backgroundColor: 'transparent',
-                padding: '0',
-                fontSize: '28rpx',
-                lineHeight: '40rpx',
-              }"
-            />
-          </view>
-        </u-form-item>
-
-        <!-- 营业执照上传 -->
-        <u-form-item
-          prop="businessLicense"
-          :border-bottom="false"
-          class="form-item-custom"
-        >
-          <template #label>
-            <text class="field-label">
-              营业执照
-            </text>
-          </template>
-          <view class="upload-container">
-            <view class="upload-item-wrapper">
-              <u-upload
-                ref="licenseUpload"
-                :file-list="licenseFileList"
-                :max-count="1"
-                :width="320"
-                :height="200"
-                @afterRead="afterReadLicense"
-                @delete="deleteLicense"
-              >
-                <template #default>
-                  <view class="upload-slot">
-                    <image
-                      class="upload-icon"
-                      src="/static/images/upload-plus.png"
-                    />
-                    <text class="upload-slot-text">
-                      上传营业执照
-                    </text>
-                  </view>
-                </template>
-              </u-upload>
-            </view>
           </view>
         </u-form-item>
       </u--form>

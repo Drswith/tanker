@@ -13,4 +13,9 @@ export const userApi = {
   getMyProfile(data) {
     return request.get('/api/users/me/profile', data)
   },
+
+  // 更新用户信息
+  updateMyProfile(data) {
+    return request.put('/api/users/me', data)
+  },
 }

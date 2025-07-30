@@ -4,6 +4,17 @@ import { userApi } from '@/api/user'
 export default {
   data() {
     return {
+      userInfo: {
+        id: null,
+        username: '',
+        nickname: '',
+        mobile: '',
+        avatar: '',
+        inviter: '',
+      },
+      pageState: {
+        isLoading: false,
+      },
       orderStatusList: [
         {
           icon:
@@ -34,27 +45,73 @@ export default {
       constants: {},
     }
   },
-  methods: {},
+  onShow() {
+    this.loadUserProfile()
+  },
+  methods: {
+    // 加载用户信息
+    async loadUserProfile() {
+      try {
+        this.pageState.isLoading = true
+        const response = await userApi.getMyProfile()
+
+        if (response) {
+          this.userInfo = {
+            id: response.id || null,
+            username: response.username || '',
+            nickname: response.nickname || '',
+            mobile: response.mobile || '',
+            avatar: response.avatar || '/static/images/mine-avatar.png',
+            inviter: response.inviter || '',
+          }
+        }
+      }
+      catch (error) {
+        console.error('加载用户信息失败:', error)
+        uni.showToast({
+          title: '加载用户信息失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.pageState.isLoading = false
+      }
+    },
+
+    // 跳转到用户信息页面
+    goToUserInfo() {
+      uni.navigateTo({
+        url: `/pages/mine/info/index?userData=${encodeURIComponent(JSON.stringify(this.userInfo))}`,
+      })
+    },
+  },
 }
 </script>
 
 <template>
   <view class="page flex-col">
-    <view class="header-section flex-col">
-      <view class="user-info flex-row justify-between">
+    <!-- 加载状态 -->
+    <view v-if="pageState.isLoading" class="loading-container flex-col">
+      <text class="loading-text">
+        加载中...
+      </text>
+    </view>
+
+    <view v-else class="header-section flex-col">
+      <view class="user-info flex-row justify-between" @click="goToUserInfo">
         <view class="avatar-wrapper flex-col">
           <image
             class="user-avatar"
             referrerpolicy="no-referrer"
-            src="/static/images/mine-avatar.png"
+            :src="userInfo.avatar || '/static/images/mine-avatar.png'"
           />
         </view>
         <view class="user-details flex-col">
           <text class="username">
-            用户名称
+            {{ userInfo.nickname || userInfo.username || '用户名称' }}
           </text>
-          <text class="user-id">
-            1234455656
+          <text class="user-mobile">
+            {{ userInfo.mobile || '暂无手机号' }}
           </text>
         </view>
         <image
@@ -91,7 +148,7 @@ export default {
           邀请好友
         </text>
         <text class="invite-code">
-          邀请码：123445
+          邀请码：{{ userInfo.inviter || '暂无邀请码' }}
         </text>
       </view>
       <view class="invite-button flex-col">
@@ -175,4 +232,17 @@ export default {
 
 <style scoped lang="scss">
 @import './index.rpx.css';
+
+/* 加载状态样式 */
+.loading-container {
+  padding: 40rpx;
+  align-items: center;
+  justify-content: center;
+  min-height: 200rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
 </style>
