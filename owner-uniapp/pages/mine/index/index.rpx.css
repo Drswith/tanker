@@ -1,13 +1,12 @@
 .page {
   background-color: rgba(247, 248, 250, 1);
   position: relative;
-  width: 750rpx;
-  height: 1624rpx;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
 }
 
 .header-section {
-  background: url(https://lanhu-oss-2537-2.lanhuapp.com/SketchPnga95e7697e321e1448d85521e94b492c3131c51f01489ec372ae6e0b9aa882bf0)
+  background: url("@/static/images/mine-header-bg.png")
     100% no-repeat;
   background-size: 100% 100%;
   position: relative;
@@ -15,43 +14,8 @@
   padding: 28rpx 4rpx 202rpx 0;
 }
 
-.status-bar {
-  margin-left: -12rpx;
-}
-
-.time-text {
-  overflow-wrap: break-word;
-  color: rgba(255, 255, 255, 1);
-  font-size: 30rpx;
-  letter-spacing: -0.30000001192092896px;
-  font-family: SFProText-Semibold;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 36rpx;
-}
-
-.signal-icon {
-  width: 34rpx;
-  height: 22rpx;
-  margin: 8rpx 0 6rpx 462rpx;
-}
-
-.wifi-icon {
-  width: 30rpx;
-  height: 22rpx;
-  margin: 6rpx 0 8rpx 10rpx;
-}
-
-.battery-icon {
-  width: 48rpx;
-  height: 22rpx;
-  margin: 6rpx 0 8rpx 10rpx;
-}
-
 .user-info {
-  width: 566rpx;
-  margin: 66rpx 2rpx 0 76rpx;
+  margin: 100rpx 2rpx 0 76rpx;
 }
 
 .user-details {
@@ -152,7 +116,7 @@
 }
 
 .invite-section {
-  background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/d0e791982d524819901b94d7cc0a02b5_mergeImage.png);
+  background-image: url("/static/images/mine-invite.png");
   border-radius: 48px;
   position: relative;
   width: 686rpx;
