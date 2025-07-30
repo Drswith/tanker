@@ -1,5 +1,5 @@
 <script>
-import baseUrl from '@/utils/baseUrl.js'
+import { messageApi } from '@/api/message'
 
 export default {
   name: '',
@@ -8,6 +8,9 @@ export default {
   props: {},
   data() {
     return {
+      options1: [{
+        text: '删除',
+      }],
       dataList: [
         {
           id: 1,
@@ -42,7 +45,11 @@ export default {
       // this.httpApi.getMsgList(config).then(res => {
       // 	this.$refs.paging.complete(res.data.content);
       // });
-      this.$refs.paging.complete(this.dataList)
+      messageApi.getMessageList(config).then((data) => {
+        console.log('消息', data)
+        this.$refs.paging.complete(data.content)
+      })
+      // this.$refs.paging.complete(this.dataList)
     },
 
     // 点击消息
@@ -58,6 +65,20 @@ export default {
         this.$com.goPageByUrl(item.jumpPath)
       }
     },
+    // 点击消息
+    async handleClickSwipeItem(e) {
+      console.log('点击消息', e)
+      const id = e.name
+      // 删除消息
+      try {
+        await messageApi.deleteMessage(id)
+        console.log('删除消息成功')
+        this.$refs.paging.refresh()
+      }
+      catch (error) {
+        console.log('删除消息失败', error)
+      }
+    },
   },
 }
 </script>
@@ -65,10 +86,14 @@ export default {
 <template>
   <view class="container">
     <z-paging ref="paging" v-model="dataList" @query="queryList">
-      <view class="zpag w-690 mg-x-center mt-30">
-        <view
-          v-for="(item, index) in dataList" :key="index" class="zpag-item mb-27 bg-01 bs-01 br-20"
-          @click="handleClick(item)"
+      <u-swipe-action class="zpag mg-x-center mt-30">
+        <u-swipe-action-item
+          v-for="(item, index) in dataList"
+          :key="index"
+          class="zpag-item mb-27"
+          :options="options1"
+          :name="item.id"
+          @click="handleClickSwipeItem"
         >
           <view class="flex-between pd-20">
             <view class="flex-y-center">
@@ -97,12 +122,11 @@ export default {
               />
             </view>
           </view>
-        </view>
-      </view>
+        </u-swipe-action-item>
+      </u-swipe-action>
     </z-paging>
   </view>
 </template>
 
 <style scoped lang="scss">
-@import './index.rpx.css';
 </style>
