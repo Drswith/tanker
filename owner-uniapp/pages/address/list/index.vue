@@ -106,15 +106,19 @@ export default {
 
     // 删除地址
     deleteAddress(address) {
-      uni.showModal({
-        title: '确认删除',
-        content: `确定要删除地址"${address.contactPerson}"吗？`,
-        success: (res) => {
-          if (res.confirm) {
-            this.confirmDeleteAddress(address)
-          }
-        },
+      uni.showToast({
+        title: '缺少api接口',
+        icon: 'none',
       })
+      // uni.showModal({
+      //   title: '确认删除',
+      //   content: `确定要删除地址"${address.contactPerson}"吗？`,
+      //   success: (res) => {
+      //     if (res.confirm) {
+      //       this.confirmDeleteAddress(address)
+      //     }
+      //   },
+      // })
     },
 
     // 确认删除地址
