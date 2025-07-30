@@ -6,7 +6,7 @@
   overflow: hidden;
 }
 
-.section_1 {
+.header-section {
   background: url(https://lanhu-oss-2537-2.lanhuapp.com/SketchPnga95e7697e321e1448d85521e94b492c3131c51f01489ec372ae6e0b9aa882bf0)
     100% no-repeat;
   background-size: 100% 100%;
@@ -15,11 +15,11 @@
   padding: 28rpx 4rpx 202rpx 0;
 }
 
-.group_1 {
+.status-bar {
   margin-left: -12rpx;
 }
 
-.text_1 {
+.time-text {
   overflow-wrap: break-word;
   color: rgba(255, 255, 255, 1);
   font-size: 30rpx;
@@ -31,33 +31,33 @@
   line-height: 36rpx;
 }
 
-.thumbnail_1 {
+.signal-icon {
   width: 34rpx;
   height: 22rpx;
   margin: 8rpx 0 6rpx 462rpx;
 }
 
-.thumbnail_2 {
+.wifi-icon {
   width: 30rpx;
   height: 22rpx;
   margin: 6rpx 0 8rpx 10rpx;
 }
 
-.image_1 {
+.battery-icon {
   width: 48rpx;
   height: 22rpx;
   margin: 6rpx 0 8rpx 10rpx;
 }
 
-.group_2 {
+.user-info {
   width: 566rpx;
   margin: 66rpx 2rpx 0 76rpx;
 }
 
-.text-group_15 {
+.user-details {
 }
 
-.text_2 {
+.username {
   overflow-wrap: break-word;
   color: rgba(51, 51, 51, 1);
   font-size: 32rpx;
@@ -69,7 +69,7 @@
   margin-right: 12rpx;
 }
 
-.text_3 {
+.user-id {
   overflow-wrap: break-word;
   color: rgba(153, 153, 153, 1);
   font-size: 24rpx;
@@ -80,13 +80,13 @@
   margin-top: 16rpx;
 }
 
-.thumbnail_3 {
+.arrow-icon {
   width: 16rpx;
   height: 32rpx;
   margin: 30rpx 0 32rpx 0;
 }
 
-.section_4 {
+.order-center-section {
   background-color: rgba(255, 255, 255, 1);
   border-radius: 4px;
   position: absolute;
@@ -97,7 +97,7 @@
   padding: 32rpx 42rpx 26rpx 32rpx;
 }
 
-.text_4 {
+.section-title {
   overflow-wrap: break-word;
   color: rgba(77, 78, 70, 1);
   font-size: 32rpx;
@@ -109,23 +109,23 @@
   margin-right: 484rpx;
 }
 
-.list_4 {
+.order-status-list {
   width: 606rpx;
   height: 106rpx;
   margin: 32rpx 0 0 6rpx;
 }
 
-.image-text_32 {
+.order-status-item {
   margin-right: 58rpx;
 }
 
-.label_1 {
+.status-icon {
   width: 54rpx;
   height: 56rpx;
   margin: 0 8rpx 0 10rpx;
 }
 
-.text-group_2 {
+.status-label {
   overflow-wrap: break-word;
   color: rgba(77, 78, 70, 1);
   font-size: 24rpx;
@@ -136,7 +136,7 @@
   margin-top: 16rpx;
 }
 
-.image-wrapper_1 {
+.avatar-wrapper {
   background-color: rgba(216, 216, 216, 1);
   border-radius: 50%;
   height: 96rpx;
@@ -146,12 +146,12 @@
   top: 128rpx;
 }
 
-.label_2 {
+.user-avatar {
   width: 96rpx;
   height: 96rpx;
 }
 
-.section_5 {
+.invite-section {
   background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/d0e791982d524819901b94d7cc0a02b5_mergeImage.png);
   border-radius: 48px;
   position: relative;
@@ -161,11 +161,11 @@
   padding: 0 48rpx 0 124rpx;
 }
 
-.text-wrapper_5 {
+.invite-info {
   margin: 24rpx 0 34rpx 0;
 }
 
-.text_5 {
+.invite-title {
   overflow-wrap: break-word;
   color: rgba(255, 255, 255, 1);
   font-size: 32rpx;
@@ -177,7 +177,7 @@
   margin-right: 50rpx;
 }
 
-.text_6 {
+.invite-code {
   overflow-wrap: break-word;
   color: rgba(255, 255, 255, 1);
   font-size: 24rpx;
@@ -188,14 +188,14 @@
   margin-top: 24rpx;
 }
 
-.text-wrapper_2 {
+.invite-button {
   background-color: rgba(255, 255, 255, 1);
   border-radius: 24px;
   margin: 80rpx 0 24rpx 38rpx;
   padding: 10rpx 24rpx 12rpx 24rpx;
 }
 
-.text_7 {
+.invite-btn-text {
   overflow-wrap: break-word;
   color: rgba(255, 158, 0, 1);
   font-size: 24rpx;
@@ -206,13 +206,13 @@
   line-height: 34rpx;
 }
 
-.image_2 {
+.invite-decoration {
   width: 148rpx;
   height: 160rpx;
   margin-left: 6rpx;
 }
 
-.image_3 {
+.invite-bg-image {
   position: absolute;
   left: -32rpx;
   top: -26rpx;
@@ -220,7 +220,7 @@
   height: 202rpx;
 }
 
-.section_6 {
+.features-section {
   background-color: rgba(255, 255, 255, 1);
   border-radius: 4px;
   width: 686rpx;
@@ -229,50 +229,25 @@
   padding: 32rpx 462rpx 48rpx 32rpx;
 }
 
-.text_8 {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 44rpx;
-  margin-right: 64rpx;
-}
-
-.image-text_33 {
+.feature-item {
   width: 176rpx;
   margin: 48rpx 0 0 16rpx;
 }
 
-.thumbnail_4 {
-  width: 40rpx;
-  height: 40rpx;
-}
-
-.text-group_3 {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 28rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-.image-text_34 {
-  width: 176rpx;
+.feature-item:nth-child(3) {
   margin: 62rpx 0 0 16rpx;
 }
 
-.thumbnail_5 {
+.feature-item:nth-child(n+4) {
+  margin: 64rpx 0 0 16rpx;
+}
+
+.feature-icon {
   width: 40rpx;
   height: 40rpx;
 }
 
-.text-group_4 {
+.feature-label {
   overflow-wrap: break-word;
   color: rgba(77, 78, 70, 1);
   font-size: 28rpx;
@@ -283,93 +258,7 @@
   line-height: 40rpx;
 }
 
-.image-text_35 {
-  width: 176rpx;
-  margin: 64rpx 0 0 16rpx;
-}
-
-.thumbnail_6 {
-  width: 40rpx;
-  height: 40rpx;
-}
-
-.text-group_5 {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 28rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-.image-text_36 {
-  width: 176rpx;
-  margin: 64rpx 0 0 16rpx;
-}
-
-.thumbnail_9 {
-  width: 40rpx;
-  height: 40rpx;
-}
-
-.text-group_14 {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 28rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-.image-text_37 {
-  width: 176rpx;
-  margin: 64rpx 0 0 16rpx;
-}
-
-.thumbnail_7 {
-  width: 40rpx;
-  height: 38rpx;
-  margin-bottom: 2rpx;
-}
-
-.text-group_6 {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 28rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-.image-text_38 {
-  width: 176rpx;
-  margin: 64rpx 0 0 16rpx;
-}
-
-.thumbnail_8 {
-  width: 40rpx;
-  height: 34rpx;
-  margin: 2rpx 0 4rpx 0;
-}
-
-.text-group_7 {
-  overflow-wrap: break-word;
-  color: rgba(77, 78, 70, 1);
-  font-size: 28rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 40rpx;
-}
-
-.section_7 {
+.bottom-navigation {
   box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.1);
   background-color: rgba(255, 255, 255, 1);
   border-radius: 8px 8px 0px 0px;
@@ -378,16 +267,16 @@
   padding: 22rpx 76rpx 12rpx 74rpx;
 }
 
-.image-text_39 {
+.nav-item {
 }
 
-.label_3 {
+.nav-item:nth-child(1) .nav-icon {
   width: 46rpx;
   height: 46rpx;
   margin: 0 4rpx 0 6rpx;
 }
 
-.text-group_8 {
+.nav-item:nth-child(1) .nav-label {
   overflow-wrap: break-word;
   color: rgba(153, 153, 153, 1);
   font-size: 28rpx;
@@ -398,17 +287,17 @@
   margin-top: 8rpx;
 }
 
-.image-text_40 {
+.nav-item:nth-child(2) {
   margin: 2rpx 0 2rpx 0;
 }
 
-.label_4 {
+.nav-item:nth-child(2) .nav-icon {
   width: 44rpx;
   height: 42rpx;
   align-self: center;
 }
 
-.text-group_9 {
+.nav-item:nth-child(2) .nav-label {
   overflow-wrap: break-word;
   color: rgba(153, 153, 153, 1);
   font-size: 24rpx;
@@ -419,17 +308,17 @@
   margin-top: 14rpx;
 }
 
-.image-text_41 {
+.nav-item:nth-child(3) {
   margin-bottom: 2rpx;
 }
 
-.image_4 {
+.nav-item:nth-child(3) .nav-icon {
   width: 38rpx;
   height: 42rpx;
   margin: 0 30rpx 0 28rpx;
 }
 
-.text-group_10 {
+.nav-item:nth-child(3) .nav-label {
   overflow-wrap: break-word;
   color: rgba(255, 158, 0, 1);
   font-size: 24rpx;
@@ -441,17 +330,17 @@
   margin-top: 16rpx;
 }
 
-.image-text_42 {
+.nav-item:nth-child(4) {
   margin-bottom: 2rpx;
 }
 
-.image_5 {
+.nav-item:nth-child(4) .nav-icon {
   width: 40rpx;
   height: 46rpx;
   align-self: center;
 }
 
-.text-group_11 {
+.nav-item:nth-child(4) .nav-label {
   overflow-wrap: break-word;
   color: rgba(153, 153, 153, 1);
   font-size: 24rpx;
