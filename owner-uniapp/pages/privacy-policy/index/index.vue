@@ -46,6 +46,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum
   </view>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 @import './index.rpx.css';
 </style>

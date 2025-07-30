@@ -236,6 +236,6 @@ export default {
   </view>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 @import './index.rpx.css';
 </style>
