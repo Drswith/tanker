@@ -119,6 +119,13 @@
         "navigationBarTitleText": "注册",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/axios-test/index",
+      "style": {
+        "navigationBarTitleText": "Axios API测试",
+        "navigationStyle": "default"
+      }
     }
   ],
   "globalStyle": {
