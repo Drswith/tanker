@@ -8,24 +8,24 @@ export default {
   props: {},
   data() {
     return {
-      options1: [{
+      swipeOptions: [{
         text: '删除',
       }],
       dataList: [
-        {
-          id: 1,
-          title: '测试消息',
-          content: '这是一条测试消息',
-          readStatus: 0,
-          jumpPath: '/pages/home/index/index',
-        },
-        {
-          id: 2,
-          title: '测试消息2',
-          content: '这是一条测试消息2',
-          readStatus: 1,
-          jumpPath: '/pages/home/index/index',
-        },
+        // {
+        //   id: 1,
+        //   title: '测试消息',
+        //   content: '这是一条测试消息',
+        //   readStatus: 0,
+        //   jumpPath: '/pages/home/index/index',
+        // },
+        // {
+        //   id: 2,
+        //   title: '测试消息2',
+        //   content: '这是一条测试消息2',
+        //   readStatus: 1,
+        //   jumpPath: '/pages/home/index/index',
+        // },
       ],
     }
   },
@@ -53,8 +53,17 @@ export default {
     },
 
     // 点击消息
-    handleClick(item) {
-      if (item.readStatus == 0) {
+    async handleClick(item) {
+      console.log('消息', item)
+      if (!item.readStatus) {
+        try {
+          await messageApi.markMessageRead(item.id)
+          console.log('标记消息为已读成功')
+          this.$refs.paging.refresh()
+        }
+        catch (error) {
+          console.log('标记消息为已读失败', error)
+        }
         // this.httpApi.readMsgItem(item.id).then(res => {
         // 	setTimeout(() => {
         // 		this.$refs.paging.refresh();
@@ -65,7 +74,7 @@ export default {
         this.$com.goPageByUrl(item.jumpPath)
       }
     },
-    // 点击消息
+    // 横向滑动点击消息
     async handleClickSwipeItem(e) {
       console.log('点击消息', e)
       const id = e.name
@@ -91,11 +100,11 @@ export default {
           v-for="(item, index) in dataList"
           :key="index"
           class="zpag-item mb-27"
-          :options="options1"
+          :options="swipeOptions"
           :name="item.id"
           @click="handleClickSwipeItem"
         >
-          <view class="flex-between pd-20">
+          <view class="flex-between pd-20" @click="handleClick(item)">
             <view class="flex-y-center">
               <view class="pr">
                 <u-image
@@ -103,7 +112,7 @@ export default {
                   height="100"
                 />
                 <u-badge
-                  v-if="item.readStatus == 0" :is-dot="true" :offset="[0, 0]"
+                  v-if="!item.readStatus" :is-dot="true" :offset="[0, 0]"
                   :absolute="true"
                 />
               </view>
