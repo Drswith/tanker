@@ -61,6 +61,7 @@
     "**/dist/**": true,
     "**/logs": true,
     "**/node_modules": true,
+    "**/uni_modules": true,
     "**/out/**": true,
     "**/package-lock.json": true,
     "**/pnpm-lock.yaml": true,
