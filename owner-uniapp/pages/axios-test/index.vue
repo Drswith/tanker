@@ -1,60 +1,3 @@
-<template>
-  <view class="container">
-    <view class="header">
-      <text class="title">HTTP API 测试</text>
-      <text class="subtitle">基于UniAxios的业务层封装</text>
-    </view>
-
-    <view class="section">
-      <text class="section-title">基础请求测试</text>
-      
-      <button @click="testGet" class="test-btn">测试 GET 请求</button>
-      <button @click="testPost" class="test-btn">测试 POST 请求</button>
-      <button @click="testError" class="test-btn error">测试错误处理</button>
-    </view>
-
-    <view class="section">
-      <text class="section-title">业务API测试</text>
-      
-      <button @click="testLogin" class="test-btn">测试登录API</button>
-      <button @click="testOrderList" class="test-btn">测试订单列表</button>
-      <button @click="testMapCoordinates" class="test-btn">测试地图坐标</button>
-    </view>
-
-    <view class="section">
-      <text class="section-title">高级功能测试</text>
-      
-      <button @click="testConcurrent" class="test-btn">测试并发请求</button>
-      <button @click="testSilentApi" class="test-btn">测试静默请求</button>
-      <button @click="testCustomInstance" class="test-btn">测试自定义实例</button>
-    </view>
-
-    <view class="section">
-      <text class="section-title">拦截器测试</text>
-      
-      <button @click="addInterceptor" class="test-btn">添加拦截器</button>
-      <button @click="removeInterceptor" class="test-btn">移除拦截器</button>
-      <button @click="testWithInterceptor" class="test-btn">测试拦截器效果</button>
-    </view>
-
-    <view class="section">
-      <text class="section-title">文件上传测试</text>
-      
-      <button @click="testImageUpload" class="test-btn">测试图片上传</button>
-      <button @click="testFileUpload" class="test-btn">测试文件上传</button>
-    </view>
-
-    <view class="results">
-      <text class="results-title">测试结果：</text>
-      <scroll-view scroll-y class="results-content">
-        <text class="result-item" v-for="(result, index) in results" :key="index">
-          {{ result }}
-        </text>
-      </scroll-view>
-    </view>
-  </view>
-</template>
-
 <script>
 import { mapApi, orderApi, silentApi, uploadApi, userApi } from '@/utils/api'
 import http, { httpWithoutLoading, request } from '@/utils/http'
@@ -64,10 +7,10 @@ export default {
     return {
       results: [],
       requestInterceptorId: null,
-      responseInterceptorId: null
+      responseInterceptorId: null,
     }
   },
-  
+
   methods: {
     addResult(message) {
       const timestamp = new Date().toLocaleTimeString()
@@ -83,7 +26,8 @@ export default {
         this.addResult('开始GET请求测试...')
         const result = await request.get('/api/test/get', { id: 123 })
         this.addResult(`GET请求成功: ${JSON.stringify(result)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`GET请求失败: ${error.message}`)
       }
     },
@@ -94,10 +38,11 @@ export default {
         this.addResult('开始POST请求测试...')
         const result = await request.post('/api/test/post', {
           name: 'test',
-          value: 123
+          value: 123,
         })
         this.addResult(`POST请求成功: ${JSON.stringify(result)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`POST请求失败: ${error.message}`)
       }
     },
@@ -107,7 +52,8 @@ export default {
       try {
         this.addResult('开始错误处理测试...')
         await request.get('/api/test/error')
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`错误处理测试完成: ${error.message}`)
       }
     },
@@ -118,10 +64,11 @@ export default {
         this.addResult('开始登录API测试...')
         const result = await userApi.login({
           username: 'test',
-          password: '123456'
+          password: '123456',
         })
         this.addResult(`登录成功: ${JSON.stringify(result)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`登录失败: ${error.message}`)
       }
     },
@@ -132,10 +79,11 @@ export default {
         this.addResult('开始订单列表测试...')
         const result = await orderApi.getOrderList({
           page: 1,
-          size: 10
+          size: 10,
         })
         this.addResult(`订单列表获取成功: ${JSON.stringify(result)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`订单列表获取失败: ${error.message}`)
       }
     },
@@ -146,10 +94,11 @@ export default {
         this.addResult('开始地图坐标测试...')
         const result = await mapApi.getCoordinates({
           latitude: 39.9042,
-          longitude: 116.4074
+          longitude: 116.4074,
         })
         this.addResult(`地图坐标获取成功: ${JSON.stringify(result)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`地图坐标获取失败: ${error.message}`)
       }
     },
@@ -160,10 +109,11 @@ export default {
         this.addResult('开始并发请求测试...')
         const [userInfo, orders] = await request.all([
           userApi.getUserInfo(),
-          orderApi.getOrderList({ page: 1, size: 5 })
+          orderApi.getOrderList({ page: 1, size: 5 }),
         ])
         this.addResult(`并发请求成功: 用户信息=${JSON.stringify(userInfo)}, 订单=${JSON.stringify(orders)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`并发请求失败: ${error.message}`)
       }
     },
@@ -174,7 +124,8 @@ export default {
         this.addResult('开始静默请求测试...')
         const result = await silentApi.heartbeat()
         this.addResult(`静默请求成功: ${JSON.stringify(result)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`静默请求失败: ${error.message}`)
       }
     },
@@ -187,13 +138,14 @@ export default {
           timeout: 5000,
           showLoading: false,
           headers: {
-            'Custom-Header': 'test-value'
-          }
+            'Custom-Header': 'test-value',
+          },
         })
-        
+
         const result = await customHttp.get('/api/test/custom')
         this.addResult(`自定义实例请求成功: ${JSON.stringify(result)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`自定义实例请求失败: ${error.message}`)
       }
     },
@@ -201,7 +153,7 @@ export default {
     // 添加拦截器
     addInterceptor() {
       this.addResult('添加请求和响应拦截器...')
-      
+
       // 添加请求拦截器
       this.requestInterceptorId = http.interceptors.request.use(
         (config) => {
@@ -212,7 +164,7 @@ export default {
         (error) => {
           this.addResult(`[拦截器] 请求错误: ${error.message}`)
           return Promise.reject(error)
-        }
+        },
       )
 
       // 添加响应拦截器
@@ -224,7 +176,7 @@ export default {
         (error) => {
           this.addResult(`[拦截器] 响应错误: ${error.message}`)
           return Promise.reject(error)
-        }
+        },
       )
     },
 
@@ -235,7 +187,7 @@ export default {
         this.requestInterceptorId = null
         this.addResult('请求拦截器已移除')
       }
-      
+
       if (this.responseInterceptorId !== null) {
         http.interceptors.response.eject(this.responseInterceptorId)
         this.responseInterceptorId = null
@@ -249,7 +201,8 @@ export default {
         this.addResult('开始拦截器效果测试...')
         const result = await http.get('/api/test/interceptor')
         this.addResult(`拦截器测试成功: ${JSON.stringify(result)}`)
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`拦截器测试失败: ${error.message}`)
       }
     },
@@ -258,7 +211,7 @@ export default {
     async testImageUpload() {
       try {
         this.addResult('开始图片上传测试...')
-        
+
         // 选择图片
         const chooseResult = await new Promise((resolve, reject) => {
           uni.chooseImage({
@@ -266,18 +219,19 @@ export default {
             sizeType: ['compressed'],
             sourceType: ['album', 'camera'],
             success: resolve,
-            fail: reject
+            fail: reject,
           })
         })
 
         if (chooseResult.tempFilePaths && chooseResult.tempFilePaths.length > 0) {
           const filePath = chooseResult.tempFilePaths[0]
           const result = await uploadApi.uploadImage(filePath, {
-            type: 'avatar'
+            type: 'avatar',
           })
           this.addResult(`图片上传成功: ${JSON.stringify(result)}`)
         }
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`图片上传失败: ${error.message}`)
       }
     },
@@ -286,25 +240,26 @@ export default {
     async testFileUpload() {
       try {
         this.addResult('开始文件上传测试...')
-        
+
         // 选择文件
         const chooseResult = await new Promise((resolve, reject) => {
           uni.chooseMessageFile({
             count: 1,
             type: 'file',
             success: resolve,
-            fail: reject
+            fail: reject,
           })
         })
 
         if (chooseResult.tempFiles && chooseResult.tempFiles.length > 0) {
           const filePath = chooseResult.tempFiles[0].path
           const result = await uploadApi.uploadFile(filePath, {
-            category: 'document'
+            category: 'document',
           })
           this.addResult(`文件上传成功: ${JSON.stringify(result)}`)
         }
-      } catch (error) {
+      }
+      catch (error) {
         this.addResult(`文件上传失败: ${error.message}`)
       }
     },
@@ -312,7 +267,7 @@ export default {
     // 清空结果
     clearResults() {
       this.results = []
-    }
+    },
   },
 
   onLoad() {
@@ -323,9 +278,110 @@ export default {
   onUnload() {
     // 清理拦截器
     this.removeInterceptor()
-  }
+  },
 }
 </script>
+
+<template>
+  <view class="container">
+    <view class="header">
+      <text class="title">
+        HTTP API 测试
+      </text>
+      <text class="subtitle">
+        基于UniAxios的业务层封装
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">
+        基础请求测试
+      </text>
+
+      <button class="test-btn" @click="testGet">
+        测试 GET 请求
+      </button>
+      <button class="test-btn" @click="testPost">
+        测试 POST 请求
+      </button>
+      <button class="test-btn error" @click="testError">
+        测试错误处理
+      </button>
+    </view>
+
+    <view class="section">
+      <text class="section-title">
+        业务API测试
+      </text>
+
+      <button class="test-btn" @click="testLogin">
+        测试登录API
+      </button>
+      <button class="test-btn" @click="testOrderList">
+        测试订单列表
+      </button>
+      <button class="test-btn" @click="testMapCoordinates">
+        测试地图坐标
+      </button>
+    </view>
+
+    <view class="section">
+      <text class="section-title">
+        高级功能测试
+      </text>
+
+      <button class="test-btn" @click="testConcurrent">
+        测试并发请求
+      </button>
+      <button class="test-btn" @click="testSilentApi">
+        测试静默请求
+      </button>
+      <button class="test-btn" @click="testCustomInstance">
+        测试自定义实例
+      </button>
+    </view>
+
+    <view class="section">
+      <text class="section-title">
+        拦截器测试
+      </text>
+
+      <button class="test-btn" @click="addInterceptor">
+        添加拦截器
+      </button>
+      <button class="test-btn" @click="removeInterceptor">
+        移除拦截器
+      </button>
+      <button class="test-btn" @click="testWithInterceptor">
+        测试拦截器效果
+      </button>
+    </view>
+
+    <view class="section">
+      <text class="section-title">
+        文件上传测试
+      </text>
+
+      <button class="test-btn" @click="testImageUpload">
+        测试图片上传
+      </button>
+      <button class="test-btn" @click="testFileUpload">
+        测试文件上传
+      </button>
+    </view>
+
+    <view class="results">
+      <text class="results-title">
+        测试结果：
+      </text>
+      <scroll-view scroll-y class="results-content">
+        <text v-for="(result, index) in results" :key="index" class="result-item">
+          {{ result }}
+        </text>
+      </scroll-view>
+    </view>
+  </view>
+</template>
 
 <style scoped>
 .container {
