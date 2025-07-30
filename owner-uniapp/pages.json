@@ -154,7 +154,7 @@
         "text": "现场实况"
       },
       {
-        "pagePath": "pages/orderList/index/index",
+        "pagePath": "pages/order-center/list/index",
         "iconPath": "static/images/tabbar/order.png",
         "selectedIconPath": "/static/images/tabbar/order_active.png",
         "text": "订单中心"
