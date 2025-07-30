@@ -8,6 +8,20 @@
       }
     },
     {
+      "path": "pages/invite/index/index",
+      "style": {
+        "navigationBarTitleText": "邀请好友",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/invite-record/index/index",
+      "style": {
+        "navigationBarTitleText": "邀请记录",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/live/index/index",
       "style": {
         "navigationBarTitleText": "现场实况",
@@ -22,19 +36,13 @@
       }
     },
     {
-      "path": "pages/login/sms/index",
+      "path": "pages/login/index/index",
       "style": {
         "navigationBarTitleText": "登录",
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/login/password/index",
-      "style": {
-        "navigationBarTitleText": "登录",
-        "navigationStyle": "custom"
-      }
-    },
+
     {
       "path": "pages/message-center/index/index",
       "style": {

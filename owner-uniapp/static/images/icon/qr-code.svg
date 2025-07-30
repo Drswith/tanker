@@ -1,0 +1,26 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="white"/>
+<!-- 左上角定位点 -->
+<rect x="10" y="10" width="30" height="30" stroke="black" stroke-width="3" fill="none"/>
+<rect x="16" y="16" width="18" height="18" fill="black"/>
+<!-- 右上角定位点 -->
+<rect x="60" y="10" width="30" height="30" stroke="black" stroke-width="3" fill="none"/>
+<rect x="66" y="16" width="18" height="18" fill="black"/>
+<!-- 左下角定位点 -->
+<rect x="10" y="60" width="30" height="30" stroke="black" stroke-width="3" fill="none"/>
+<rect x="16" y="66" width="18" height="18" fill="black"/>
+<!-- 数据模块 -->
+<rect x="50" y="50" width="4" height="4" fill="black"/>
+<rect x="56" y="50" width="4" height="4" fill="black"/>
+<rect x="62" y="50" width="4" height="4" fill="black"/>
+<rect x="50" y="56" width="4" height="4" fill="black"/>
+<rect x="62" y="56" width="4" height="4" fill="black"/>
+<rect x="50" y="62" width="4" height="4" fill="black"/>
+<rect x="56" y="62" width="4" height="4" fill="black"/>
+<rect x="62" y="62" width="4" height="4" fill="black"/>
+<!-- 更多数据点 -->
+<rect x="46" y="46" width="2" height="2" fill="black"/>
+<rect x="70" y="46" width="2" height="2" fill="black"/>
+<rect x="46" y="70" width="2" height="2" fill="black"/>
+<rect x="70" y="70" width="2" height="2" fill="black"/>
+</svg>

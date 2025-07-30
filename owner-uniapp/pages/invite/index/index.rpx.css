@@ -1,0 +1,155 @@
+.page {
+  background-color: rgba(255, 255, 255, 1);
+  position: relative;
+  width: 750rpx;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+
+
+/* 分享内容区域 */
+.share-content {
+  flex: 1;
+  padding: 80rpx 32rpx 40rpx;
+  align-items: center;
+}
+
+.share-image-wrapper {
+  position: relative;
+  width: 686rpx;
+  height: 900rpx;
+  background: linear-gradient(135deg, #ff9e00, #ffab00);
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin-bottom: 60rpx;
+}
+
+.share-image {
+  width: 100%;
+  height: 700rpx;
+  object-fit: cover;
+}
+
+.qr-code {
+  position: absolute;
+  bottom: 120rpx;
+  right: 30rpx;
+  width: 120rpx;
+  height: 120rpx;
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 8rpx;
+  padding: 10rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.qr-image {
+  width: 100%;
+  height: 100%;
+}
+
+.invite-info {
+  position: absolute;
+  bottom: 30rpx;
+  left: 30rpx;
+  color: rgba(255, 255, 255, 1);
+}
+
+.invite-text {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 44rpx;
+  margin-bottom: 8rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+.invite-code {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 40rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+
+
+/* 分享操作区域 */
+.share-actions {
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 30rpx 30rpx 0 0;
+  padding: 40rpx 32rpx 60rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.share-title {
+  color: rgba(77, 78, 70, 1);
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  line-height: 44rpx;
+  margin-bottom: 32rpx;
+}
+
+.share-buttons {
+  justify-content: space-between;
+  margin-bottom: 60rpx;
+}
+
+.share-button {
+  align-items: center;
+  width: 120rpx;
+}
+
+.share-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 16rpx;
+  border-radius: 16rpx;
+}
+
+.share-label {
+  color: rgba(77, 78, 70, 1);
+  font-size: 24rpx;
+  font-weight: normal;
+  text-align: center;
+  line-height: 34rpx;
+}
+
+/* 取消按钮 */
+.cancel-button-wrapper {
+  background: url(https://lanhu-oss-2537-2.lanhuapp.com/SketchPnge970a70f1c9c6ab0cfe327d25a84d3a0aebc95e8bd94dcb8feb1b7af52cf8a02) 100% no-repeat;
+  background-size: 100% 100%;
+  margin: 0 2rpx 0 0;
+  padding: 26rpx 280rpx 26rpx 278rpx;
+}
+
+.cancel-button-text {
+  overflow-wrap: break-word;
+  color: rgba(255, 255, 255, 1);
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 44rpx;
+}
+
+/* 通用flex样式 */
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
