@@ -128,12 +128,6 @@ export default {
 
 <template>
   <view class="order-center">
-    <!-- 顶部标题 -->
-    <view class="topTitle">
-      <text style="white-space: 1px;">
-        订单中心
-      </text>
-    </view>
     <view class="context">
       <!-- 标签栏 -->
       <view class="tab-bar">

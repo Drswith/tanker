@@ -64,9 +64,23 @@
       }
     },
     {
-      "path": "pages/create-order/index/index",
+      "path": "pages/order-center/add/index",
       "style": {
         "navigationBarTitleText": "下单",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/order-center/sign/index",
+      "style": {
+        "navigationBarTitleText": "签署合同",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/order-center/list/index",
+      "style": {
+        "navigationBarTitleText": "订单中心",
         "navigationStyle": "default"
       }
     },
@@ -99,13 +113,7 @@
         "navigationStyle": "default"
       }
     },
-    {
-      "path": "pages/orderList/index/index",
-      "style": {
-        "navigationBarTitleText": "订单中心",
-        "navigationStyle": "custom"
-      }
-    },
+
     {
       "path": "pages/privacy-policy/index/index",
       "style": {
@@ -118,13 +126,6 @@
       "style": {
         "navigationBarTitleText": "注册",
         "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/axios-test/index",
-      "style": {
-        "navigationBarTitleText": "Axios API测试",
-        "navigationStyle": "default"
       }
     }
   ],
