@@ -8,6 +8,20 @@
       }
     },
     {
+      "path": "pages/address/list/index",
+      "style": {
+        "navigationBarTitleText": "地址列表",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/address/add/index",
+      "style": {
+        "navigationBarTitleText": "新增地址",
+        "navigationStyle": "default"
+      }
+    },
+    {
       "path": "pages/driver/list/index",
       "style": {
         "navigationBarTitleText": "我的司机",
@@ -76,6 +90,13 @@
       "style": {
         "navigationBarTitleText": "我的",
         "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mine/info/index",
+      "style": {
+        "navigationBarTitleText": "基本信息",
+        "navigationStyle": "default"
       }
     },
     {
