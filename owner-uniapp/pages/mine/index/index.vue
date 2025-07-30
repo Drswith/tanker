@@ -84,6 +84,27 @@ export default {
         url: `/pages/mine/info/index?userData=${encodeURIComponent(JSON.stringify(this.userInfo))}`,
       })
     },
+
+    // 跳转到邀请记录页面
+    goToInviteList() {
+      uni.navigateTo({
+        url: '/pages/invite/list/index',
+      })
+    },
+
+    // 跳转到收货地址页面
+    goToAddressList() {
+      uni.navigateTo({
+        url: '/pages/address/list/index',
+      })
+    },
+
+    // 跳转到合作司机页面
+    goToDriverList() {
+      uni.navigateTo({
+        url: '/pages/driver/list/index',
+      })
+    },
   },
 }
 </script>
@@ -166,7 +187,7 @@ export default {
       <text class="section-title">
         其他功能
       </text>
-      <view class="feature-item flex-row justify-between">
+      <view class="feature-item flex-row " @click="goToInviteList">
         <image
           class="feature-icon"
           referrerpolicy="no-referrer"
@@ -176,7 +197,7 @@ export default {
           邀请记录
         </text>
       </view>
-      <view class="feature-item flex-row justify-between">
+      <view class="feature-item flex-row " @click="goToAddressList">
         <image
           class="feature-icon"
           referrerpolicy="no-referrer"
@@ -186,7 +207,7 @@ export default {
           收货地址
         </text>
       </view>
-      <view class="feature-item flex-row justify-between">
+      <view class="feature-item flex-row " @click="goToDriverList">
         <image
           class="feature-icon"
           referrerpolicy="no-referrer"
@@ -196,7 +217,7 @@ export default {
           合作司机
         </text>
       </view>
-      <view class="feature-item flex-row justify-between">
+      <view class="feature-item flex-row ">
         <image
           class="feature-icon"
           referrerpolicy="no-referrer"
@@ -206,7 +227,7 @@ export default {
           修改密码
         </text>
       </view>
-      <view class="feature-item flex-row justify-between">
+      <view class="feature-item flex-row ">
         <image
           class="feature-icon"
           referrerpolicy="no-referrer"
@@ -216,7 +237,7 @@ export default {
           电话客服
         </text>
       </view>
-      <view class="feature-item flex-row justify-between">
+      <view class="feature-item flex-row ">
         <image
           class="feature-icon"
           referrerpolicy="no-referrer"

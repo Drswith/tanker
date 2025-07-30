@@ -70,7 +70,6 @@
   text-align: left;
   white-space: nowrap;
   line-height: 44rpx;
-  margin-right: 484rpx;
 }
 
 .order-status-list {
@@ -190,11 +189,10 @@
   width: 686rpx;
   align-self: center;
   margin-top: 24rpx;
-  padding: 32rpx 462rpx 48rpx 32rpx;
+  padding: 32rpx 32rpx 48rpx 32rpx;
 }
 
 .feature-item {
-  width: 176rpx;
   margin: 48rpx 0 0 16rpx;
 }
 
@@ -220,6 +218,8 @@
   text-align: left;
   white-space: nowrap;
   line-height: 40rpx;
+  margin-left: 24rpx;
+  flex: 1;
 }
 
 .bottom-navigation {
