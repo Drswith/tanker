@@ -8,6 +8,9 @@ export const userApi = {
   login(data) {
     return request.post('/api/auth/login', data)
   },
-}
 
-export default userApi
+  // 获取用户信息
+  getMyProfile(data) {
+    return request.get('/api/users/me/profile', data)
+  },
+}

@@ -9,5 +9,3 @@ export const mapApi = {
     return request.get('/api/order/map_coordinates', data)
   },
 }
-
-export default mapApi

@@ -14,5 +14,3 @@ export const orderApi = {
     return request.get('/api/order/current_order', data)
   },
 }
-
-export default orderApi
