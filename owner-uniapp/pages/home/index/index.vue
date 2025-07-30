@@ -1,5 +1,7 @@
 <script>
-import { mapApi, orderApi } from '@/api'
+import { mapApi } from '@/api/map'
+import { orderApi } from '@/api/order'
+
 // #ifdef H5
 let mapObj = null // 地图实例
 let agriculture = null // 图标样式实例

@@ -1,5 +1,5 @@
 <script>
-import { orderApi } from '@/api'
+import { orderApi } from '@/api/order'
 
 export default {
   data() {
