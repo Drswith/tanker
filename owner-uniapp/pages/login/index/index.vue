@@ -266,7 +266,7 @@ export default {
       <image
         class="header-logo"
         referrerpolicy="no-referrer"
-        src="https://lanhu-oss-2537-2.lanhuapp.com/SketchPnga446dcdee06ac078a46859047640a4fe59b44edf2314c730c3a1a8bdd1ac9bb3"
+        src="/static/images/kache.png"
       />
       <text class="page-title">
         欢迎登录
