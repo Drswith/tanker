@@ -10,14 +10,14 @@
     {
       "path": "pages/address/list/index",
       "style": {
-        "navigationBarTitleText": "地址列表",
+        "navigationBarTitleText": "地址管理",
         "navigationStyle": "default"
       }
     },
     {
       "path": "pages/address/add/index",
       "style": {
-        "navigationBarTitleText": "新增地址",
+        "navigationBarTitleText": "添加地址",
         "navigationStyle": "default"
       }
     },
@@ -50,7 +50,7 @@
       }
     },
     {
-      "path": "pages/invite-record/index/index",
+      "path": "pages/invite/list/index",
       "style": {
         "navigationBarTitleText": "邀请记录",
         "navigationStyle": "default"
