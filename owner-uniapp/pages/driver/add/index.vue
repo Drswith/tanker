@@ -121,19 +121,7 @@ export default {
 </script>
 
 <template>
-  <view class="auth-page flex-col">
-    <!-- 头部 -->
-    <view class="header-container flex-col">
-      <image
-        class="header-logo"
-        referrerpolicy="no-referrer"
-        src="/static/images/kache.png"
-      />
-      <text class="page-title">
-        新增司机
-      </text>
-    </view>
-
+  <view class="flex-col">
     <view class="form-container flex-col">
       <!-- uView 表单 -->
       <u--form
@@ -298,5 +286,5 @@ export default {
 </template>
 
 <style scoped lang="scss">
-@import '@/static/css/auth.scss';
+@import '@/static/css/form.scss';
 </style>
