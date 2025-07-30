@@ -10,13 +10,11 @@ export default {
         companyName: '', // 公司名称
         contactPerson: '', // 联系人
         companyAddress: '', // 公司地址
-        businessLicenseFront: '', // 营业执照正面
-        businessLicenseBack: '', // 营业执照反面
+        businessLicense: '', // 营业执照
       },
 
       // 上传文件列表
-      frontFileList: [],
-      backFileList: [],
+      licenseFileList: [],
 
       // 页面状态
       pageState: {
@@ -135,42 +133,23 @@ export default {
       }
     },
 
-    // 营业执照正面上传后处理
-    afterReadFront(event) {
+    // 营业执照上传后处理
+    afterReadLicense(event) {
       const { file } = event
-      this.frontFileList = [file]
-      this.formData.businessLicenseFront = file.url || file.path
+      this.licenseFileList = [file]
+      this.formData.businessLicense = file.url || file.path
 
       // TODO: 上传到服务器
       uni.showToast({
-        title: '正面上传成功',
+        title: '营业执照上传成功',
         icon: 'success',
       })
     },
 
-    // 营业执照反面上传后处理
-    afterReadBack(event) {
-      const { file } = event
-      this.backFileList = [file]
-      this.formData.businessLicenseBack = file.url || file.path
-
-      // TODO: 上传到服务器
-      uni.showToast({
-        title: '反面上传成功',
-        icon: 'success',
-      })
-    },
-
-    // 删除营业执照正面
-    deleteFront() {
-      this.frontFileList = []
-      this.formData.businessLicenseFront = ''
-    },
-
-    // 删除营业执照反面
-    deleteBack() {
-      this.backFileList = []
-      this.formData.businessLicenseBack = ''
+    // 删除营业执照
+    deleteLicense() {
+      this.licenseFileList = []
+      this.formData.businessLicense = ''
     },
 
     // 表单验证
@@ -450,53 +429,28 @@ export default {
             </text>
           </template>
           <view class="upload-container">
-            <view class="upload-row">
-              <view class="upload-item-wrapper">
-                <u-upload
-                  ref="frontUpload"
-                  :file-list="frontFileList"
-                  :max-count="1"
-                  :width="320"
-                  :height="200"
-                  @afterRead="afterReadFront"
-                  @delete="deleteFront"
-                >
-                  <template #default>
-                    <view class="upload-slot">
-                      <image
-                        class="upload-icon"
-                        src="/static/images/upload-plus.png"
-                      />
-                      <text class="upload-slot-text">
-                        上传营业执照正面
-                      </text>
-                    </view>
-                  </template>
-                </u-upload>
-              </view>
-              <view class="upload-item-wrapper">
-                <u-upload
-                  ref="backUpload"
-                  :file-list="backFileList"
-                  :max-count="1"
-                  :width="320"
-                  :height="200"
-                  @afterRead="afterReadBack"
-                  @delete="deleteBack"
-                >
-                  <template #default>
-                    <view class="upload-slot">
-                      <image
-                        class="upload-icon"
-                        src="/static/images/upload-plus.png"
-                      />
-                      <text class="upload-slot-text">
-                        上传营业执照反面
-                      </text>
-                    </view>
-                  </template>
-                </u-upload>
-              </view>
+            <view class="upload-item-wrapper">
+              <u-upload
+                ref="licenseUpload"
+                :file-list="licenseFileList"
+                :max-count="1"
+                :width="320"
+                :height="200"
+                @afterRead="afterReadLicense"
+                @delete="deleteLicense"
+              >
+                <template #default>
+                  <view class="upload-slot">
+                    <image
+                      class="upload-icon"
+                      src="/static/images/upload-plus.png"
+                    />
+                    <text class="upload-slot-text">
+                      上传营业执照
+                    </text>
+                  </view>
+                </template>
+              </u-upload>
             </view>
           </view>
         </u-form-item>
