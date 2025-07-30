@@ -18,7 +18,9 @@
     "eslint-plugin-format": "^1.0.1",
     "mini-types": "*",
     "miniprogram-api-typings": "*",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vue": "^2.6.11",
+    "vue-template-compiler": "^2.6.11"
   },
   "resolutions": {
     "**/eslint-processor-vue-blocks/@vue/compiler-sfc": "^3.3.0",
