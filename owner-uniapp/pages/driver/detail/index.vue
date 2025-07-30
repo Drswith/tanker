@@ -40,11 +40,13 @@ export default {
       try {
         const driverData = JSON.parse(decodeURIComponent(options.driverData))
         this.mapDriverData(driverData)
-      } catch (error) {
+      }
+      catch (error) {
         console.error('解析司机数据失败:', error)
         this.loadDriverDetail()
       }
-    } else {
+    }
+    else {
       this.loadDriverDetail()
     }
   },
@@ -64,7 +66,7 @@ export default {
         vehicleWeight: driverData.carLoad ? `${driverData.carLoad}吨` : '未知',
         vehiclePhoto: driverData.imgList && driverData.imgList.length > 0 ? driverData.imgList[0] : '/static/images/fallback-image.png',
         // 保留原始数据
-        originalData: driverData
+        originalData: driverData,
       }
     },
 
