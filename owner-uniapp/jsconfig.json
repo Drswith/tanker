@@ -5,6 +5,7 @@
     "baseUrl": ".",
     "moduleResolution": "node",
     "paths": {
+      "@/api/*": ["api/*"],
       "@/common/*": ["common/*"],
       "@/components/*": ["components/*"],
       "@/pages/*": ["pages/*"],
@@ -23,6 +24,7 @@
     "skipDefaultLibCheck": false
   },
   "include": [
+    "api/**/*",
     "common/**/*",
     "components/**/*",
     "pages/**/*",

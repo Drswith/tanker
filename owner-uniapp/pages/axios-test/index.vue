@@ -1,5 +1,5 @@
 <script>
-import { mapApi, orderApi, silentApi, uploadApi, userApi } from '@/utils/api'
+import { mapApi, orderApi, silentApi, uploadApi, userApi } from '@/api'
 import http, { httpWithoutLoading, request } from '@/utils/http'
 
 export default {

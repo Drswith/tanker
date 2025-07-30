@@ -1,4 +1,5 @@
 <script>
+import { orderApi } from '@/api'
 // #ifdef H5
 let mapObj = null // 地图实例
 let agriculture = null // 图标样式实例
@@ -172,12 +173,13 @@ export default {
     // 获取订单数据
     async getData() {
       try {
-        const data = await this.httpApi.usageCurrentOrder({
+        // const data = await this.httpApi.usageCurrentOrder({
+        const data = await orderApi.getCurrentOrder({
           page: this.page,
           size: this.size,
         })
 
-        this.dataList = data.data?.content || []
+        this.dataList = data?.content || []
         this.orderList = [...this.orderList, ...this.dataList]
       }
       catch (e) {
