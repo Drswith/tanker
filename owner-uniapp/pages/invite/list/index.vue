@@ -1,142 +1,17 @@
 <script>
+import { inviteApi } from '@/api/invite'
+
 export default {
   data() {
     return {
       // 推荐人信息
       referrerInfo: {
-        name: '多多',
-        totalFriends: 3,
+        name: '',
+        totalFriends: 0,
       },
 
       // 邀请记录列表数据
-      inviteList: [
-        {
-          id: 1,
-          name: '章鱼哥',
-          phone: '195****1234',
-          inviteTime: '2021-12-12 12:00',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 2,
-          name: '海绵宝宝',
-          phone: '195****1234',
-          inviteTime: '2021-12-12 12:00',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 3,
-          name: '红红',
-          phone: '195****1234',
-          inviteTime: '2021-12-12 12:00',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 4,
-          name: '派大星',
-          phone: '137****5678',
-          inviteTime: '2021-12-13 15:30',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 5,
-          name: '蟹老板',
-          phone: '158****9012',
-          inviteTime: '2021-12-14 09:15',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 6,
-          name: '珊迪',
-          phone: '186****3456',
-          inviteTime: '2021-12-15 16:45',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 7,
-          name: '痞老板',
-          phone: '139****7890',
-          inviteTime: '2021-12-16 11:20',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 8,
-          name: '小蜗',
-          phone: '150****2345',
-          inviteTime: '2021-12-17 14:40',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 9,
-          name: '泡芙老师',
-          phone: '133****4567',
-          inviteTime: '2021-12-18 10:25',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 10,
-          name: '海之王',
-          phone: '177****8901',
-          inviteTime: '2021-12-19 13:15',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 11,
-          name: '小比目鱼',
-          phone: '138****2345',
-          inviteTime: '2021-12-20 16:30',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 12,
-          name: '贝壳王子',
-          phone: '159****6789',
-          inviteTime: '2021-12-21 09:45',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 13,
-          name: '海星使者',
-          phone: '136****0123',
-          inviteTime: '2021-12-22 14:20',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 14,
-          name: '珊瑚公主',
-          phone: '155****4567',
-          inviteTime: '2021-12-23 11:35',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 15,
-          name: '水母仙子',
-          phone: '189****8901',
-          inviteTime: '2021-12-24 15:50',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 16,
-          name: '鲨鱼先生',
-          phone: '135****2345',
-          inviteTime: '2021-12-25 08:40',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 17,
-          name: '海龟爷爷',
-          phone: '156****6789',
-          inviteTime: '2021-12-26 12:55',
-          avatar: '/static/images/default-avatar.png',
-        },
-        {
-          id: 18,
-          name: '海马侠',
-          phone: '187****0123',
-          inviteTime: '2021-12-27 17:10',
-          avatar: '/static/images/default-avatar.png',
-        },
-      ],
+      inviteList: [],
 
       // 页面状态
       pageState: {
@@ -154,11 +29,24 @@ export default {
     async loadInviteList() {
       try {
         this.pageState.isLoading = true
-        // TODO: 调用获取邀请记录列表接口
-        // const response = await this.httpApi.getInviteList();
-        // this.inviteList = response.data;
+        const response = await inviteApi.getInviteList()
+
+        // 适配接口数据到页面显示格式
+        this.inviteList = response.map(item => ({
+          id: item.id,
+          name: item.extData?.name || '未知用户',
+          phone: item.extData?.phone || '未知手机号',
+          inviteTime: item.creationTime || '',
+          avatar: item.extData?.avatar || '/static/images/default-avatar.png',
+          userId: item.userId,
+          inviterId: item.inviterId,
+        }))
+
+        // 更新好友总数
+        this.referrerInfo.totalFriends = this.inviteList.length
       }
       catch (error) {
+        console.error('加载邀请记录失败:', error)
         uni.showToast({
           title: '加载失败，请重试',
           icon: 'none',
