@@ -1,3 +1,10 @@
+/* 引入通用表单样式 */
+@import './form.scss';
+
+/* ========================================
+   认证页面专用样式
+   ======================================== */
+
 /* 认证页面主容器 */
 .auth-page {
   position: relative;
@@ -46,142 +53,4 @@
   width: 100%;
   padding: 90rpx 32rpx 82rpx 32rpx;
   min-height: calc(100vh - 330rpx);
-}
-
-/* uView 表单自定义样式 - 使用深度选择器 */
-.form-item-custom {
-  margin-bottom: 0 !important;
-  padding: 0 !important;
-}
-
-.form-item-custom ::v-deep .u-form-item__body,
-.form-item-custom ::v-deep .u-form-item__body__left,
-.form-item-custom ::v-deep .u-form-item__body__right {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-/* 表单项间距调整 */
-.form-item-custom:not(:first-child) {
-  margin-top: 48rpx !important;
-}
-
-/* 通用标签样式 */
-.field-label {
-  color: rgba(77, 78, 70, 1);
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  line-height: 44rpx;
-}
-
-/* 必填字段标签容器 */
-.field-label-required {
-  height: 44rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  line-height: 44rpx;
-  display: flex;
-  align-items: center;
-}
-
-/* 必填标识星号 */
-.required-asterisk {
-  color: #f00;
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  line-height: 44rpx;
-}
-
-/* 通用输入框样式 */
-.input-field {
-  background-color: #fff;
-  border-radius: 16rpx;
-  border: 1.5px solid rgba(238, 238, 238, 1);
-  margin: 16rpx 2rpx 0 0;
-  width: 100%;
-  padding: 12rpx 18rpx;
-}
-
-/* 带按钮的输入框（验证码） */
-.input-field--with-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* 获取验证码按钮 */
-.get-code-btn {
-  color: rgba(255, 171, 0, 1);
-  font-size: 28rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  line-height: 48rpx;
-  cursor: pointer;
-}
-
-/* 通用按钮容器 */
-.btn-container {
-  background: linear-gradient(326deg, #FFD100 0%, #FFA500 100%);
-  border-radius: 48rpx;
-  margin-top: 80rpx;
-  height: 96rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-/* 通用按钮文字 */
-.btn-text {
-  color: #fff;
-  font-size: 32rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  line-height: 44rpx;
-}
-
-/* 链接容器 */
-.link-container {
-  height: 36rpx;
-  line-height: 36rpx;
-  margin: 32rpx auto auto;
-  cursor: pointer;
-  text-align: center;
-}
-
-/* 链接前缀文字样式 */
-.prefix-text {
-  color: rgba(153, 153, 153, 1);
-  font-size: 26rpx;
-  font-weight: normal;
-  line-height: 36rpx;
-}
-
-/* 链接文字样式 */
-.link-text {
-  color: rgba(255, 158, 0, 1);
-  font-size: 26rpx;
-  font-weight: normal;
-  line-height: 36rpx;
-}
-
-/* 忘记密码链接 */
-.forgot-password-link {
-  color: rgba(255, 158, 0, 1);
-  font-size: 24rpx;
-  font-weight: normal;
-  line-height: 34rpx;
-  cursor: pointer;
-}
-
-/* 切换登录方式链接 */
-.switch-login-link {
-  color: rgba(255, 158, 0, 1);
-  font-size: 24rpx;
-  font-weight: normal;
-  line-height: 34rpx;
-  margin-top: 16rpx;
-  cursor: pointer;
 }
