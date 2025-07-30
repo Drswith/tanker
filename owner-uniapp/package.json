@@ -4,8 +4,10 @@
   "author": "",
   "keywords": [],
   "scripts": {
-    "dev": "echo \"Error: 请使用 HBuilderX 开发项目\" && exit 1",
-    "build": "echo \"Error: 请使用 HBuilderX 构建项目\" && exit 1",
+    "dev": "echo \"\nError: DevServer Running at http://localhost:8080 Please visit http://localhost:8080 to view the project\n\" && exit 1",
+    "dev:h5": "npm run dev",
+    "build": "echo \"\nError: Please use HBuilderX to build the project\n\" && exit 1",
+    "preview": "echo \"\nError: Please use HBuilderX to preview the project\n\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
