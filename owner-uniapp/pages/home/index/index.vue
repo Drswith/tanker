@@ -188,6 +188,12 @@ export default {
         console.error('订单数据加载失败:', e)
       }
     },
+    // 跳转新增订单
+    navgateToAddOrderCenter() {
+      uni.navigateTo({
+        url: '/pages/order-center/add/index',
+      })
+    },
     // 滚动加载更多
     onScroll(e) {
       if (this.dataList.length >= this.size
@@ -250,6 +256,12 @@ export default {
       />
       <!-- #endif -->
     </view>
+    <div class="float-btn" @click="navgateToAddOrderCenter">
+      <image
+        class="float-btn-icon"
+        src="/static/images/upload-plus.png"
+      />
+    </div>
     <view :class="show ? 'listCard down' : 'listCard top'">
       <view class="list">
         <view style="padding-left: 5%;" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
@@ -323,6 +335,28 @@ export default {
   height: 25vh;
 }
 .map {
+  width: 100%;
+  height: 100%;
+}
+
+// 浮动按钮
+.float-btn {
+  position: relative;
+  left: calc(50vw - 75rpx - 40rpx);
+  bottom: 200rpx;
+  width: 150rpx;
+  height: 150rpx;
+	background: linear-gradient(to right, #FEA801, #FFCA00);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+  z-index: 999999;
+  padding: 40rpx;
+}
+
+.float-btn-icon {
   width: 100%;
   height: 100%;
 }
