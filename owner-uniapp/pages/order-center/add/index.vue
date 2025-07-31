@@ -8,6 +8,7 @@ export default {
     return {
       // 表单数据
       formData: {
+        id: null,
         name: '测试姓名',
         phone: '19899999999',
         isDefault: true,
@@ -106,8 +107,22 @@ export default {
           },
         ],
       },
-      // 提交状态
-      submitting: false,
+
+      submitting: false, // 提交状态
+      isLoading: false, // 加载状态
+      isEdit: false, // 是否编辑模式
+      orderId: null, // 订单ID（编辑时使用）
+    }
+  },
+  onLoad(options) {
+    if (options.id) {
+      this.isEdit = true
+      this.orderId = options.id
+      this.loadDetail(options.orderData)
+      // 修改页面标题
+      uni.setNavigationBarTitle({
+        title: '修改订单',
+      })
     }
   },
   methods: {
@@ -131,13 +146,19 @@ export default {
         console.log('提交订单数据:', orderData)
 
         // 调用创建订单API
-        const response = await orderApi.createOrder(orderData)
+        let response
+        if (this.isEdit) {
+          response = await orderApi.updateOrder(orderData)
+        }
+        else {
+          response = await orderApi.createOrder(orderData)
+        }
 
-        console.log('订单创建成功:', response)
+        console.log('订单创建/更新成功:', response)
 
         // 显示成功提示
         uni.showToast({
-          title: '订单创建成功',
+          title: this.isEdit ? '订单更新成功' : '订单创建成功',
           icon: 'success',
           duration: 2000,
         })
@@ -154,7 +175,7 @@ export default {
 
         // 显示错误提示
         uni.showToast({
-          title: error.message || '创建订单失败，请重试',
+          title: error.message || '创建/更新订单失败，请重试',
           icon: 'none',
           duration: 3000,
         })
@@ -181,6 +202,7 @@ export default {
     // 构建订单数据，映射到API字段格式
     buildOrderData() {
       return {
+        id: this.orderId || null,
         // 收货信息
         takeName: this.formData.name, // 收货人姓名
         takeMobile: this.formData.phone, // 收货人手机号
@@ -220,6 +242,38 @@ export default {
       }
     },
 
+    // 加载订单详情（编辑时使用）
+    async loadDetail(orderData) {
+      try {
+        this.isLoading = true
+        const order = JSON.parse(decodeURIComponent(orderData))
+        console.log(order)
+        this.formData = {
+          name: order.takeName,
+          phone: order.takeMobile,
+          address: order.address,
+          userAddressId: order.userAddressId,
+          quantity: order.buyCount,
+          totalCost: order.price,
+          originCity: order.shippingLocationAddress,
+          shippingLocationId: order.shippingLocationId,
+          driverUserId: order.driverUserId,
+          driverName: order.driverName,
+          driverPhone: order.driverMobile,
+          plateNumber: order.carNumber,
+          vehicleType: order.type,
+        }
+      }
+      catch (error) {
+        uni.showToast({
+          title: '加载失败，请重试',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.isLoading = false
+      }
+    },
     // 选择收货地址
     selectDeliveryAddress() {
       // TODO: 跳转到地址选择页面
@@ -491,7 +545,8 @@ export default {
         @click="confirmOrder"
       >
         <text class="confirm-btn-text">
-          {{ submitting ? '提交中...' : '确认下单' }}
+          {{ submitting ? '提交中...'
+            : isEdit ? '确认修改' : '确认下单' }}
         </text>
       </view>
     </view>
