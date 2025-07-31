@@ -2,147 +2,212 @@
 export default {
   data() {
     return {
-      constants: {},
+      // 订单数据
+      orderData: {
+        // 收货地址信息
+        deliveryAddress: {
+          name: '张三',
+          phone: '12345678909',
+          isDefault: true,
+          address: '浙江省杭州市滨江区奥体中心旁边'
+        },
+        // 货物信息
+        cargoInfo: {
+          quantity: 200,
+          unit: '吨',
+          originCity: '杭州'
+        },
+        // 司机信息
+        driverInfo: {
+          name: '200',
+          phone: '12345678909',
+          plateNumber: '浙A 66666',
+          vehicleType: '大卡车'
+        },
+        // 费用信息
+        totalCost: 675.0
+      }
     }
   },
-  methods: {},
+  methods: {
+    // 确认下单
+    confirmOrder() {
+      // TODO: 实现下单逻辑
+      console.log('确认下单', this.orderData)
+    },
+    
+    // 选择收货地址
+    selectDeliveryAddress() {
+      // TODO: 跳转到地址选择页面
+    },
+    
+    // 选择发货地址
+    selectOriginAddress() {
+      // TODO: 跳转到发货地址选择页面
+    }
+  },
 }
 </script>
 
 <template>
-  <view class="page flex-col">
-    <view class="group_1 flex-col">
-      <view class="section_1 flex-row">
-        <text class="text_1">
+  <view class="order-create-page flex-col">
+    <!-- 状态栏和导航栏 -->
+    <view class="header-container flex-col">
+      <!-- 状态栏 -->
+      <view class="status-bar flex-row">
+        <text class="status-time">
           9:41
         </text>
         <image
-          class="thumbnail_1"
+          class="status-signal-icon"
           referrerpolicy="no-referrer"
           src="https://lanhu-oss-2537-2.lanhuapp.com/SketchPng1be20f0eced1f466b6b4dc3a981fc6b52a4b9cf391debed94bcf2e01f7c38668"
         />
         <image
-          class="thumbnail_2"
+          class="status-wifi-icon"
           referrerpolicy="no-referrer"
           src="https://lanhu-oss-2537-2.lanhuapp.com/SketchPngb3bbe96fea0140cfc24043ebc96677b3c6566f6cd0b99cb137439fb58271c764"
         />
         <image
-          class="image_1"
+          class="status-battery-icon"
           referrerpolicy="no-referrer"
           src="https://lanhu-oss-2537-2.lanhuapp.com/SketchPnga05957db16243a63d7c74f823baeb36bbafa63e1b3e30902724223c367fb5eeb"
         />
       </view>
-      <view class="section_2 flex-row justify-between">
+      <!-- 导航栏 -->
+      <view class="navigation-bar flex-row justify-between">
         <image
-          class="thumbnail_3"
+          class="nav-back-icon"
           referrerpolicy="no-referrer"
           src="https://lanhu-oss-2537-2.lanhuapp.com/SketchPng56f6bee2c636c96d9771d242dd3d0e2bae43b83273e5cd46d78a4004d741a667"
         />
-        <text class="text_2">
+        <text class="nav-title">
           下单
         </text>
       </view>
     </view>
-    <view class="group_2 flex-row justify-between">
-      <view class="box_1 flex-col">
-        <view class="text-wrapper_1 flex-row justify-between">
-          <text class="text_3">
-            张三
+
+    <!-- 收货地址卡片 -->
+    <view class="delivery-address-card flex-row justify-between" @click="selectDeliveryAddress">
+      <view class="address-info flex-col">
+        <!-- 姓名和电话 -->
+        <view class="contact-info flex-row justify-between">
+          <text class="contact-name">
+            {{ orderData.deliveryAddress.name }}
           </text>
-          <text class="text_4">
-            12345678909
+          <text class="contact-phone">
+            {{ orderData.deliveryAddress.phone }}
           </text>
         </view>
-        <view class="text-wrapper_2">
-          <text class="text_5">
+        <!-- 地址信息 -->
+        <view class="address-detail">
+          <text class="address-tag" v-if="orderData.deliveryAddress.isDefault">
             【默认】
           </text>
-          <text class="text_6">
-            浙江省杭州市滨江区奥体中心旁边
+          <text class="address-text">
+            {{ orderData.deliveryAddress.address }}
           </text>
         </view>
       </view>
       <image
-        class="thumbnail_4"
+        class="address-arrow-icon"
         referrerpolicy="no-referrer"
         src="https://lanhu-oss-2537-2.lanhuapp.com/SketchPng76cc6f48137f27a5e7f7db5848dc067ef9b97fb2c2f1c28097636c89e774521f"
       />
     </view>
-    <view class="group_3 flex-col">
-      <text class="text_7">
+
+    <!-- 货物信息卡片 -->
+    <view class="cargo-info-card flex-col">
+      <text class="card-title">
         货物信息
       </text>
-      <text class="text_8">
+      
+      <!-- 购买数量 -->
+      <text class="field-label">
         购买数量
       </text>
-      <view class="text-wrapper_3 flex-row justify-between">
-        <text class="text_9">
-          200
+      <view class="quantity-input flex-row justify-between">
+        <text class="quantity-value">
+          {{ orderData.cargoInfo.quantity }}
         </text>
-        <text class="text_10">
-          吨
+        <text class="quantity-unit">
+          {{ orderData.cargoInfo.unit }}
         </text>
       </view>
-      <text class="text_11">
+      
+      <!-- 发货地址 -->
+      <text class="field-label">
         发货地址
       </text>
-      <view class="block_1 flex-row justify-between">
-        <text class="text_12">
-          杭州
+      <view class="origin-address-selector flex-row justify-between" @click="selectOriginAddress">
+        <text class="origin-city">
+          {{ orderData.cargoInfo.originCity }}
         </text>
         <image
-          class="thumbnail_5"
+          class="selector-arrow-icon"
           referrerpolicy="no-referrer"
           src="https://lanhu-oss-2537-2.lanhuapp.com/SketchPng5f0ad0ca685566386aff84decbcd88a1fae8d5f7d3f453d5aea3b0176d95c2c3"
         />
       </view>
     </view>
-    <view class="group_4 flex-col">
-      <text class="text_13">
+
+    <!-- 司机信息卡片 -->
+    <view class="driver-info-card flex-col">
+      <text class="card-title">
         选择司机
       </text>
-      <text class="text_14">
+      
+      <!-- 司机姓名 -->
+      <text class="field-label">
         司机
       </text>
-      <view class="text-wrapper_4 flex-col">
-        <text class="text_15">
-          200
+      <view class="driver-name-input flex-col">
+        <text class="driver-name">
+          {{ orderData.driverInfo.name }}
         </text>
       </view>
-      <text class="text_16">
+      
+      <!-- 手机号 -->
+      <text class="field-label">
         手机号
       </text>
-      <view class="text-wrapper_5 flex-col">
-        <text class="text_17">
-          12345678909
+      <view class="driver-phone-input flex-col">
+        <text class="driver-phone">
+          {{ orderData.driverInfo.phone }}
         </text>
       </view>
-      <text class="text_18">
+      
+      <!-- 车牌号 -->
+      <text class="field-label">
         车牌号
       </text>
-      <view class="text-wrapper_6 flex-col">
-        <text class="text_19">
-          浙A&nbsp;66666
+      <view class="plate-number-input flex-col">
+        <text class="plate-number">
+          {{ orderData.driverInfo.plateNumber }}
         </text>
       </view>
-      <text class="text_20">
+      
+      <!-- 车辆类型 -->
+      <text class="field-label">
         车辆类型
       </text>
-      <view class="text-wrapper_7 flex-col">
-        <text class="text_21">
-          大卡车
+      <view class="vehicle-type-input flex-col">
+        <text class="vehicle-type">
+          {{ orderData.driverInfo.vehicleType }}
         </text>
       </view>
     </view>
-    <view class="group_5 flex-row">
-      <text class="text_22">
+
+    <!-- 底部操作栏 -->
+    <view class="bottom-action-bar flex-row">
+      <text class="cost-label">
         总共费用
       </text>
-      <text class="text_23">
-        ¥675.0
+      <text class="total-cost">
+        ¥{{ orderData.totalCost }}
       </text>
-      <view class="text-wrapper_8 flex-col">
-        <text class="text_24">
+      <view class="confirm-order-btn flex-col" @click="confirmOrder">
+        <text class="confirm-btn-text">
           确认下单
         </text>
       </view>
