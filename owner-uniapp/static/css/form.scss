@@ -166,3 +166,15 @@
   margin-top: 16rpx;
   cursor: pointer;
 }
+
+/* ========================================
+   虚拟地址输入框样式
+   ======================================== */
+
+.address-input-field {
+  font-size: 28rpx;
+  line-height: 48rpx;
+  background-color: transparent;
+  display: flex;
+  justify-content: space-between;
+}
