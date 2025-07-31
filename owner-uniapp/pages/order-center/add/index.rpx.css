@@ -42,6 +42,7 @@
   text-align: left;
   white-space: nowrap;
   line-height: 40rpx;
+  padding-left: 40rpx;
 }
 
 .address-detail {

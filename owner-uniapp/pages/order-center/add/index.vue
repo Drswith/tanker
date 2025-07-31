@@ -1,4 +1,6 @@
 <script>
+import { addressApi } from '@/api/address'
+import { driverApi } from '@/api/driver'
 import { orderApi } from '@/api/order'
 
 export default {
@@ -6,17 +8,18 @@ export default {
     return {
       // 表单数据
       formData: {
-        name: '张三',
-        phone: '12345678909',
+        name: '测试姓名',
+        phone: '19899999999',
         isDefault: true,
-        address: '浙江省杭州市滨江区奥体中心旁边',
-        quantity: 200,
+        address: '测试地址123',
+
+        quantity: 5,
         unit: '吨',
         originCity: '杭州',
-        driverName: '200',
-        driverPhone: '13712345678',
-        plateNumber: '浙A 66666',
-        vehicleType: '大卡车',
+        driverName: '张三',
+        driverPhone: '15012341232',
+        plateNumber: '浙A123',
+        vehicleType: '大货车',
         totalCost: 675.0,
       },
       rules: {
