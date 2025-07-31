@@ -12,10 +12,12 @@ export default {
         phone: '19899999999',
         isDefault: true,
         address: '测试地址123',
+        userAddressId: 1,
 
         quantity: 5,
         unit: '吨',
         originCity: '杭州',
+        shippingLocationId: 2,
         driverName: '张三',
         driverPhone: '15012341232',
         plateNumber: '浙A123',
@@ -182,6 +184,7 @@ export default {
         takeName: this.formData.name, // 收货人姓名
         takeMobile: this.formData.phone, // 收货人手机号
         address: this.formData.address, // 详细地址(收货地址，卸货位置)
+        userAddressId: this.formData.userAddressId,
 
         // 货物信息
         buyCount: Number(this.formData.quantity), // 购买数量
@@ -190,6 +193,7 @@ export default {
         // 发货信息
         shippingLocationName: this.formData.originCity, // 发货地名称
         shippingLocationAddress: this.formData.originCity, // 发货详细地址
+        shippingLocationId: this.formData.shippingLocationId, // 发货地ID
 
         // 司机信息
         driverName: this.formData.driverName, // 司机姓名
@@ -198,19 +202,19 @@ export default {
         type: this.formData.vehicleType, // 车类型
 
         // 订单状态和时间
-        status: 0, // 订单状态 0 已创建待支付
-        placeOrderTime: new Date().toISOString(), // 下单时间
+        // status: 0, // 订单状态 0 已创建待支付
+        // placeOrderTime: new Date().toISOString(), // 下单时间
 
         // 其他必要字段
-        isDel: 0, // 0 未删除
-        isEvaluate: 0, // 0 未评价
-        orderCount: 1, // 订单数量
+        // isDel: 0, // 0 未删除
+        // isEvaluate: 0, // 0 未评价
+        // orderCount: 1, // 订单数量
 
         // 扩展数据
-        extData: {
-          unit: this.formData.unit, // 单位
-          isDefault: this.formData.isDefault, // 是否默认地址
-        },
+        // extData: {
+        //   unit: this.formData.unit, // 单位
+        //   isDefault: this.formData.isDefault, // 是否默认地址
+        // },
       }
     },
 

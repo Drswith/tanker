@@ -1,32 +1,89 @@
 <script>
 import { orderApi } from '@/api/order'
 
+/**
+ * 订单状态枚举映射
+ *
+ * 订单流程说明：
+ * 0  - 已创建待支付
+ * 1  - 已支付待接单
+ * 2  - 已接单待签署（业主和平台）
+ * 3  - 已签署司机前往发车地待验车
+ * 4  - 验车通过待施封
+ * 5  - 验车不通过
+ * 6  - 完成施封待安装GPS
+ * 7  - 完成GPS安装待司机签署
+ * 8  - 司机已签署（运输中）
+ * 9  - 司机确认送达待核验
+ * 10 - 业主核验确认收货后待评价（用于查询）
+ * 11 - 业主核验不通过
+ * 12 - 已评价（用于前端查询）
+ * 13 - 确认收货后待邮寄GPS
+ * 14 - 已邮寄
+ * 15 - 后台确认收到GPS订单结束
+ * 16 - 已提交资料待退款
+ * 17 - 已退款已取消
+ */
+const OrderStatus = Object.freeze({
+  // 订单创建阶段
+  Created: 0, // 已创建待支付
+  Paid: 1, // 已支付待接单
+
+  // 接单签署阶段
+  Accepted: 2, // 已接单待签署（业主和平台）
+  Signed: 3, // 已签署司机前往发车地待验车
+
+  // 验车施封阶段
+  Verified: 4, // 验车通过待施封
+  Unverified: 5, // 验车不通过
+  Sealed: 6, // 完成施封待安装GPS
+
+  // GPS安装阶段
+  GpsInstalled: 7, // 完成GPS安装待司机签署
+  DriverSigned: 8, // 司机已签署（运输中）
+
+  // 运输配送阶段
+  DeliveryConfirmed: 9, // 司机确认送达待核验
+  OwnerVerified: 10, // 业主核验确认收货后待评价
+  OwnerRejected: 11, // 业主核验不通过
+  Evaluated: 12, // 已评价（用于前端查询）
+
+  // GPS回收阶段
+  WaitingGpsReturn: 13, // 确认收货后待邮寄GPS
+  GpsShipped: 14, // 已邮寄
+  GpsReceived: 15, // 后台确认收到GPS订单结束
+
+  // 退款取消阶段
+  RefundSubmitted: 16, // 已提交资料待退款
+  RefundCompleted: 17, // 已退款已取消
+})
+
 export default {
   data() {
     return {
-      // 标签栏数据
-      // 0 已创建待支付 1 已支付待接单 2已接单待签署（业主和平台）
-      // 3已签署司机前往发车地待验车 4 验车通过待施封 5 验车不通过 6 完成施封待安装gps
-      tabList: [{
-        title: '待接单',
-        id: 1,
-      }, {
-        title: '待支付',
-        id: 0,
-      }, {
-        title: '待发车',
-        id: 3,
-      }, {
-        title: '待签署',
-        id: 2,
-      }, {
-        title: '运输中',
-        id: 4,
-      }, {
-        title: 'GPS待回收',
-        id: 6,
-      }],
-      currentTab: 1, // 当前选中标签索引
+      // 标签栏数据 - 使用OrderStatus枚举替代硬编码数字
+      tabList: [
+        // 主要业务流程状态
+        { title: '待支付', id: OrderStatus.Created }, // 0 - 已创建待支付
+        { title: '待接单', id: OrderStatus.Paid }, // 1 - 已支付待接单
+        { title: '待签署', id: OrderStatus.Accepted }, // 2 - 已接单待签署（业主和平台）
+        { title: '待发车', id: OrderStatus.Signed }, // 3 - 已签署司机前往发车地待验车
+        { title: '验车中', id: OrderStatus.Verified }, // 4 - 验车通过待施封
+        { title: '验车失败', id: OrderStatus.Unverified }, // 5 - 验车不通过
+        { title: 'GPS待安装', id: OrderStatus.Sealed }, // 6 - 完成施封待安装GPS
+        { title: '待司机签署', id: OrderStatus.GpsInstalled }, // 7 - 完成GPS安装待司机签署
+        { title: '运输中', id: OrderStatus.DriverSigned }, // 8 - 司机已签署（运输中）
+        { title: '待核验', id: OrderStatus.DeliveryConfirmed }, // 9 - 司机确认送达待核验
+        { title: '待评价', id: OrderStatus.OwnerVerified }, // 10 - 业主核验确认收货后待评价
+        { title: '核验失败', id: OrderStatus.OwnerRejected }, // 11 - 业主核验不通过
+        { title: '已评价', id: OrderStatus.Evaluated }, // 12 - 已评价（用于前端查询）
+        { title: 'GPS待回收', id: OrderStatus.WaitingGpsReturn }, // 13 - 确认收货后待邮寄GPS
+        { title: 'GPS已邮寄', id: OrderStatus.GpsShipped }, // 14 - 已邮寄
+        { title: '已完成', id: OrderStatus.GpsReceived }, // 15 - 后台确认收到GPS订单结束
+        { title: '待退款', id: OrderStatus.RefundSubmitted }, // 16 - 已提交资料待退款
+        { title: '已取消', id: OrderStatus.RefundCompleted }, // 17 - 已退款已取消
+      ],
+      currentTab: OrderStatus.Paid, // 默认选中"待接单"状态
       page: 1,
       size: 10,
       // 订单数据，实际可从接口获取
@@ -231,8 +288,9 @@ export default {
                 @click="callCustomNumber(item.driverMobile)"
               />
             </view>
+
             <view class="button-group">
-              <view v-if="currentTab == 2" class="sign-btn" style="margin-left: 10px;">
+              <view v-if="currentTab === 2" class="sign-btn" style="margin-left: 10px;">
                 立即签署
               </view>
               <view class="modify-btn" style="margin-left: 10px;">
@@ -240,6 +298,21 @@ export default {
               </view>
               <view class="cancel-btn">
                 取消订单
+              </view>
+              <view class="cancel-btn">
+                订单进度
+              </view>
+              <view class="cancel-btn">
+                验收授权
+              </view>
+              <view class="cancel-btn">
+                确认收货
+              </view>
+              <view v-if="currentTab === 6" class="cancel-btn">
+                寄回GPS
+              </view>
+              <view class="cancel-btn">
+                立即评价
               </view>
             </view>
           </view>
