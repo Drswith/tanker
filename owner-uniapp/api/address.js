@@ -25,4 +25,9 @@ export const addressApi = {
   setDefaultAddress(data) {
     return request.put('/api/users/me/set_address_default', data)
   },
+
+  // 发货地址列表
+  getShippingAddressList(data) {
+    return request.get('/api/order/get_shipping_address_list', data)
+  },
 }

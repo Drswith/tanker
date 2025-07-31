@@ -29,8 +29,18 @@ export const orderApi = {
     return request.delete(`/api/order/delete/${id}`)
   },
 
+  // 签署合同
+  signContract(data) {
+    return request.post('/api/order/contract', data)
+  },
+
   // 评价订单
   evaluateOrder(data) {
     return request.post('/api/order/evaluate', data)
+  },
+
+  // GPS寄回
+  gpsReturn(data) {
+    return request.put('/api/order/return_gps', data)
   },
 }

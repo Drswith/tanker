@@ -8,4 +8,9 @@ export const mapApi = {
   getCoordinates(data) {
     return request.get('/api/order/map_coordinates', data)
   },
+
+  // 地图坐标
+  getMapCoordinates(data) {
+    return request.get('/api/order/map_coordinates', data)
+  },
 }

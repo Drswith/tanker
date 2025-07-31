@@ -78,6 +78,20 @@
       }
     },
     {
+      "path": "pages/order-center/gps-return/index",
+      "style": {
+        "navigationBarTitleText": "GPS寄回",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/order-center/pay/index",
+      "style": {
+        "navigationBarTitleText": "收银台",
+        "navigationStyle": "default"
+      }
+    },
+    {
       "path": "pages/order-center/sign/index",
       "style": {
         "navigationBarTitleText": "签署合同",
@@ -117,13 +131,6 @@
       "path": "pages/mine/info/index",
       "style": {
         "navigationBarTitleText": "基本信息",
-        "navigationStyle": "default"
-      }
-    },
-    {
-      "path": "pages/pay/index/index",
-      "style": {
-        "navigationBarTitleText": "收银台",
         "navigationStyle": "default"
       }
     },

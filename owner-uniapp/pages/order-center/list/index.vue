@@ -124,11 +124,11 @@ export default {
         { name: '订单进度', class: '', handler: () => {} },
         { name: '验收授权', class: '', handler: () => {} },
         { name: '确认收货', class: '', handler: () => {} },
-        { name: '寄回GPS', class: '', handler: () => {} },
+        { name: '寄回GPS', class: '', handler: order => this.handleReturnGps(order) },
         { name: '立即评价', class: '', handler: order => this.handleEvaluateOrder(order) },
         { name: '删除订单', class: '', handler: order => this.apiErrorToast(order) },
         { name: '再来一单', class: '', handler: order => this.apiErrorToast(order) },
-        { name: '立即支付', class: '', handler: () => {} },
+        { name: '立即支付', class: '', handler: order => this.handlePayOrder(order) },
       ]
 
       const statusButtonGroupMap = {
@@ -136,7 +136,7 @@ export default {
         [OrderStatus.Paid]: buttonGroups.filter(item => ['修改订单', '取消订单'].includes(item.name)), // 1 - 已支付待接单
         [OrderStatus.Accepted]: buttonGroups.filter(item => ['修改订单', '取消订单', '立即签署'].includes(item.name)), // 2 - 已接单待签署（业主和平台）
         [OrderStatus.Signed]: buttonGroups.filter(item => [].includes(item.name)), // 3 - 已签署待发车
-        [OrderStatus.Verified]: buttonGroups.filter(item => [].includes(item.name)), // 4 - 验车通过待施封
+        [OrderStatus.Verified]: buttonGroups.filter(item => ['寄回GPS'].includes(item.name)), // 4 - 验车通过待施封
         [OrderStatus.Unverified]: buttonGroups.filter(item => [].includes(item.name)), // 5 - 验车不通过
         [OrderStatus.Sealed]: buttonGroups.filter(item => [].includes(item.name)), // 6 - 完成施封待安装GPS
         [OrderStatus.GpsInstalled]: buttonGroups.filter(item => ['取消订单', '立即签署'].includes(item.name)), // 7 - 完成GPS安装待司机签署
@@ -262,6 +262,20 @@ export default {
       console.log('order', order)
       uni.navigateTo({
         url: `/pages/order-center/evaluate/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
+    // 寄回GPS
+    handleReturnGps(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/gps-return/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
+    // 立即支付
+    handlePayOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/pay/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
       })
     },
   },
