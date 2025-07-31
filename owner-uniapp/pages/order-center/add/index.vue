@@ -2,32 +2,7 @@
 export default {
   data() {
     return {
-      // 订单数据
-      orderData: {
-        // 收货地址信息
-        deliveryAddress: {
-          name: '张三',
-          phone: '12345678909',
-          isDefault: true,
-          address: '浙江省杭州市滨江区奥体中心旁边',
-        },
-        // 货物信息
-        cargoInfo: {
-          quantity: 200,
-          unit: '吨',
-          originCity: '杭州',
-        },
-        // 司机信息
-        driverInfo: {
-          name: '200',
-          phone: '12345678909',
-          plateNumber: '浙A 66666',
-          vehicleType: '大卡车',
-        },
-        // 费用信息
-        totalCost: 675.0,
-      },
-
+      // 表单数据
       formData: {
         name: '张三',
         phone: '12345678909',
@@ -43,14 +18,13 @@ export default {
         totalCost: 675.0,
       },
       rules: {},
-
     }
   },
   methods: {
     // 确认下单
     confirmOrder() {
       // TODO: 实现下单逻辑
-      console.log('确认下单', this.orderData)
+      console.log('确认下单', this.formData)
     },
 
     // 选择收货地址
@@ -83,19 +57,19 @@ export default {
           <!-- 姓名和电话 -->
           <view class="contact-info flex-row justify-between">
             <text class="contact-name">
-              {{ orderData.deliveryAddress.name }}
+              {{ formData.name }}
             </text>
             <text class="contact-phone">
-              {{ orderData.deliveryAddress.phone }}
+              {{ formData.phone }}
             </text>
           </view>
           <!-- 地址信息 -->
           <view class="address-detail">
-            <text v-if="orderData.deliveryAddress.isDefault" class="address-tag">
+            <text v-if="formData.isDefault" class="address-tag">
               【默认】
             </text>
             <text class="address-text">
-              {{ orderData.deliveryAddress.address }}
+              {{ formData.address }}
             </text>
           </view>
         </view>
@@ -308,7 +282,7 @@ export default {
         总共费用
       </text>
       <text class="total-cost">
-        ¥{{ orderData.totalCost }}
+        ¥{{ formData.totalCost }}
       </text>
       <view class="confirm-order-btn flex-col" @click="confirmOrder">
         <text class="confirm-btn-text">
