@@ -73,13 +73,12 @@
 }
 
 .order-status-list {
-  width: 606rpx;
-  height: 106rpx;
-  margin: 32rpx 0 0 6rpx;
+  /* height: 106rpx; */
+  margin: 32rpx 0 0 0;
 }
 
 .order-status-item {
-  margin-right: 58rpx;
+  /* margin-right: 58rpx; */
 }
 
 .status-icon {
@@ -116,6 +115,7 @@
 
 .invite-section {
   background-image: url("/static/images/mine-invite.png");
+  background-size: 100% 100%;
   border-radius: 48px;
   position: relative;
   width: 686rpx;

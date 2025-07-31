@@ -26,11 +26,11 @@ export default {
             '/static/images/mine-sign.png',
           label: '待签署',
         },
-        {
-          icon:
-            '/static/images/mine-signed.png',
-          label: '待签署',
-        },
+        // {
+        //   icon:
+        //     '/static/images/mine-signed.png',
+        //   label: '待签署',
+        // },
         {
           icon:
             '/static/images/mine-trans.png',
@@ -146,7 +146,7 @@ export default {
         <text class="section-title">
           订单中心
         </text>
-        <view class="order-status-list flex-row">
+        <view class="order-status-list flex-row justify-between">
           <view
             v-for="(item, index) in orderStatusList"
             :key="index"
