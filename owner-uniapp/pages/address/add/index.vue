@@ -1,4 +1,6 @@
 <script>
+import { addressApi } from '@/api/address'
+
 export default {
   data() {
     return {
@@ -17,6 +19,15 @@ export default {
         isLoading: false, // 加载状态
         isEdit: false, // 是否编辑模式
         addressId: null, // 地址ID（编辑时使用）
+        submitting: false, // 提交状态
+      },
+
+      // 地区选择相关数据
+      regionData: {
+        province: '', // 省份
+        city: '', // 城市
+        district: '', // 区县
+        addressCode: [], // 地址编码
       },
 
       // 常量配置
@@ -24,6 +35,12 @@ export default {
         PHONE_REGEX: /^1[3-9]\d{9}$/, // 手机号正则
         POSTAL_CODE_REGEX: /^\d{6}$/, // 邮政编码正则
       },
+
+      visible: false,
+      maskCloseAble: true,
+      defaultValue: '',
+      // defaultValue: ['河北省','唐山市','丰南区'],
+      column: 3,
 
       // 表单验证规则
       rules: {
@@ -66,9 +83,9 @@ export default {
             trigger: ['blur', 'change'],
           },
           {
-            min: 5,
+            min: 1,
             max: 100,
-            message: '详细地址长度为5-100位',
+            message: '详细地址长度为1-100位',
             trigger: ['blur', 'change'],
           },
         ],
@@ -87,23 +104,46 @@ export default {
       },
     }
   },
+  computed: {
+    // 地区选择显示文本
+    regionDisplayText() {
+      if (this.regionData.province && this.regionData.city && this.regionData.district) {
+        return `${this.regionData.province} / ${this.regionData.city} / ${this.regionData.district}`
+      }
+      return '请选择地区'
+    },
+  },
 
   onLoad(options) {
     if (options.id) {
       this.pageState.isEdit = true
       this.pageState.addressId = options.id
-      this.loadAddressDetail(options.id)
+      this.loadAddressDetail(options.addressData)
     }
   },
 
   methods: {
     // 加载地址详情（编辑时使用）
-    async loadAddressDetail(id) {
+    async loadAddressDetail(addressData) {
       try {
         this.pageState.isLoading = true
-        // TODO: 调用获取地址详情接口
-        // const response = await this.httpApi.getAddressDetail(id);
-        // this.formData = response.data;
+        const address = JSON.parse(decodeURIComponent(addressData))
+        console.log(address)
+        this.formData = {
+          contactPerson: address.name || '',
+          phoneNumber: address.mobile || '',
+          region: `${address.province || ''} ${address.city || ''} ${address.district || ''}`,
+          detailAddress: address.address || '',
+          postalCode: address.zip || '',
+          isDefault: address.isDefault || false,
+        }
+        this.regionData = {
+          province: address.province || '',
+          city: address.city || '',
+          district: address.district || '',
+          addressCode: [address.addressCode || ''],
+        }
+        this.defaultValue = [address.province || '', address.city || '', address.district || '']
       }
       catch (error) {
         uni.showToast({
@@ -116,6 +156,35 @@ export default {
       }
     },
 
+    // 选择城市
+    selectRegion() {
+      console.log('选择城市')
+      this.visible = true
+    },
+
+    // 地区选择确认
+    confirm(e) {
+      console.log('地区选择确认:', e)
+      this.visible = false
+
+      if (e && e.code) {
+        // 更新地区数据
+        this.regionData.province = e.provinceName
+        this.regionData.city = e.cityName
+        this.regionData.district = e.areaName
+        this.regionData.addressCode = [e.code] // 存储地区编码
+
+        // 更新显示文本
+        this.formData.region = e.name // 使用完整的地区名称
+      }
+    },
+
+    // 地区选择取消
+    cancel() {
+      console.log('地区选择取消')
+      this.visible = false
+    },
+
     // 表单验证
     validateForm() {
       return this.$refs.uForm.validate()
@@ -124,24 +193,39 @@ export default {
     // 提交地址信息
     async submitAddress() {
       try {
+        // 表单验证
         const valid = await this.validateForm()
         if (!valid) {
           return
         }
 
+        // 防止重复提交
+        if (this.pageState.submitting) {
+          return
+        }
+
+        this.pageState.submitting = true
         this.pageState.isLoading = true
 
+        // 构建API请求数据
+        const addressData = this.buildAddressData()
+
         if (this.pageState.isEdit) {
-          // TODO: 调用编辑地址接口
-          // await this.httpApi.updateAddress(this.pageState.addressId, this.formData);
+          // 编辑地址
+          await addressApi.updateAddress({
+            ...addressData,
+            id: this.pageState.addressId,
+          })
+
           uni.showToast({
             title: '编辑地址成功',
             icon: 'success',
           })
         }
         else {
-          // TODO: 调用新增地址接口
-          // await this.httpApi.addAddress(this.formData);
+          // 新增地址
+          await addressApi.addAddress(addressData)
+
           uni.showToast({
             title: '新增地址成功',
             icon: 'success',
@@ -154,6 +238,7 @@ export default {
         }, 1500)
       }
       catch (error) {
+        console.error('提交地址失败:', error)
         uni.showToast({
           title: error.message || '操作失败，请重试',
           icon: 'none',
@@ -161,6 +246,23 @@ export default {
       }
       finally {
         this.pageState.isLoading = false
+        this.pageState.submitting = false
+      }
+    },
+
+    // 构建API请求数据
+    buildAddressData() {
+      return {
+        name: this.formData.contactPerson, // 收货人姓名
+        mobile: this.formData.phoneNumber, // 收货人手机号
+        province: this.regionData.province, // 省份
+        city: this.regionData.city, // 城市
+        district: this.regionData.district, // 区县
+        address: this.formData.detailAddress, // 详细地址
+        zip: this.formData.postalCode, // 邮政编码
+        isDefault: this.formData.isDefault, // 是否默认地址
+        // addressCode: this.regionData.addressCode, // 地址编码
+        extData: {}, // 扩展数据
       }
     },
 
@@ -313,21 +415,11 @@ export default {
               地区
             </text>
           </template>
-          <view class="input-field flex-col">
-            <u--input
-              v-model="formData.region"
-              placeholder="请选择省/市/区"
-              placeholder-style="color: #999999; font-size: 28rpx;"
-              border="none"
-              :custom-style="{
-                backgroundColor: 'transparent',
-                padding: '0',
-                fontSize: '28rpx',
-                lineHeight: '40rpx',
-              }"
-              readonly
-              @click="selectRegion"
-            />
+          <view class="input-field flex-col" @click="selectRegion">
+            <view class="address-input-field">
+              <view>{{ regionDisplayText }}</view>
+              <u-icon name="arrow-down-fill" size="28" />
+            </view>
           </view>
         </u-form-item>
 
@@ -411,7 +503,11 @@ export default {
       </u--form>
 
       <!-- 保存按钮 -->
-      <view class="btn-container flex-col" @click="submitAddress">
+      <view
+        class="btn-container flex-col"
+        :class="{ 'btn-disabled': pageState.submitting }"
+        @click="submitAddress"
+      >
         <u-loading-icon
           v-if="pageState.isLoading"
           color="#ffffff"
@@ -419,7 +515,7 @@ export default {
           mode="circle"
         />
         <text v-else class="btn-text">
-          保存
+          {{ pageState.submitting ? '提交中...' : '保存' }}
         </text>
       </view>
 
@@ -433,6 +529,7 @@ export default {
         </text>
       </view>
     </view>
+    <piaoyi-cityPicker :column="column" :default-value="defaultValue" :mask-close-able="maskCloseAble" :visible="visible" @confirm="confirm" @cancel="cancel" />
   </view>
 </template>
 
@@ -451,6 +548,13 @@ export default {
   // align-items: center;
   // justify-content: flex-start;
   // height: 70rpx;
+}
+
+/* 按钮禁用状态样式 */
+.btn-disabled {
+  background: rgba(255, 209, 0, 0.6) !important;
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 /* Secondary按钮样式 */

@@ -100,7 +100,7 @@ export default {
     // 编辑地址
     editAddress(address) {
       uni.navigateTo({
-        url: `/pages/address/add/index?id=${address.id}&mode=edit`,
+        url: `/pages/address/add/index?id=${address.id}&addressData=${encodeURIComponent(JSON.stringify(address.originalData))}`,
       })
     },
 
