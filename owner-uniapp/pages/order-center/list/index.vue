@@ -295,7 +295,7 @@ export default {
 
           <view
             class="card_item" :style="{
-              marginBottom: (currentTab === OrderStatus.Accepted || currentTab === OrderStatus.GpsInstalled) ? '45px' : '15px',
+              marginBottom: (currentTab === OrderStatus.Accepted || currentTab === OrderStatus.GpsInstalled) ? '90rpx' : '30rpx',
             }"
           >
             <view>
@@ -311,7 +311,7 @@ export default {
                   {{ item.buyCount }} 吨
                 </text>
               </view>
-              <view style="margin-left: 20px;">
+              <view style="margin-left: 40rpx;">
                 下单时间：<text id="text" style="color:#000000;">
                   {{ item.placeOrderTime }}
                 </text>
@@ -321,12 +321,12 @@ export default {
               <view class="text_right">
                 司机：
               </view><text id="text" style="color:#000000;">
-                {{ item.deliveryName ? `${item.deliveryName}师傅` : "" }}<text style="margin-left: 10px;">
+                {{ item.deliveryName ? `${item.deliveryName}师傅` : "" }}<text style="margin-left: 20rpx;">
                   {{ item.deliveryMobile ? `(${item.deliveryMobile})` : "" }}
                 </text>
               </text>
               <image
-                v-show="item.deliveryMobile" style="width: 12px; height: 12px; margin-left: 5px;" src="/static/images/icon/phone.png"
+                v-show="item.deliveryMobile" style="width: 24rpx; height: 24rpx; margin-left: 10rpx;" src="/static/images/icon/phone.png"
                 @click="callCustomNumber(item.deliveryMobile)"
               />
             </view>
@@ -334,35 +334,35 @@ export default {
               <view class="text_right">
                 发货员：
               </view><text id="text" style="color:#000000;">
-                {{ item.driverName ? `${item.driverName}师傅` : "" }} <text style="margin-left: 10px;">
+                {{ item.driverName ? `${item.driverName}师傅` : "" }} <text style="margin-left: 20rpx;">
                   {{ item.driverMobile ? `(${item.driverMobile})` : "" }}
                 </text>
               </text>
               <image
-                v-show="item.driverMobile" style="width: 12px; height: 12px; margin-left: 5px;" src="/static/images/icon/phone.png"
+                v-show="item.driverMobile" style="width: 24rpx; height: 24rpx; margin-left: 10rpx;" src="/static/images/icon/phone.png"
                 @click="callCustomNumber(item.driverMobile)"
               />
             </view>
 
             <view v-if="currentCardButtonGroup.length > 0" class="button-group">
-              <view v-for="(btn, index) in currentCardButtonGroup" :key="index" :class="btn.class" style="margin-left: 10px;">
+              <view v-for="(btn, index) in currentCardButtonGroup" :key="index" :class="btn.class" style="margin-left: 20rpx;">
                 {{ btn.name }}
               </view>
             </view>
           </view>
 
           <view v-if="currentTab === OrderStatus.Accepted" class="notes">
-            <text style="margin-left: 10px;">
+            <text style="margin-left: 20rpx;">
               备注：平台服务协议
             </text>
           </view>
           <view v-else-if="currentTab === OrderStatus.GpsInstalled" class="notes">
-            <text style="margin-left: 10px;">
+            <text style="margin-left: 20rpx;">
               备注：司机承运协议
             </text>
           </view>
         </view>
-        <view style="height: 50px;background-color: #F8F8F8;" />
+        <view style="height: 100rpx;background-color: #F8F8F8;" />
       </scroll-view>
     </view>
   </view>
