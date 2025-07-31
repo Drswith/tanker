@@ -18,6 +18,7 @@ export default {
         unit: '吨',
         originCity: '杭州',
         shippingLocationId: 2,
+        driverUserId: 1, // 司机ID
         driverName: '张三',
         driverPhone: '15012341232',
         plateNumber: '浙A123',
@@ -196,6 +197,7 @@ export default {
         shippingLocationId: this.formData.shippingLocationId, // 发货地ID
 
         // 司机信息
+        driverUserId: this.formData.driverUserId, // 司机ID
         driverName: this.formData.driverName, // 司机姓名
         driverMobile: this.formData.driverPhone, // 司机手机号
         carNumber: this.formData.plateNumber, // 车牌号
