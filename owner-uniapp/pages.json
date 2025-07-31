@@ -113,7 +113,13 @@
         "navigationStyle": "default"
       }
     },
-
+    {
+      "path": "pages/pay/index/index",
+      "style": {
+        "navigationBarTitleText": "收银台",
+        "navigationStyle": "default"
+      }
+    },
     {
       "path": "pages/privacy-policy/index/index",
       "style": {
