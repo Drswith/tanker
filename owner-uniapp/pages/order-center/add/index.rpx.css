@@ -164,6 +164,13 @@
   background-color: rgba(255, 158, 0, 1);
   border-radius: 24px;
   padding: 26rpx 80rpx 26rpx 80rpx;
+  transition: all 0.3s ease;
+}
+
+/* 按钮禁用状态 */
+.confirm-order-btn.btn-disabled {
+  background-color: rgba(204, 204, 204, 1);
+  opacity: 0.6;
 }
 
 .confirm-btn-text {

@@ -9,6 +9,11 @@ export const orderApi = {
     return request.get('/api/order/search', data)
   },
 
+  // 创建订单
+  createOrder(data) {
+    return request.post('/api/order/create', data)
+  },
+
   // 获取当前订单
   getCurrentOrder(data) {
     return request.get('/api/order/current_order', data)

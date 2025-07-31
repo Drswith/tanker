@@ -1,4 +1,6 @@
 <script>
+import { orderApi } from '@/api/order'
+
 export default {
   data() {
     return {
@@ -12,29 +14,219 @@ export default {
         unit: '吨',
         originCity: '杭州',
         driverName: '200',
-        driverPhone: '12345678909',
+        driverPhone: '13712345678',
         plateNumber: '浙A 66666',
         vehicleType: '大卡车',
         totalCost: 675.0,
       },
-      rules: {},
+      rules: {
+        name: [
+          {
+            required: true,
+            message: '请输入收货人姓名',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        phone: [
+          {
+            required: true,
+            message: '请输入手机号',
+            trigger: ['blur', 'change'],
+          },
+          {
+            pattern: /^1[3-9]\d{9}$/,
+            message: '请输入正确的手机号',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        address: [
+          {
+            required: true,
+            message: '请输入收货地址',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        quantity: [
+          {
+            required: true,
+            message: '请输入购买数量',
+            trigger: ['blur', 'change'],
+          },
+          {
+            type: 'number',
+            min: 1,
+            message: '购买数量必须大于0',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        originCity: [
+          {
+            required: true,
+            message: '请选择发货地址',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        driverName: [
+          {
+            required: true,
+            message: '请输入司机姓名',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        driverPhone: [
+          {
+            required: true,
+            message: '请输入司机手机号',
+            trigger: ['blur', 'change'],
+          },
+          {
+            pattern: /^1[3-9]\d{9}$/,
+            message: '请输入正确的司机手机号',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        plateNumber: [
+          {
+            required: true,
+            message: '请输入车牌号',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        vehicleType: [
+          {
+            required: true,
+            message: '请选择车辆类型',
+            trigger: ['blur', 'change'],
+          },
+        ],
+      },
+      // 提交状态
+      submitting: false,
     }
   },
   methods: {
     // 确认下单
-    confirmOrder() {
-      // TODO: 实现下单逻辑
-      console.log('确认下单', this.formData)
+    async confirmOrder() {
+      if (this.submitting)
+        return
+
+      try {
+        this.submitting = true
+
+        // 表单验证
+        const isValid = await this.validateForm()
+        if (!isValid) {
+          return
+        }
+
+        // 构建订单数据，映射到API要求的字段格式
+        const orderData = this.buildOrderData()
+
+        console.log('提交订单数据:', orderData)
+
+        // 调用创建订单API
+        const response = await orderApi.createOrder(orderData)
+
+        console.log('订单创建成功:', response)
+
+        // 显示成功提示
+        uni.showToast({
+          title: '订单创建成功',
+          icon: 'success',
+          duration: 2000,
+        })
+
+        // 延迟跳转到订单列表页面
+        setTimeout(() => {
+          uni.navigateTo({
+            url: '/pages/order-center/list/index',
+          })
+        }, 2000)
+      }
+      catch (error) {
+        console.error('创建订单失败:', error)
+
+        // 显示错误提示
+        uni.showToast({
+          title: error.message || '创建订单失败，请重试',
+          icon: 'none',
+          duration: 3000,
+        })
+      }
+      finally {
+        this.submitting = false
+      }
+    },
+
+    // 表单验证
+    async validateForm() {
+      try {
+        // 使用uView表单验证，rules中已经定义了所有验证规则
+        await this.$refs.uForm.validate()
+        return true
+      }
+      catch (error) {
+        console.error('表单验证失败:', error)
+        // uView会自动显示验证错误信息，这里不需要额外处理
+        return false
+      }
+    },
+
+    // 构建订单数据，映射到API字段格式
+    buildOrderData() {
+      return {
+        // 收货信息
+        takeName: this.formData.name, // 收货人姓名
+        takeMobile: this.formData.phone, // 收货人手机号
+        address: this.formData.address, // 详细地址(收货地址，卸货位置)
+
+        // 货物信息
+        buyCount: Number(this.formData.quantity), // 购买数量
+        price: Number(this.formData.totalCost), // 价格
+
+        // 发货信息
+        shippingLocationName: this.formData.originCity, // 发货地名称
+        shippingLocationAddress: this.formData.originCity, // 发货详细地址
+
+        // 司机信息
+        driverName: this.formData.driverName, // 司机姓名
+        driverMobile: this.formData.driverPhone, // 司机手机号
+        carNumber: this.formData.plateNumber, // 车牌号
+        type: this.formData.vehicleType, // 车类型
+
+        // 订单状态和时间
+        status: 0, // 订单状态 0 已创建待支付
+        placeOrderTime: new Date().toISOString(), // 下单时间
+
+        // 其他必要字段
+        isDel: 0, // 0 未删除
+        isEvaluate: 0, // 0 未评价
+        orderCount: 1, // 订单数量
+
+        // 扩展数据
+        extData: {
+          unit: this.formData.unit, // 单位
+          isDefault: this.formData.isDefault, // 是否默认地址
+        },
+      }
     },
 
     // 选择收货地址
     selectDeliveryAddress() {
       // TODO: 跳转到地址选择页面
+      uni.showToast({
+        title: '地址选择功能开发中',
+        icon: 'none',
+      })
     },
 
     // 选择发货地址
     selectOriginAddress() {
       // TODO: 跳转到发货地址选择页面
+      uni.showToast({
+        title: '发货地址选择功能开发中',
+        icon: 'none',
+      })
     },
   },
 }
@@ -284,9 +476,13 @@ export default {
       <text class="total-cost">
         ¥{{ formData.totalCost }}
       </text>
-      <view class="confirm-order-btn flex-col" @click="confirmOrder">
+      <view
+        class="confirm-order-btn flex-col"
+        :class="{ 'btn-disabled': submitting }"
+        @click="confirmOrder"
+      >
         <text class="confirm-btn-text">
-          确认下单
+          {{ submitting ? '提交中...' : '确认下单' }}
         </text>
       </view>
     </view>
