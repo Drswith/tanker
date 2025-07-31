@@ -23,4 +23,14 @@ export const orderApi = {
   getCurrentOrder(data) {
     return request.get('/api/order/current_order', data)
   },
+
+  // 删除订单
+  deleteOrder(id) {
+    return request.delete(`/api/order/delete/${id}`)
+  },
+
+  // 评价订单
+  evaluateOrder(data) {
+    return request.post('/api/order/evaluate', data)
+  },
 }

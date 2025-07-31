@@ -71,6 +71,13 @@
       }
     },
     {
+      "path": "pages/order-center/evaluate/index",
+      "style": {
+        "navigationBarTitleText": "评价",
+        "navigationStyle": "default"
+      }
+    },
+    {
       "path": "pages/order-center/sign/index",
       "style": {
         "navigationBarTitleText": "签署合同",

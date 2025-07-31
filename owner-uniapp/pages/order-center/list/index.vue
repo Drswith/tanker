@@ -118,16 +118,16 @@ export default {
     // 当前卡片按钮组
     currentCardButtonGroup() {
       const buttonGroups = [
-        { name: '取消订单', class: '', handler: () => {} },
-        { name: '修改订单', class: '', handler: () => {} },
+        { name: '取消订单', class: '', handler: order => this.apiErrorToast(order) },
+        { name: '修改订单', class: '', handler: order => this.handleEditOrder(order) },
         { name: '立即签署', class: '', handler: () => {} },
         { name: '订单进度', class: '', handler: () => {} },
         { name: '验收授权', class: '', handler: () => {} },
         { name: '确认收货', class: '', handler: () => {} },
         { name: '寄回GPS', class: '', handler: () => {} },
-        { name: '立即评价', class: '', handler: () => {} },
-        { name: '删除订单', class: '', handler: () => {} },
-        { name: '再来一单', class: '', handler: () => {} },
+        { name: '立即评价', class: '', handler: order => this.handleEvaluateOrder(order) },
+        { name: '删除订单', class: '', handler: order => this.apiErrorToast(order) },
+        { name: '再来一单', class: '', handler: order => this.apiErrorToast(order) },
         { name: '立即支付', class: '', handler: () => {} },
       ]
 
@@ -176,6 +176,13 @@ export default {
     this.orderDataList = this.dataList
   },
   methods: {
+    apiErrorToast(params) {
+      console.log('params', params)
+      uni.showToast({
+        title: '缺少API接口',
+        icon: 'none',
+      })
+    },
     // 切换标签
     async changeTab({ index }) {
       console.log('changeTab', index)
@@ -242,6 +249,20 @@ export default {
 
       // }
       // 可以在这里处理滚动逻辑，如：
+    },
+    // 修改订单
+    handleEditOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/add/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
+    // 评价订单
+    handleEvaluateOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/evaluate/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
     },
   },
 }
@@ -345,7 +366,7 @@ export default {
             </view>
 
             <view v-if="currentCardButtonGroup.length > 0" class="button-group">
-              <view v-for="(btn, index) in currentCardButtonGroup" :key="index" :class="btn.class" style="margin-left: 20rpx;">
+              <view v-for="(btn, btnIndex) in currentCardButtonGroup" :key="btnIndex" :class="btn.class" style="margin-left: 20rpx;" @click="() => btn.handler(item)">
                 {{ btn.name }}
               </view>
             </view>
