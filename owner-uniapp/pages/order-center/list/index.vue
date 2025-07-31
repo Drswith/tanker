@@ -61,29 +61,30 @@ const OrderStatus = Object.freeze({
 export default {
   data() {
     return {
+      OrderStatus,
       // 标签栏数据 - 使用OrderStatus枚举替代硬编码数字
       tabList: [
         // 主要业务流程状态
-        { title: '待支付', id: OrderStatus.Created }, // 0 - 已创建待支付
-        { title: '待接单', id: OrderStatus.Paid }, // 1 - 已支付待接单
-        { title: '待签署', id: OrderStatus.Accepted }, // 2 - 已接单待签署（业主和平台）
-        { title: '待发车', id: OrderStatus.Signed }, // 3 - 已签署司机前往发车地待验车
-        { title: '验车中', id: OrderStatus.Verified }, // 4 - 验车通过待施封
-        { title: '验车失败', id: OrderStatus.Unverified }, // 5 - 验车不通过
-        { title: 'GPS待安装', id: OrderStatus.Sealed }, // 6 - 完成施封待安装GPS
-        { title: '待司机签署', id: OrderStatus.GpsInstalled }, // 7 - 完成GPS安装待司机签署
-        { title: '运输中', id: OrderStatus.DriverSigned }, // 8 - 司机已签署（运输中）
-        { title: '待核验', id: OrderStatus.DeliveryConfirmed }, // 9 - 司机确认送达待核验
-        { title: '待评价', id: OrderStatus.OwnerVerified }, // 10 - 业主核验确认收货后待评价
-        { title: '核验失败', id: OrderStatus.OwnerRejected }, // 11 - 业主核验不通过
-        { title: '已评价', id: OrderStatus.Evaluated }, // 12 - 已评价（用于前端查询）
-        { title: 'GPS待回收', id: OrderStatus.WaitingGpsReturn }, // 13 - 确认收货后待邮寄GPS
-        { title: 'GPS已邮寄', id: OrderStatus.GpsShipped }, // 14 - 已邮寄
-        { title: '已完成', id: OrderStatus.GpsReceived }, // 15 - 后台确认收到GPS订单结束
-        { title: '待退款', id: OrderStatus.RefundSubmitted }, // 16 - 已提交资料待退款
-        { title: '已取消', id: OrderStatus.RefundCompleted }, // 17 - 已退款已取消
+        { name: '待接单', status: OrderStatus.Paid }, // 1 - 已支付待接单
+        { name: '待支付', status: OrderStatus.Created }, // 0 - 已创建待支付
+        { name: '待发车', status: OrderStatus.Signed }, // 3 - 已签署司机前往发车地待验车
+        { name: '待签署', status: OrderStatus.Accepted }, // 2 - 已接单待签署（业主和平台）
+        { name: '验车中', status: OrderStatus.Verified }, // 4 - 验车通过待施封
+        { name: '验车失败', status: OrderStatus.Unverified }, // 5 - 验车不通过
+        { name: 'GPS待安装', status: OrderStatus.Sealed }, // 6 - 完成施封待安装GPS
+        { name: '待司机签署', status: OrderStatus.GpsInstalled }, // 7 - 完成GPS安装待司机签署
+        { name: '运输中', status: OrderStatus.DriverSigned }, // 8 - 司机已签署（运输中）
+        { name: '待核验', status: OrderStatus.DeliveryConfirmed }, // 9 - 司机确认送达待核验
+        { name: '待评价', status: OrderStatus.OwnerVerified }, // 10 - 业主核验确认收货后待评价
+        { name: '核验失败', status: OrderStatus.OwnerRejected }, // 11 - 业主核验不通过
+        { name: '已评价', status: OrderStatus.Evaluated }, // 12 - 已评价（用于前端查询）
+        { name: 'GPS待回收', status: OrderStatus.WaitingGpsReturn }, // 13 - 确认收货后待邮寄GPS
+        { name: 'GPS已邮寄', status: OrderStatus.GpsShipped }, // 14 - 已邮寄
+        { name: '已完成', status: OrderStatus.GpsReceived }, // 15 - 后台确认收到GPS订单结束
+        { name: '待退款', status: OrderStatus.RefundSubmitted }, // 16 - 已提交资料待退款
+        { name: '已取消', status: OrderStatus.RefundCompleted }, // 17 - 已退款已取消
       ],
-      currentTab: OrderStatus.Paid, // 默认选中"待接单"状态
+      currentTab: 0,
       page: 1,
       size: 10,
       // 订单数据，实际可从接口获取
@@ -97,17 +98,93 @@ export default {
       // 模拟，实际可根据不同标签逻辑复杂处理，比如接口按状态筛选
       return this.orderDataList
     },
+
+    // 当前状态配置
+    currentStatusConfig() {
+      const styleConfigs = {
+        [OrderStatus.Accepted]: { background: 'linear-gradient(to right, #FD4641, #FD7966)' },
+        [OrderStatus.Signed]: { background: 'linear-gradient(to right, #FD4641, #FD7966)' },
+      }
+
+      const style = styleConfigs[this.tabList[this.currentTab].status] || null
+      if (style) {
+        return { name: this.tabList[this.currentTab].name, style }
+      }
+      else {
+        return { name: this.tabList[this.currentTab].name, style: { background: 'linear-gradient(to right, #0975FF, #62CBFD)' } }
+      }
+    },
+
+    // 当前卡片按钮组
+    currentCardButtonGroup() {
+      const buttonGroups = [
+        { name: '取消订单', class: '', handler: () => {} },
+        { name: '修改订单', class: '', handler: () => {} },
+        { name: '立即签署', class: '', handler: () => {} },
+        { name: '订单进度', class: '', handler: () => {} },
+        { name: '验收授权', class: '', handler: () => {} },
+        { name: '确认收货', class: '', handler: () => {} },
+        { name: '寄回GPS', class: '', handler: () => {} },
+        { name: '立即评价', class: '', handler: () => {} },
+        { name: '删除订单', class: '', handler: () => {} },
+        { name: '再来一单', class: '', handler: () => {} },
+        { name: '立即支付', class: '', handler: () => {} },
+      ]
+
+      const statusButtonGroupMap = {
+        [OrderStatus.Created]: buttonGroups.filter(item => ['取消订单', '立即支付'].includes(item.name)), // 0 - 已创建待支付
+        [OrderStatus.Paid]: buttonGroups.filter(item => ['修改订单', '取消订单'].includes(item.name)), // 1 - 已支付待接单
+        [OrderStatus.Accepted]: buttonGroups.filter(item => ['修改订单', '取消订单', '立即签署'].includes(item.name)), // 2 - 已接单待签署（业主和平台）
+        [OrderStatus.Signed]: buttonGroups.filter(item => [].includes(item.name)), // 3 - 已签署待发车
+        [OrderStatus.Verified]: buttonGroups.filter(item => [].includes(item.name)), // 4 - 验车通过待施封
+        [OrderStatus.Unverified]: buttonGroups.filter(item => [].includes(item.name)), // 5 - 验车不通过
+        [OrderStatus.Sealed]: buttonGroups.filter(item => [].includes(item.name)), // 6 - 完成施封待安装GPS
+        [OrderStatus.GpsInstalled]: buttonGroups.filter(item => ['取消订单', '立即签署'].includes(item.name)), // 7 - 完成GPS安装待司机签署
+        [OrderStatus.DriverSigned]: buttonGroups.filter(item => ['订单进度', '验收授权', '确认收货'].includes(item.name)), // 8 - 司机已签署（运输中）
+        [OrderStatus.DeliveryConfirmed]: buttonGroups.filter(item => ['验收授权'].includes(item.name)), // 9 - 司机确认送达待核验
+        [OrderStatus.OwnerVerified]: buttonGroups.filter(item => ['立即评价'].includes(item.name)), // 10 - 业主核验确认收货后待评价
+        [OrderStatus.OwnerRejected]: buttonGroups.filter(item => [].includes(item.name)), // 11 - 业主核验不通过
+        [OrderStatus.Evaluated]: buttonGroups.filter(item => [].includes(item.name)), // 12 - 已评价（用于前端查询）
+        [OrderStatus.WaitingGpsReturn]: buttonGroups.filter(item => ['寄回GPS'].includes(item.name)), // 13 - 确认收货后待邮寄GPS
+        [OrderStatus.GpsShipped]: buttonGroups.filter(item => [].includes(item.name)), // 14 - 已邮寄
+        [OrderStatus.GpsReceived]: buttonGroups.filter(item => [].includes(item.name)), // 15 - 后台确认收到GPS订单结束
+        [OrderStatus.RefundSubmitted]: buttonGroups.filter(item => ['删除订单'].includes(item.name)), // 16 - 已提交资料待退款
+        [OrderStatus.RefundCompleted]: buttonGroups.filter(item => ['删除订单'].includes(item.name)), // 17 - 已退款已取消
+      }
+
+      // inject class
+      console.log('this.tabList[this.currentTab].status', this.currentTab, this.tabList[this.currentTab].status, statusButtonGroupMap[this.tabList[this.currentTab].status])
+      const result = statusButtonGroupMap[this.tabList[this.currentTab].status]?.reverse() || []
+      for (let index = 0; index < result.length; index++) {
+        const element = result[index]
+        if (index === 1) {
+          element.class = 'modify-btn'
+        }
+        else if (index === 2) {
+          element.class = 'cancel-btn'
+        }
+        else {
+          element.class = 'sign-btn'
+        }
+      }
+
+      return result.reverse()
+    },
   },
-  onLoad() {
-    this.getOrder()
+  async onShow() {
+    this.dataList = await this.getOrder()
+    this.orderDataList = this.dataList
   },
   methods: {
     // 切换标签
-    switchTab(index) {
+    async changeTab({ index }) {
+      console.log('changeTab', index)
       this.currentTab = index
       this.page = 1
-      this.getOrder()
-      // 可在此处根据标签切换，调用接口重新获取对应状态订单数据等逻辑
+      this.dataList = []
+      this.orderDataList = []
+      this.dataList = await this.getOrder()
+      this.orderDataList = this.dataList
     },
     // 拨打电话
     callCustomNumber(phone) {
@@ -135,8 +212,8 @@ export default {
       // }
 
       // let data = await this.httpApi.usageOrderList({
-      let data = await orderApi.getOrderList({
-        status: this.currentTab,
+      const data = await orderApi.getOrderList({
+        status: this.tabList[this.currentTab].status,
         page: this.page,
         size: this.size,
       })
@@ -146,28 +223,15 @@ export default {
           item.deliveryName = item.deliveryName ? item.deliveryName.substr(0, 1) : null
         })
       }
-
-      this.dataList = data.content
-      this.orderDataList = data.content
+      return data?.content || []
     },
     async onScroll(e) {
       // e.detail.scrollTop 是滚动距离
       console.log('滚动位置：', e.detail.scrollTop)
       if (this.dataList.length >= this.size && e.detail.scrollTop > this.orderList.length * 110) {
         this.page++
-        let data = await this.httpApi.usageOrderList({
-          status: this.currentTab,
-          page: this.page,
-          size: this.size,
-        })
-        if (data?.data?.content && Array.isArray(data.data.content)) {
-          data.data.content.forEach((item) => {
-            item.driverName = item.driverName ? item.driverName.substr(0, 1) : null
-            item.deliveryName = item.deliveryName ? item.deliveryName.substr(0, 1) : null
-          })
-        }
-        this.dataList = data.data.content
-        this.orderDataList = [...this.orderDataList, ...data.data.content]
+        this.dataList = await this.getOrder()
+        this.orderDataList = [...this.orderDataList, ...this.dataList]
       }
       // if(this.show) {
       // 	if (this.orderList.length > this.size && e.detail.scrollTop > this.orderList.length * 90) {
@@ -186,15 +250,34 @@ export default {
 <template>
   <view class="order-center">
     <view class="context">
-      <!-- 标签栏 -->
-      <view class="tab-bar">
-        <view
-          v-for="(item, index) in tabList" :key="index" class="tab-item"
-          :class="{ active: currentTab === item.id }" @click="switchTab(item.id)"
-        >
-          {{ item.title }}
-        </view>
-      </view>
+      <u-tabs
+        :current="currentTab"
+        :list="tabList"
+        line-color="transparent"
+        :active-style="{
+          fontWeight: '600',
+          fontSize: '32rpx',
+          color: '#333333',
+          height: '44rpx',
+          lineHeight: '44rpx',
+          textAlign: 'left',
+          fontStyle: 'normal',
+          transform: 'translateY(-4rpx)',
+          transition: 'all 0.1s ease-in-out',
+        }"
+        :inactive-style="{
+          fontWeight: '500',
+          fontSize: '24rpx',
+          color: '#999999',
+          height: '34rpx',
+          lineHeight: '34rpx',
+          textAlign: 'left',
+          fontStyle: 'normal',
+          transition: 'all 0.1s ease-in-out',
+        }"
+        item-style="padding-left: 16rpx; padding-right: 16rpx ;height: 44rpx;"
+        @change="changeTab"
+      />
       <!-- 订单状态 0 已创建待支付 1 已支付待接单 2已接单待签署（业主和平台）
 			3已签署司机前往发车地待验车 4 验车通过待施封 5 验车不通过 6 完成施封待安装gps
 			7完成gps安装待司机签署 8司机已签署（运输中）9司机确认送达待核验 10业主核验确认收货后 待评价（用于查询）
@@ -203,44 +286,16 @@ export default {
       <scroll-view class="order" scroll-y @scroll="onScroll">
         <view v-for="(item, index) in orderDataList" :key="index" class="card">
           <view
-            v-if="currentTab === 1" class="treetop"
-            style="background: linear-gradient(to right, #0975FF, #62CBFD);"
+            v-if="currentStatusConfig"
+            class="treetop"
+            :style="currentStatusConfig.style"
           >
-            <text>待接单</text>
+            <text>{{ currentStatusConfig.name }}</text>
           </view>
-          <view
-            v-if="currentTab === 0" class="treetop"
-            style="background: linear-gradient(to right, #0975FF, #62CBFD);"
-          >
-            <text>待支付</text>
-          </view>
-          <view
-            v-if="currentTab === 3" class="treetop"
-            style="background: linear-gradient(to right, #0975FF, #62CBFD);"
-          >
-            <text>待发车</text>
-          </view>
-          <view
-            v-if="currentTab === 4" class="treetop"
-            style="background: linear-gradient(to right, #0975FF, #62CBFD);"
-          >
-            <text>运输中</text>
-          </view>
-          <view
-            v-if="currentTab === 6" class="treetop"
-            style="background: linear-gradient(to right, #0975FF, #62CBFD);"
-          >
-            <text>待回收</text>
-          </view>
-          <view
-            v-if="currentTab === 2" class="treetop"
-            style="background: linear-gradient(to right, #FD4641, #FD7966);"
-          >
-            <text>待签署</text>
-          </view>
+
           <view
             class="card_item" :style="{
-              marginBottom: currentTab === 2 ? '45px' : '15px',
+              marginBottom: (currentTab === OrderStatus.Accepted || currentTab === OrderStatus.GpsInstalled) ? '45px' : '15px',
             }"
           >
             <view>
@@ -289,37 +344,21 @@ export default {
               />
             </view>
 
-            <view class="button-group">
-              <view v-if="currentTab === 2" class="sign-btn" style="margin-left: 10px;">
-                立即签署
-              </view>
-              <view class="modify-btn" style="margin-left: 10px;">
-                修改订单
-              </view>
-              <view class="cancel-btn">
-                取消订单
-              </view>
-              <view class="cancel-btn">
-                订单进度
-              </view>
-              <view class="cancel-btn">
-                验收授权
-              </view>
-              <view class="cancel-btn">
-                确认收货
-              </view>
-              <view v-if="currentTab === 6" class="cancel-btn">
-                寄回GPS
-              </view>
-              <view class="cancel-btn">
-                立即评价
+            <view v-if="currentCardButtonGroup.length > 0" class="button-group">
+              <view v-for="(btn, index) in currentCardButtonGroup" :key="index" :class="btn.class" style="margin-left: 10px;">
+                {{ btn.name }}
               </view>
             </view>
           </view>
 
-          <view v-if="currentTab === 2" class="notes">
+          <view v-if="currentTab === OrderStatus.Accepted" class="notes">
             <text style="margin-left: 10px;">
               备注：平台服务协议
+            </text>
+          </view>
+          <view v-else-if="currentTab === OrderStatus.GpsInstalled" class="notes">
+            <text style="margin-left: 10px;">
+              备注：司机承运协议
             </text>
           </view>
         </view>

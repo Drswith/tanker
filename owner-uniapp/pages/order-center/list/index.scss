@@ -22,20 +22,20 @@
 	}
 
 	.tab-item {
-		// width: 140px;
-		height: 20px;
-		margin-top: 10px;
-		margin-left: 2px;
+		// width: 280rpx;
+		height: 40rpx;
+		margin-top: 20rpx;
+		margin-left: 4rpx;
 		text-align: center;
-		padding: 10px 0;
+		padding: 20rpx 0;
 		color: #B0B0B0;
-		font-size: 14px;
+		font-size: 28rpx;
 	}
 
 	.tab-item.active {
 		color: #333333;
-		font-size: 16px;
-		margin-top: -1rpx;
+		font-size: 32rpx;
+		margin-top: -2rpx;
 		font-weight: 600;
 	}
 
@@ -55,9 +55,9 @@
 
 	.card {
 		// width: 90%;
-		margin-top: 5px;
-		// margin-bottom: 15px;
-		// margin-bottom: 45px;
+		margin-top: 10rpx;
+		// margin-bottom: 30rpx;
+		// margin-bottom: 90rpx;
 		// background-color: #FFFFFF;
 		
 
@@ -71,20 +71,20 @@
 		right: 0;
 		/* background-color: #FEA801; */
 		color: #fff;
-		font-size: 10px;
+		font-size: 20rpx;
 		font-weight: 400;
-		padding: 4px 10px;
-		border-radius: 0 5px 0 5px;
+		padding: 8rpx 20rpx;
+		border-radius: 0 10rpx 0 10rpx;
 
 	}
 
 	.order .card_item {
-		padding: 10px;
-		font-size: 12px;
+		padding: 20rpx;
+		font-size: 24rpx;
 		color: #C3C3C3;
-		line-height: 30px;
+		line-height: 60rpx;
 		background: #FFFFFF;
-		border: 1px solid #E5E5E5;
+		border: 2rpx solid #E5E5E5;
 		box-shadow: 0rpx 4rpx 4rpx 0rpx rgba(0,0,0,0.1);
 		border-radius: 16rpx;
 	}
@@ -92,7 +92,7 @@
 	.flex {
 		display: flex;
 		width: 100%;
-		height: 30px;
+		height: 60rpx;
 		overflow: hidden;
 
 	}
@@ -102,17 +102,17 @@
 	}
 
 	.title {
-		height: 20px;
-		font-size: 16px;
+		height: 40rpx;
+		font-size: 32rpx;
 		font-weight: 500;
-		margin-top: 10px;
+		margin-top: 20rpx;
 	}
 
 	.image {
 		position: absolute;
-		top: 10px;
+		top: 20rpx;
 		width: 100%;
-		height: 30px;
+		height: 60rpx;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -143,60 +143,67 @@
 		width: 100%;
 		height: 60rpx;
 		display: flex;
-		flex-direction: row-reverse;
 		justify-content: flex-end;
 		margin-top: 20rpx;
 	}
 
 	/* 取消订单按钮样式 */
 	.cancel-btn {
-		width: 80px;
+		width: 160rpx;
 		height: 100%;
 		background-color: #E9E9E9;
 		color: #AAAAAA;
-		font-size: 12px;
-		border-radius: 20px;
+		font-size: 24rpx;
+		border-radius: 40rpx;
 		margin: 0;
 		text-align: center;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	/* 修改订单按钮样式 */
 	.modify-btn {
-		width: 80px;
+		width: 160rpx;
 		height: 100%;
 		background-color: #fff;
 		color: #EBA932;
-		font-size: 12px;
-		border: 1px solid #EBA932;
-		border-radius: 20px;
+		font-size: 24rpx;
+		border: 2rpx solid #EBA932;
+		border-radius: 40rpx;
 		margin: 0;
 		text-align: center;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	/* 立即签署按钮样式 */
 	.sign-btn {
-		width: 80px;
+		width: 160rpx;
 		height: 100%;
 		background: linear-gradient(to right, #FFA600, #FFCD01);
 		color: #fff;
-		border-radius: 20px;
-		font-size: 12px;
+		border-radius: 40rpx;
+		font-size: 24rpx;
 		margin: 0;
-		text-align: center;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.text_right {
-		width: 70px;
+		width: 140rpx;
 		text-align: right;
 		display: inline-block;
-		font-size: 12px;
+		font-size: 24rpx;
 		font-weight: 300;
 		color:#999999
 	}
 	/* 图片 */
 	.image {
 		display: inline-block;
-		width: 10px;
-		height: 10px;
+		width: 20rpx;
+		height: 20rpx;
 		background-image: url(/static/images/icon/phone.png);
 	}
