@@ -146,44 +146,44 @@ export default {
       <scroll-view class="order" scroll-y @scroll="onScroll">
         <view v-for="(item, index) in orderDataList" :key="index" class="card">
           <view
-            v-if="currentTab == 1" class="treetop"
+            v-if="currentTab === 1" class="treetop"
             style="background: linear-gradient(to right, #0975FF, #62CBFD);"
           >
             <text>待接单</text>
           </view>
           <view
-            v-if="currentTab == 0" class="treetop"
+            v-if="currentTab === 0" class="treetop"
             style="background: linear-gradient(to right, #0975FF, #62CBFD);"
           >
             <text>待支付</text>
           </view>
           <view
-            v-if="currentTab == 3" class="treetop"
+            v-if="currentTab === 3" class="treetop"
             style="background: linear-gradient(to right, #0975FF, #62CBFD);"
           >
             <text>待发车</text>
           </view>
           <view
-            v-if="currentTab == 4" class="treetop"
+            v-if="currentTab === 4" class="treetop"
             style="background: linear-gradient(to right, #0975FF, #62CBFD);"
           >
             <text>运输中</text>
           </view>
           <view
-            v-if="currentTab == 6" class="treetop"
+            v-if="currentTab === 6" class="treetop"
             style="background: linear-gradient(to right, #0975FF, #62CBFD);"
           >
             <text>待回收</text>
           </view>
           <view
-            v-if="currentTab == 2" class="treetop"
+            v-if="currentTab === 2" class="treetop"
             style="background: linear-gradient(to right, #FD4641, #FD7966);"
           >
             <text>待签署</text>
           </view>
           <view
             class="card_item" :style="{
-              marginBottom: currentTab == 2 ? '45px' : '15px',
+              marginBottom: currentTab === 2 ? '45px' : '15px',
             }"
           >
             <view>
@@ -243,7 +243,8 @@ export default {
               </view>
             </view>
           </view>
-          <view v-if="currentTab == 2" class="notes">
+
+          <view v-if="currentTab === 2" class="notes">
             <text style="margin-left: 10px;">
               备注：平台服务协议
             </text>
