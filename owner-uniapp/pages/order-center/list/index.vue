@@ -326,7 +326,7 @@ export default {
 
         <view
           class="card_item" :style="{
-            marginBottom: (currentTab === OrderStatus.Accepted || currentTab === OrderStatus.GpsInstalled) ? '90rpx' : '30rpx',
+            marginBottom: (item.status === OrderStatus.Accepted || item.status === OrderStatus.GpsInstalled) ? '90rpx' : '30rpx',
           }"
           @click="() => handleOrderDetail(item)"
         >
@@ -383,16 +383,13 @@ export default {
           </view>
         </view>
 
-        <view v-if="currentTab === OrderStatus.Accepted" class="notes">
-          <text style="margin-left: 20rpx;">
-            备注：平台服务协议
-          </text>
-        </view>
-        <view v-else-if="currentTab === OrderStatus.GpsInstalled" class="notes">
-          <text style="margin-left: 20rpx;">
-            备注：司机承运协议
-          </text>
-        </view>
+        <template v-if="item.status === OrderStatus.Accepted || item.status === OrderStatus.GpsInstalled">
+          <view class="notes">
+            <text style="margin-left: 20rpx;">
+              {{ item.status === OrderStatus.Accepted ? '备注：平台服务协议' : '备注：司机承运协议' }}
+            </text>
+          </view>
+        </template>
       </view>
       <view style="height: 100rpx;background-color: #F8F8F8;" />
     </scroll-view>
