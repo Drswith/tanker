@@ -118,16 +118,16 @@ export default {
     if (options.id) {
       this.pageState.isEdit = true
       this.pageState.addressId = options.id
-      this.loadAddressDetail(options.addressData)
+      this.loadAddressDetail(options.id)
     }
   },
 
   methods: {
     // 加载地址详情（编辑时使用）
-    async loadAddressDetail(addressData) {
+    async loadAddressDetail(id) {
       try {
         this.pageState.isLoading = true
-        const address = JSON.parse(decodeURIComponent(addressData))
+        const address = await addressApi.getAddressDetail(id)
         console.log(address)
         this.formData = {
           contactPerson: address.name || '',
