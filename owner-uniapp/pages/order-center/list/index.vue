@@ -86,7 +86,7 @@ export default {
       ],
       currentTab: 0,
       page: 1,
-      size: 10,
+      size: 20,
       // 订单数据，实际可从接口获取
       orderDataList: [],
       dataList: [],
@@ -99,7 +99,7 @@ export default {
       return this.orderDataList
     },
 
-    // 当前状态配置
+    // 当前卡片角标
     currentStatusConfig() {
       const styleConfigs = {
         [OrderStatus.Accepted]: { background: 'linear-gradient(to right, #FD4641, #FD7966)' },
@@ -284,7 +284,7 @@ export default {
 
 <template>
   <view class="order-center">
-    <view class="context">
+    <view class="order-tabs">
       <u-tabs
         :current="currentTab"
         :list="tabList"
@@ -313,96 +313,241 @@ export default {
         item-style="padding-left: 16rpx; padding-right: 16rpx ;height: 44rpx;"
         @change="changeTab"
       />
-      <!-- 订单状态 0 已创建待支付 1 已支付待接单 2已接单待签署（业主和平台）
+    </view>
+
+    <!-- 订单状态 0 已创建待支付 1 已支付待接单 2已接单待签署（业主和平台）
 			3已签署司机前往发车地待验车 4 验车通过待施封 5 验车不通过 6 完成施封待安装gps
 			7完成gps安装待司机签署 8司机已签署（运输中）9司机确认送达待核验 10业主核验确认收货后 待评价（用于查询）
 			11业主核验不通过12 已评价(用于前端查询) 13确认收货后待邮寄gps 14已邮寄
 			15后台确认收到gps订单结束 16已提交资料待退款 17已退款已取消 -->
-      <scroll-view class="order" scroll-y @scroll="onScroll">
-        <view v-for="(item, index) in orderDataList" :key="index" class="card">
-          <view
-            v-if="currentStatusConfig"
-            class="treetop"
-            :style="currentStatusConfig.style"
-          >
-            <text>{{ currentStatusConfig.name }}</text>
-          </view>
+    <scroll-view class="order" scroll-y @scroll="onScroll">
+      <view v-for="(item, index) in orderDataList" :key="index" class="card">
+        <view
+          v-if="currentStatusConfig"
+          class="treetop"
+          :style="currentStatusConfig.style"
+        >
+          <text>{{ currentStatusConfig.name }}</text>
+        </view>
 
-          <view
-            class="card_item" :style="{
-              marginBottom: (currentTab === OrderStatus.Accepted || currentTab === OrderStatus.GpsInstalled) ? '90rpx' : '30rpx',
-            }"
-          >
+        <view
+          class="card_item" :style="{
+            marginBottom: (currentTab === OrderStatus.Accepted || currentTab === OrderStatus.GpsInstalled) ? '90rpx' : '30rpx',
+          }"
+        >
+          <view>
+            <view class="text_right">
+              订单编号：
+            </view>{{ item.orderNo }}
+          </view>
+          <view class="flex">
             <view>
               <view class="text_right">
-                订单编号：
-              </view>{{ item.orderNo }}
-            </view>
-            <view class="flex">
-              <view>
-                <view class="text_right">
-                  购买数量：
-                </view><text id="text" style="color:#000000;">
-                  {{ item.buyCount }} 吨
-                </text>
-              </view>
-              <view style="margin-left: 40rpx;">
-                下单时间：<text id="text" style="color:#000000;">
-                  {{ item.placeOrderTime }}
-                </text>
-              </view>
-            </view>
-            <view>
-              <view class="text_right">
-                司机：
+                购买数量：
               </view><text id="text" style="color:#000000;">
-                {{ item.deliveryName ? `${item.deliveryName}师傅` : "" }}<text style="margin-left: 20rpx;">
-                  {{ item.deliveryMobile ? `(${item.deliveryMobile})` : "" }}
-                </text>
+                {{ item.buyCount }} 吨
               </text>
-              <image
-                v-show="item.deliveryMobile" style="width: 24rpx; height: 24rpx; margin-left: 10rpx;" src="/static/images/icon/phone.png"
-                @click="callCustomNumber(item.deliveryMobile)"
-              />
             </view>
-            <view>
-              <view class="text_right">
-                发货员：
-              </view><text id="text" style="color:#000000;">
-                {{ item.driverName ? `${item.driverName}师傅` : "" }} <text style="margin-left: 20rpx;">
-                  {{ item.driverMobile ? `(${item.driverMobile})` : "" }}
-                </text>
+            <view style="margin-left: 40rpx;">
+              下单时间：<text id="text" style="color:#000000;">
+                {{ item.placeOrderTime }}
               </text>
-              <image
-                v-show="item.driverMobile" style="width: 24rpx; height: 24rpx; margin-left: 10rpx;" src="/static/images/icon/phone.png"
-                @click="callCustomNumber(item.driverMobile)"
-              />
-            </view>
-
-            <view v-if="currentCardButtonGroup.length > 0" class="button-group">
-              <view v-for="(btn, btnIndex) in currentCardButtonGroup" :key="btnIndex" :class="btn.class" style="margin-left: 20rpx;" @click="() => btn.handler(item)">
-                {{ btn.name }}
-              </view>
             </view>
           </view>
-
-          <view v-if="currentTab === OrderStatus.Accepted" class="notes">
-            <text style="margin-left: 20rpx;">
-              备注：平台服务协议
+          <view>
+            <view class="text_right">
+              司机：
+            </view><text id="text" style="color:#000000;">
+              {{ item.deliveryName ? `${item.deliveryName}师傅` : "" }}<text style="margin-left: 20rpx;">
+                {{ item.deliveryMobile ? `(${item.deliveryMobile})` : "" }}
+              </text>
             </text>
+            <image
+              v-show="item.deliveryMobile" style="width: 24rpx; height: 24rpx; margin-left: 10rpx;" src="/static/images/icon/phone.png"
+              @click="callCustomNumber(item.deliveryMobile)"
+            />
           </view>
-          <view v-else-if="currentTab === OrderStatus.GpsInstalled" class="notes">
-            <text style="margin-left: 20rpx;">
-              备注：司机承运协议
+          <view>
+            <view class="text_right">
+              发货员：
+            </view><text id="text" style="color:#000000;">
+              {{ item.driverName ? `${item.driverName}师傅` : "" }} <text style="margin-left: 20rpx;">
+                {{ item.driverMobile ? `(${item.driverMobile})` : "" }}
+              </text>
             </text>
+            <image
+              v-show="item.driverMobile" style="width: 24rpx; height: 24rpx; margin-left: 10rpx;" src="/static/images/icon/phone.png"
+              @click="callCustomNumber(item.driverMobile)"
+            />
+          </view>
+
+          <view v-if="currentCardButtonGroup.length > 0" class="button-group">
+            <view v-for="(btn, btnIndex) in currentCardButtonGroup" :key="btnIndex" :class="btn.class" style="margin-left: 20rpx;" @click="() => btn.handler(item)">
+              {{ btn.name }}
+            </view>
           </view>
         </view>
-        <view style="height: 100rpx;background-color: #F8F8F8;" />
-      </scroll-view>
-    </view>
+
+        <view v-if="currentTab === OrderStatus.Accepted" class="notes">
+          <text style="margin-left: 20rpx;">
+            备注：平台服务协议
+          </text>
+        </view>
+        <view v-else-if="currentTab === OrderStatus.GpsInstalled" class="notes">
+          <text style="margin-left: 20rpx;">
+            备注：司机承运协议
+          </text>
+        </view>
+      </view>
+      <view style="height: 100rpx;background-color: #F8F8F8;" />
+    </scroll-view>
   </view>
 </template>
 
 <style scoped lang="scss">
-	@import "./index.scss";
+  /* 订单中心页面主容器 */
+.order-center {
+	width: 100vw;
+	min-height: 100vh;
+	background-color: #F8F8F8;
+	overflow: auto;
+}
+
+.order-tabs {
+	background-color: #F8F8F8;
+  padding: 32rpx 32rpx 0 32rpx;
+	position: fixed;
+	top: calc(88rpx + env(safe-area-inset-top));
+	left: 0;
+	right: 0;
+	z-index: 100;
+	height: calc(44rpx + 32rpx);
+}
+
+/* 订单列表滚动容器 */
+.order {
+	overflow: scroll;
+	padding: calc(44rpx + 32rpx) 32rpx 0 32rpx;
+}
+
+/* 订单卡片容器 */
+.card {
+	margin-top: 10rpx;
+	position: relative;
+	z-index: 10;
+}
+
+/* 订单状态角标 */
+.treetop {
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: #fff;
+	font-size: 20rpx;
+	font-weight: 400;
+	padding: 8rpx 20rpx;
+	border-radius: 0 10rpx 0 10rpx;
+}
+
+/* 订单卡片内容 */
+.order .card_item {
+	padding: 20rpx;
+	font-size: 24rpx;
+	color: #C3C3C3;
+	line-height: 60rpx;
+	background: #FFFFFF;
+	border: 2rpx solid #E5E5E5;
+	box-shadow: 0rpx 4rpx 4rpx 0rpx rgba(0,0,0,0.1);
+	border-radius: 16rpx;
+}
+
+/* 弹性布局容器 */
+.flex {
+	display: flex;
+	width: 100%;
+	height: 60rpx;
+	overflow: hidden;
+}
+
+/* 右对齐文本 */
+.text_right {
+	width: 140rpx;
+	text-align: right;
+	display: inline-block;
+	font-size: 24rpx;
+	font-weight: 300;
+	color: #999999;
+}
+
+/* 订单备注信息 */
+.notes {
+	width: 100%;
+	background-color: #FFF3E0;
+	font-size: 24rpx;
+	color: #797063;
+	display: flex;
+	align-items: center;
+	box-shadow: 0rpx 4rpx 4rpx 0rpx rgba(0,0,0,0.1);
+	border-radius: 0rpx 0rpx 16rpx 16rpx;
+	position: absolute;
+	bottom: 0px;
+	transform: translateY(calc(100% - 16rpx));
+	z-index: -2;
+	padding-top: 32rpx;
+	padding-bottom: 16rpx;
+}
+
+/* 按钮组容器 */
+.button-group {
+	width: 100%;
+	height: 60rpx;
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 20rpx;
+}
+
+/* 取消订单按钮样式 */
+.cancel-btn {
+	width: 160rpx;
+	height: 100%;
+	background-color: #E9E9E9;
+	color: #AAAAAA;
+	font-size: 24rpx;
+	border-radius: 40rpx;
+	margin: 0;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* 修改订单按钮样式 */
+.modify-btn {
+	width: 160rpx;
+	height: 100%;
+	background-color: #fff;
+	color: #EBA932;
+	font-size: 24rpx;
+	border: 2rpx solid #EBA932;
+	border-radius: 40rpx;
+	margin: 0;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* 立即签署按钮样式 */
+.sign-btn {
+	width: 160rpx;
+	height: 100%;
+	background: linear-gradient(to right, #FFA600, #FFCD01);
+	color: #fff;
+	border-radius: 40rpx;
+	font-size: 24rpx;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 </style>
