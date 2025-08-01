@@ -1,0 +1,163 @@
+<template>
+	<view>
+		<map :style="{ 'height':heightMap+'px'}">
+			<!-- <text @click="expandDrawer" class="tipNvue" :class="{origin: !mExpand, target: mExpand}">nvue</text> -->
+
+			<text @click="expandDrawer" class="tipNvue" :style="showCss()">nvue</text>
+
+		</map>
+
+		<ww-bottom-drawerapp :proportionShow='proportionvc' :dragHandleHeight="handleHeight" :isExpand="mExpand"
+			:transitionTime="transitionTime" @callExpand="onCallExpand">
+			<slot>
+
+				<!-- 填充内容 -->
+				<swiper :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval" :duration="duration"
+					:circular="circular" style="height:100rpx">
+					<swiper-item>
+						<view class="swiper-item uni-bg-red">A</view>
+					</swiper-item>
+					<swiper-item>
+						<view class="swiper-item uni-bg-blue">B</view>
+					</swiper-item>
+					<swiper-item>
+						<view class="swiper-item uni-badge-purple">C</view>
+					</swiper-item>
+				</swiper>
+				<uni-grid :column="4" :highlight="false" :showBorder="false" @change="onChange">
+					<uni-grid-item v-for="(item, index) in 18" :index="index" :key="index">
+						<view class="grid-item-box" style="background-color: #fff;">
+							<uni-icons type="image" :size="30" color="#777" />
+							<text class="text">文本信息</text>
+						</view>
+					</uni-grid-item>
+				</uni-grid>
+				<!-- end -->
+			</slot>
+
+		</ww-bottom-drawerapp>
+
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				proportionvc: 0.5, //抽屉初始显示的位置，内容的百分比
+				handleHeight: 20, //抽屉顶部边框高度，可以设置0，隐藏
+				mExpand: true,
+				transitionTime: 2,
+
+				heightMap: 0,
+
+
+				autoplay: true,
+				interval: 3000,
+				duration: 1000,
+				indicatorDots: true,
+				circular: true,
+
+				h: '100%'
+			}
+		},
+		onLoad() {
+
+		},
+		onReady() {
+			const {
+				windowWidth,
+				windowHeight
+			} = uni.getSystemInfoSync();
+			this.heightMap = windowHeight
+			this.$nextTick(() => {
+				setTimeout(() => {
+					this.proportionvc = 0.5
+				}, 300)
+			})
+		},
+		methods: {
+			onChange(e) {
+				let {
+					index
+				} = e.detail;
+				console.error(index);
+				uni.showToast({
+					title: `你点击了${index}`
+				})
+			},
+			expandDrawer() { //控制初始展开状态和后期外部控制展开和搜索
+				this.mExpand = !this.mExpand
+				console.log(this.mExpand)
+			},
+			onCallExpand(e) { //展开搜索的回调监听
+
+				this.mExpand = e.value
+
+
+			},
+			showCss() {
+				if (this.mExpand) { //展开
+					return "transform: translateY(0px);transition-property: transform;transition-duration: 1s;"
+				} else { //收缩
+					return "transform: translateY(100%);transition-property: transform;transition-duration: 1s;"
+				}
+			}
+
+		}
+	}
+</script>
+
+<style>
+	page {
+		background-color: #f3f3f3;
+	}
+
+
+
+
+	.grid-item-box {
+		flex: 1;
+		// position: relative;
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 15px 0;
+	}
+
+	.text {
+		font-size: 26rpx;
+		margin-top: 10rpx;
+	}
+
+	.swiper-item {
+		height: 100rpx;
+		display: block;
+		line-height: 100rpx;
+		text-align: center;
+
+	}
+
+	.tipNvue {
+		display: flex;
+		width: 100%;
+		height: 200rpx;
+		background-color: aliceblue;
+		margin-top: 200rpx;
+	}
+
+	.target {
+		transform: translateY(100%);
+		transition-property: transform;
+		transition-duration: 1s;
+	}
+
+	.origin {
+		transform: translateY(0px);
+		transition-property: transform;
+		transition-duration: 1s;
+	}
+</style>
