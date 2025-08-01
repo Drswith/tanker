@@ -154,7 +154,13 @@
         "navigationStyle": "custom"
       }
     },
-
+    {
+      "path": "pages/change-password/index/index",
+      "style": {
+        "navigationBarTitleText": "修改密码",
+        "navigationStyle": "default"
+      }
+    },
     {
       "path": "pages/message-center/index/index",
       "style": {

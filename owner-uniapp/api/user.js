@@ -18,4 +18,9 @@ export const userApi = {
   updateMyProfile(data) {
     return request.put('/api/users/me', data)
   },
+
+  // 更新密码
+  updatePassword(data) {
+    return request.put('/api/users/me/password', data)
+  },
 }
