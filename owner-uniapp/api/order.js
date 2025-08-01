@@ -57,6 +57,30 @@ export const OrderStatus = Object.freeze({
 })
 
 /**
+ * 订单状态文本映射
+ */
+export const OrderStatusText = Object.freeze({
+  [OrderStatus.Created]: '已创建待支付',
+  [OrderStatus.Paid]: '已支付待接单',
+  [OrderStatus.Accepted]: '已接单待签署',
+  [OrderStatus.Signed]: '已签署司机前往发车地待验车',
+  [OrderStatus.Verified]: '验车通过待施封',
+  [OrderStatus.Unverified]: '验车不通过',
+  [OrderStatus.Sealed]: '完成施封待安装GPS',
+  [OrderStatus.GpsInstalled]: '完成GPS安装待司机签署',
+  [OrderStatus.DriverSigned]: '司机已签署',
+  [OrderStatus.DeliveryConfirmed]: '司机确认送达待核验',
+  [OrderStatus.OwnerVerified]: '业主核验确认收货后待评价',
+  [OrderStatus.OwnerRejected]: '业主核验不通过',
+  [OrderStatus.Evaluated]: '已评价',
+  [OrderStatus.WaitingGpsReturn]: '确认收货后待邮寄GPS',
+  [OrderStatus.GpsShipped]: '已邮寄',
+  [OrderStatus.GpsReceived]: '后台确认收到GPS订单结束',
+  [OrderStatus.RefundSubmitted]: '已提交资料待退款',
+  [OrderStatus.RefundCompleted]: '已退款已取消',
+})
+
+/**
  * 订单相关API
  */
 export const orderApi = {
@@ -73,6 +97,11 @@ export const orderApi = {
   // 更新订单
   updateOrder(data) {
     return request.post('/api/order/update_order', data)
+  },
+
+  // 订单详情
+  getOrderDetail(id) {
+    return request.get(`/api/order/detail/${id}`)
   },
 
   // 获取当前订单

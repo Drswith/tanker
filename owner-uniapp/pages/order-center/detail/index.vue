@@ -1,4 +1,6 @@
 <script>
+import { orderApi, OrderStatusText } from '@/api/order'
+
 export default {
   components: {
 
@@ -11,80 +13,89 @@ export default {
       // 路由参数
       routeParams: {
         orderId: null,
-        orderNo: '',
-        driverId: null,
       },
 
       // 订单数据
       orderData: {
-        // 模拟订单数据
-        orderNo: '813813781293128739',
-        quantity: 100,
-        unit: '吨',
-        driver: {
-          name: '小红',
-          phone: '195****1234'
-        },
-        vehicle: {
-          type: '大卡车',
-          plateNumber: '浙A66666'
-        },
-        shipper: {
-          name: '小亮',
-          phone: '138****5678'
-        },
-        addresses: {
-          pickup: '浙江省杭州市滨江区',
-          delivery: '油厂AAA(浙江省杭州市余杭区xxxxxxx)'
-        },
-        payment: {
-          method: '支付宝',
-          status: '支付凭证',
-          amount: 5000,
-          time: '2025-01-01 12:00'
-        },
-        times: {
-          orderTime: '2023-12-12 12:00:00',
-          acceptTime: '2023-12-12 12:00:00',
-          platformAgreementTime: '2023-12-12 12:00',
-          driverAgreementTime: '/',
-          vehicleTime: '2025-01-01'
-        },
-        status: '待签署'
+        id: null,
+        orderNo: '',
+        buyCount: 0,
+        memberName: '',
+        memberMobile: '',
+        driverName: '',
+        driverMobile: '',
+        carNumber: '',
+        type: '',
+        deliveryName: '',
+        deliveryMobile: '',
+        shippingLocationName: '',
+        shippingLocationAddress: '',
+        province: '',
+        city: '',
+        district: '',
+        address: '',
+        takeName: '',
+        takeMobile: '',
+        payType: '',
+        payTime: '',
+        placeOrderTime: '',
+        receiveTime: '',
+        signDate: '',
+        vehicleInspectionTime: '',
+        driverSignTime: '',
+        status: 0,
+        yzFileImg: [],
+        sjFileImg: [],
+        payImg: [],
+        vehicleInspectionImg: [],
+        leadSealImg: [],
+        deliverImg: [],
+        gpsImg: [],
       },
 
       // 页面状态
       pageState: {
         isLoading: false,
-      }
+      },
     }
   },
   computed: {
+    // 订单状态文本
+    statusText() {
+      return OrderStatusText[this.orderData.status] || '未知状态'
+    },
 
+    // 完整的收货地址
+    fullDeliveryAddress() {
+      const { province, city, district, address } = this.orderData
+      return `${province}${city}${district}${address}`
+    },
+
+    // 发货地址
+    pickupAddress() {
+      const { shippingLocationName, shippingLocationAddress } = this.orderData
+      return `${shippingLocationName}(${shippingLocationAddress})`
+    },
+
+    // 支付方式文本
+    payTypeText() {
+      const payTypeMap = {
+        1: '微信支付',
+        2: '支付宝',
+        3: '银行卡',
+      }
+      return payTypeMap[this.orderData.payType] || '未设置'
+    },
   },
   watch: {
 
   },
   onLoad(options) {
     this.routeParams.orderId = options.id
-    this.routeParams.orderNo = options.orderNo || ''
-    this.routeParams.driverId = options.driverId || null
-
-    // 如果有传递的订单数据，直接使用
-    if (options.orderData) {
-      try {
-        const orderData = JSON.parse(decodeURIComponent(options.orderData))
-        this.orderData = { ...this.orderData, ...orderData }
-        this.routeParams.orderNo = this.orderData.orderNo || ''
-        this.routeParams.driverId = this.orderData.driverId || null
-      }
-      catch (error) {
-        console.error('解析订单数据失败:', error)
-      }
+    if (this.routeParams.orderId) {
+      // 加载订单详情
+      this.loadOrderDetail()
     }
-
-    // 加载订单详情
-    this.loadOrderDetail()
   },
   created() {
 
@@ -97,15 +108,25 @@ export default {
     async loadOrderDetail() {
       try {
         this.pageState.isLoading = true
-        // 这里可以调用API加载真实数据
-        // const response = await orderApi.getOrderDetail(this.routeParams.orderId)
-        // this.orderData = response.data
+        const response = await orderApi.getOrderDetail(this.routeParams.orderId)
+        // 直接使用API返回的数据
+        this.orderData = {
+          ...response,
+          // 确保数组字段不为null
+          yzFileImg: response.yzFileImg || [],
+          sjFileImg: response.sjFileImg || [],
+          payImg: response.payImg || [],
+          vehicleInspectionImg: response.vehicleInspectionImg || [],
+          leadSealImg: response.leadSealImg || [],
+          deliverImg: response.deliverImg || [],
+          gpsImg: response.gpsImg || [],
+        }
       }
       catch (error) {
         console.error('加载订单详情失败:', error)
         uni.showToast({
           title: '加载订单详情失败',
-          icon: 'none'
+          icon: 'none',
         })
       }
       finally {
@@ -121,9 +142,9 @@ export default {
           console.error('拨打电话失败:', error)
           uni.showToast({
             title: '拨打电话失败',
-            icon: 'none'
+            icon: 'none',
           })
-        }
+        },
       })
     },
 
@@ -131,187 +152,307 @@ export default {
     viewContract() {
       uni.showToast({
         title: '查看合同功能开发中',
-        icon: 'none'
+        icon: 'none',
       })
     },
 
     // 查看车辆信息
     viewVehicleInfo() {
       uni.navigateTo({
-        url: `/pages/order-center/vehicle-info/index?orderId=${this.routeParams.orderId}`
+        url: `/pages/order-center/vehicle-info/index?orderId=${this.routeParams.orderId}`,
       })
     },
 
     // 修改订单
     editOrder() {
       uni.navigateTo({
-        url: `/pages/order-center/edit/index?orderId=${this.routeParams.orderId}`
+        url: `/pages/order-center/edit/index?orderId=${this.routeParams.orderId}`,
       })
     },
 
     // 立即签署
     signOrder() {
       uni.navigateTo({
-        url: `/pages/order-center/sign/index?orderId=${this.routeParams.orderId}`
+        url: `/pages/order-center/sign/index?orderId=${this.routeParams.orderId}`,
       })
     },
 
     // 取消订单
     cancelOrder() {
-      uni.showModal({
-        title: '确认取消',
-        content: '确定要取消这个订单吗？',
-        success: (res) => {
-          if (res.confirm) {
-            // 调用取消订单API
-            uni.showToast({
-              title: '订单已取消',
-              icon: 'success'
-            })
-          }
-        }
-      })
+      // 根据订单状态决定取消逻辑
+      if (this.orderData.status === 0) {
+        // 状态为0时直接取消订单
+        uni.showModal({
+          title: '确认取消',
+          content: '确定要取消这个订单吗？',
+          success: async (res) => {
+            if (res.confirm) {
+              try {
+                await orderApi.cancelOrder({ id: this.orderData.id })
+                uni.showToast({
+                  title: '订单已取消',
+                  icon: 'success',
+                })
+                // 重新加载订单详情
+                this.loadOrderDetail()
+              }
+              catch (error) {
+                console.error('取消订单失败:', error)
+                uni.showToast({
+                  title: '取消订单失败',
+                  icon: 'none',
+                })
+              }
+            }
+          },
+        })
+      }
+      else {
+        // 其他状态跳转到退款页面
+        uni.navigateTo({
+          url: `/pages/order-center/cancel/index?orderId=${this.orderData.id}`,
+        })
+      }
     },
 
     // 返回上一页
     navigateBack() {
       uni.navigateBack()
-    }
+    },
   },
 }
 </script>
 
 <template>
   <view class="flex-col page-container">
-    <!-- 地图区域 -->
-    <view class="map-container">
-      <image 
-        src="/static/images/fallback-image.png" 
-        class="map-image"
-        mode="aspectFill"
-      />
-      <!-- 起点和终点标记 -->
-      <view class="map-markers">
-        <view class="marker start-marker">
-          <view class="marker-icon start-icon"></view>
-          <text class="marker-text">起点地</text>
-        </view>
-        <view class="marker end-marker">
-          <view class="marker-icon end-icon"></view>
-          <text class="marker-text">发货地址</text>
-        </view>
-      </view>
+    <!-- 加载状态 -->
+    <view v-if="pageState.isLoading" class="loading-container">
+      <uni-load-more status="loading" />
     </view>
 
-    <!-- 内容区域 -->
-    <view class="content-container flex-col">
-      <!-- 待签署信息卡片 -->
-      <view class="info-card pending-card">
-        <view class="card-header">
-          <text class="card-title">待签署</text>
-        </view>
-        <view class="card-content">
-          <view class="info-row">
-            <text class="info-label">索赔：</text>
-            <text class="info-value">{{ orderData.driver.phone }}</text>
+    <!-- 主要内容 -->
+    <view v-else>
+      <!-- 地图区域 -->
+      <view class="map-container">
+        <image
+          src="/static/images/fallback-image.png"
+          class="map-image"
+          mode="aspectFill"
+        />
+        <!-- 起点和终点标记 -->
+        <view class="map-markers">
+          <view class="marker start-marker">
+            <view class="marker-icon start-icon" />
+            <text class="marker-text">
+              起点地
+            </text>
           </view>
-          <view class="info-row">
-            <text class="info-label">送货地址：</text>
-            <text class="info-value">{{ orderData.addresses.pickup }}</text>
-          </view>
-          <view class="info-row">
-            <text class="info-label">发货地址：</text>
-            <text class="info-value">{{ orderData.addresses.delivery }}</text>
+          <view class="marker end-marker">
+            <view class="marker-icon end-icon" />
+            <text class="marker-text">
+              发货地址
+            </text>
           </view>
         </view>
       </view>
 
-      <!-- 订单详情 -->
-      <view class="detail-section">
-        <view class="detail-row">
-          <text class="detail-label">订单编号：</text>
-          <text class="detail-value">{{ orderData.orderNo }}</text>
-        </view>
-        
-        <view class="detail-row">
-          <text class="detail-label">购买数量：</text>
-          <text class="detail-value">{{ orderData.quantity }}{{ orderData.unit }}</text>
-        </view>
-
-        <view class="detail-row">
-          <text class="detail-label">司机：</text>
-          <text class="detail-value">{{ orderData.driver.name }}</text>
-          <view class="phone-icon" @click="makePhoneCall(orderData.driver.phone)">
-            <image src="/static/images/icon/phone.png" class="icon-image" />
+      <!-- 内容区域 -->
+      <view class="content-container flex-col">
+        <!-- 订单状态信息卡片 -->
+        <view class="info-card pending-card">
+          <view class="card-header">
+            <text class="card-title">
+              {{ statusText }}
+            </text>
+          </view>
+          <view class="card-content">
+            <view class="info-row">
+              <text class="info-label">
+                收货人：
+              </text>
+              <text class="info-value">
+                {{ orderData.takeName || orderData.memberName }}
+              </text>
+            </view>
+            <view class="info-row">
+              <text class="info-label">
+                送货地址：
+              </text>
+              <text class="info-value">
+                {{ fullDeliveryAddress }}
+              </text>
+            </view>
+            <view class="info-row">
+              <text class="info-label">
+                发货地址：
+              </text>
+              <text class="info-value">
+                {{ pickupAddress }}
+              </text>
+            </view>
           </view>
         </view>
 
-        <view class="detail-row">
-          <text class="detail-label">车辆信息：</text>
-          <text class="detail-value">{{ orderData.vehicle.type }}，{{ orderData.vehicle.plateNumber }}</text>
-        </view>
+        <!-- 订单详情 -->
+        <view class="detail-section">
+          <view class="detail-row">
+            <text class="detail-label">
+              订单编号：
+            </text>
+            <text class="detail-value">
+              {{ orderData.orderNo }}
+            </text>
+          </view>
 
-        <view class="detail-row">
-          <text class="detail-label">发货员：</text>
-          <text class="detail-value">{{ orderData.shipper.name }}</text>
-          <view class="phone-icon" @click="makePhoneCall(orderData.shipper.phone)">
-            <image src="/static/images/icon/phone.png" class="icon-image" />
+          <view class="detail-row">
+            <text class="detail-label">
+              购买数量：
+            </text>
+            <text class="detail-value">
+              {{ orderData.buyCount }}吨
+            </text>
+          </view>
+
+          <view v-if="orderData.driverName" class="detail-row">
+            <text class="detail-label">
+              司机：
+            </text>
+            <text class="detail-value">
+              {{ orderData.driverName }}
+            </text>
+            <view class="phone-icon" @click="makePhoneCall(orderData.driverMobile)">
+              <image src="/static/images/icon/phone.png" class="icon-image" />
+            </view>
+          </view>
+
+          <view v-if="orderData.carNumber" class="detail-row">
+            <text class="detail-label">
+              车辆信息：
+            </text>
+            <text class="detail-value">
+              {{ orderData.type }}，{{ orderData.carNumber }}
+            </text>
+          </view>
+
+          <view v-if="orderData.deliveryName" class="detail-row">
+            <text class="detail-label">
+              发货员：
+            </text>
+            <text class="detail-value">
+              {{ orderData.deliveryName }}
+            </text>
+            <view v-if="orderData.deliveryMobile" class="phone-icon" @click="makePhoneCall(orderData.deliveryMobile)">
+              <image src="/static/images/icon/phone.png" class="icon-image" />
+            </view>
+          </view>
+
+          <view v-if="orderData.payType" class="detail-row">
+            <text class="detail-label">
+              支付方式：
+            </text>
+            <text class="detail-value">
+              {{ payTypeText }}
+            </text>
+            <text v-if="orderData.payTime" class="payment-status">
+              已支付
+            </text>
+          </view>
+
+          <view v-if="orderData.payTime" class="detail-row">
+            <text class="detail-label">
+              支付时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.payTime }}
+            </text>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">
+              下单时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.placeOrderTime }}
+            </text>
+          </view>
+
+          <view v-if="orderData.receiveTime" class="detail-row">
+            <text class="detail-label">
+              接单时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.receiveTime }}
+            </text>
+          </view>
+
+          <view v-if="orderData.signDate" class="detail-row">
+            <text class="detail-label">
+              平台服务协议签署时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.signDate }}
+            </text>
+            <text class="link-text" @click="viewContract">
+              合同详情
+            </text>
+          </view>
+
+          <view v-if="orderData.driverSignTime" class="detail-row">
+            <text class="detail-label">
+              司机承运协议签署时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.driverSignTime }}
+            </text>
+          </view>
+
+          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+            <text class="detail-label">
+              验车时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.vehicleInspectionTime }}
+            </text>
+            <text class="link-text" @click="viewVehicleInfo">
+              验车信息
+            </text>
           </view>
         </view>
 
-        <view class="detail-row">
-          <text class="detail-label">支付方式：</text>
-          <text class="detail-value">{{ orderData.payment.method }}</text>
-          <text class="payment-status">{{ orderData.payment.status }}</text>
-        </view>
-
-        <view class="detail-row">
-          <text class="detail-label">支付时间：</text>
-          <text class="detail-value">{{ orderData.payment.time }}</text>
-        </view>
-
-        <view class="detail-row">
-          <text class="detail-label">下单时间：</text>
-          <text class="detail-value">{{ orderData.times.orderTime }}</text>
-        </view>
-
-        <view class="detail-row">
-          <text class="detail-label">接单时间：</text>
-          <text class="detail-value">{{ orderData.times.acceptTime }}</text>
-        </view>
-
-        <view class="detail-row">
-          <text class="detail-label">平台服务协议签署时间：</text>
-          <text class="detail-value">{{ orderData.times.platformAgreementTime }}</text>
-          <text class="link-text" @click="viewContract">合同详情</text>
-        </view>
-
-        <view class="detail-row">
-          <text class="detail-label">司机承运协议签署时间：</text>
-          <text class="detail-value">{{ orderData.times.driverAgreementTime }}</text>
-        </view>
-
-        <view class="detail-row">
-          <text class="detail-label">验车时间：</text>
-          <text class="detail-value">{{ orderData.times.vehicleTime }}</text>
-          <text class="link-text" @click="viewVehicleInfo">验车信息</text>
-        </view>
+        <!-- 底部占位空间，避免内容被固定按钮遮挡 -->
+        <view class="bottom-placeholder" />
       </view>
 
-      <!-- 底部占位空间，避免内容被固定按钮遮挡 -->
-      <view class="bottom-placeholder"></view>
-    </view>
+      <!-- 固定底部按钮 -->
+      <view class="fixed-bottom-actions">
+        <!-- 取消订单按钮 - 所有状态都可以取消 -->
+        <view class="action-btn cancel-btn" @click="cancelOrder">
+          <text class="btn-text">
+            {{ orderData.status === 0 ? '取消订单' : '申请退款' }}
+          </text>
+        </view>
 
-    <!-- 固定底部按钮 -->
-    <view class="fixed-bottom-actions">
-      <view class="action-btn cancel-btn" @click="cancelOrder">
-        <text class="btn-text">取消订单</text>
-      </view>
-      <view class="action-btn edit-btn" @click="editOrder">
-        <text class="btn-text">修改订单</text>
-      </view>
-      <view class="action-btn sign-btn" @click="signOrder">
-        <text class="btn-text">立即签署</text>
+        <!-- 修改订单按钮 - 只有待支付和待接单状态可以修改 -->
+        <view
+          v-if="orderData.status <= 1"
+          class="action-btn edit-btn"
+          @click="editOrder"
+        >
+          <text class="btn-text">
+            修改订单
+          </text>
+        </view>
+
+        <!-- 立即签署按钮 - 只有已接单待签署状态显示 -->
+        <view
+          v-if="orderData.status === 2"
+          class="action-btn sign-btn"
+          @click="signOrder"
+        >
+          <text class="btn-text">
+            立即签署
+          </text>
+        </view>
       </view>
     </view>
   </view>
@@ -323,6 +464,13 @@ export default {
 .page-container {
   min-height: 100vh;
   background-color: #f5f5f5;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
 }
 
 .map-container {
@@ -555,5 +703,4 @@ export default {
   font-size: 28rpx;
   font-weight: 500;
 }
-
 </style>
