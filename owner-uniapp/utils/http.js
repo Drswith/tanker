@@ -242,36 +242,63 @@ export const request = {
   // 文件上传
   upload(url, filePath, formData = {}, config = {}) {
     return new Promise((resolve, reject) => {
+      // 验证文件路径
+      if (!filePath) {
+        const error = new Error('文件路径不能为空')
+        uni.showToast({
+          title: '文件路径不能为空',
+          icon: 'none',
+        })
+        reject(error)
+        return
+      }
+
+      console.log('[Upload] 开始上传文件:', {
+        url: httpUpload.defaults.baseURL + url,
+        filePath,
+        formData,
+      })
+
       const uploadTask = uni.uploadFile({
         url: httpUpload.defaults.baseURL + url,
         filePath,
         name: 'file',
         formData,
         header: {
-          ...httpUpload.defaults.headers,
           Authorization: uni.getStorageSync('token'),
         },
         success: (res) => {
+          console.log('[Upload] 上传响应:', res)
           try {
             const data = JSON.parse(res.data)
+            console.log('[Upload] 解析后的数据:', data)
             if (data.code === 200) {
               resolve(data.data)
             }
             else {
+              const errorMsg = data.errMsg || data.message || '上传失败'
               uni.showToast({
-                title: data.errMsg || '上传失败',
+                title: errorMsg,
                 icon: 'none',
               })
-              reject(new Error(data.errMsg || '上传失败'))
+              reject(new Error(errorMsg))
             }
           }
           catch (error) {
-            reject(new Error('响应数据解析失败'))
+            console.error('[Upload] 响应数据解析失败:', error, '原始响应:', res.data)
+            const errorMsg = '服务器响应格式错误'
+            uni.showToast({
+              title: errorMsg,
+              icon: 'none',
+            })
+            reject(new Error(errorMsg))
           }
         },
         fail: (error) => {
+          console.error('[Upload] 上传失败:', error)
+          const errorMsg = error.errMsg || '网络错误，上传失败'
           uni.showToast({
-            title: '上传失败',
+            title: errorMsg,
             icon: 'none',
           })
           reject(error)
