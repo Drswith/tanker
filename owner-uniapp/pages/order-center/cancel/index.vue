@@ -6,8 +6,8 @@ export default {
     return {
       // 表单数据
       formData: {
-        accountType: 'wechat', // 账户类型：wechat-微信, alipay-支付宝, bankcard-银行卡
-        accountNumber: '', // 具体账号
+        refundType: 0, // 退款类型：0-微信, 1-支付宝, 2-银行卡
+        refundAccount: '', // 具体账号
         cancelReason: '', // 取消原因
       },
 
@@ -24,16 +24,16 @@ export default {
       // 订单数据
       orderData: null,
 
-      // 账户类型选项
-      accountTypeOptions: [
-        { label: '微信', value: 'wechat' },
-        { label: '支付宝', value: 'alipay' },
-        { label: '银行卡', value: 'bankcard' },
+      // 退款类型选项
+      refundTypeOptions: [
+        { label: '微信', value: 0 },
+        { label: '支付宝', value: 1 },
+        { label: '银行卡', value: 2 },
       ],
 
       // 表单验证规则
       rules: {
-        accountNumber: [
+        refundAccount: [
           {
             required: true,
             message: '请填写具体账号',
@@ -44,12 +44,6 @@ export default {
           {
             required: true,
             message: '请填写取消原因',
-            trigger: ['blur', 'change'],
-          },
-          {
-            min: 5,
-            max: 200,
-            message: '取消原因长度为5-200字',
             trigger: ['blur', 'change'],
           },
         ],
@@ -66,20 +60,20 @@ export default {
   },
 
   computed: {
-    // 获取当前选中的账户类型标签
-    currentAccountTypeLabel() {
-      const option = this.accountTypeOptions.find(item => item.value === this.formData.accountType)
+    // 获取当前选中的退款类型标签
+    currentRefundTypeLabel() {
+      const option = this.refundTypeOptions.find(item => item.value === this.formData.refundType)
       return option ? option.label : ''
     },
 
-    // 根据账户类型获取占位符文本
+    // 根据退款类型获取占位符文本
     accountPlaceholder() {
-      switch (this.formData.accountType) {
-        case 'wechat':
+      switch (this.formData.refundType) {
+        case 0:
           return '请输入微信号'
-        case 'alipay':
+        case 1:
           return '请输入支付宝账号'
-        case 'bankcard':
+        case 2:
           return '请输入银行卡号'
         default:
           return '请输入账号'
@@ -107,11 +101,11 @@ export default {
       }
     },
 
-    // 选择账户类型
-    selectAccountType(type) {
-      this.formData.accountType = type
-      // 切换账户类型时清空账号
-      this.formData.accountNumber = ''
+    // 选择退款类型
+    selectRefundType(type) {
+      this.formData.refundType = type
+      // 切换退款类型时清空账号
+      this.formData.refundAccount = ''
     },
 
     // 表单验证
@@ -132,8 +126,8 @@ export default {
         // 构建API请求数据
         const refundData = {
           orderNo: this.orderData.orderNo,
-          accountType: this.formData.accountType,
-          accountNumber: this.formData.accountNumber,
+          refundType: this.formData.refundType,
+          refundAccount: this.formData.refundAccount,
           cancelReason: this.formData.cancelReason,
         }
 
@@ -184,27 +178,27 @@ export default {
         :label-style="{ fontSize: '32rpx', fontWeight: '600', color: '#4D4E46', marginBottom: '16rpx' }"
         error-type="toast"
       >
-        <!-- 账户类型 -->
+        <!-- 退款类型 -->
         <u-form-item
           :border-bottom="false"
           class="form-item-custom"
         >
           <template #label>
             <view class="field-label">
-              账户类型：
+              退款类型：
             </view>
           </template>
           <view class="account-type-field flex-col">
             <view class="radio-group">
               <view
-                v-for="option in accountTypeOptions"
+                v-for="option in refundTypeOptions"
                 :key="option.value"
                 class="radio-item"
-                @click="selectAccountType(option.value)"
+                @click="selectRefundType(option.value)"
               >
                 <view
                   class="radio-circle"
-                  :class="{ active: formData.accountType === option.value }"
+                  :class="{ active: formData.refundType === option.value }"
                 />
                 <text class="radio-label">
                   {{ option.label }}
@@ -216,7 +210,7 @@ export default {
 
         <!-- 具体账号 -->
         <u-form-item
-          prop="accountNumber"
+          prop="refundAccount"
           :required="true"
           :border-bottom="false"
           class="form-item-custom"
@@ -228,7 +222,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.accountNumber"
+              v-model="formData.refundAccount"
               :placeholder="accountPlaceholder"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
