@@ -1,62 +1,5 @@
 <script>
-import { orderApi } from '@/api/order'
-
-/**
- * 订单状态枚举映射
- *
- * 订单流程说明：
- * 0  - 已创建待支付
- * 1  - 已支付待接单
- * 2  - 已接单待签署（业主和平台）
- * 3  - 已签署司机前往发车地待验车
- * 4  - 验车通过待施封
- * 5  - 验车不通过
- * 6  - 完成施封待安装GPS
- * 7  - 完成GPS安装待司机签署
- * 8  - 司机已签署（运输中）
- * 9  - 司机确认送达待核验
- * 10 - 业主核验确认收货后待评价（用于查询）
- * 11 - 业主核验不通过
- * 12 - 已评价（用于前端查询）
- * 13 - 确认收货后待邮寄GPS
- * 14 - 已邮寄
- * 15 - 后台确认收到GPS订单结束
- * 16 - 已提交资料待退款
- * 17 - 已退款已取消
- */
-const OrderStatus = Object.freeze({
-  // 订单创建阶段
-  Created: 0, // 已创建待支付
-  Paid: 1, // 已支付待接单
-
-  // 接单签署阶段
-  Accepted: 2, // 已接单待签署（业主和平台）
-  Signed: 3, // 已签署司机前往发车地待验车
-
-  // 验车施封阶段
-  Verified: 4, // 验车通过待施封
-  Unverified: 5, // 验车不通过
-  Sealed: 6, // 完成施封待安装GPS
-
-  // GPS安装阶段
-  GpsInstalled: 7, // 完成GPS安装待司机签署
-  DriverSigned: 8, // 司机已签署（运输中）
-
-  // 运输配送阶段
-  DeliveryConfirmed: 9, // 司机确认送达待核验
-  OwnerVerified: 10, // 业主核验确认收货后待评价
-  OwnerRejected: 11, // 业主核验不通过
-  Evaluated: 12, // 已评价（用于前端查询）
-
-  // GPS回收阶段
-  WaitingGpsReturn: 13, // 确认收货后待邮寄GPS
-  GpsShipped: 14, // 已邮寄
-  GpsReceived: 15, // 后台确认收到GPS订单结束
-
-  // 退款取消阶段
-  RefundSubmitted: 16, // 已提交资料待退款
-  RefundCompleted: 17, // 已退款已取消
-})
+import { orderApi, OrderStatus } from '@/api/order'
 
 export default {
   data() {
@@ -120,10 +63,10 @@ export default {
       const buttonGroups = [
         { name: '取消订单', class: '', handler: order => this.apiErrorToast(order) },
         { name: '修改订单', class: '', handler: order => this.handleEditOrder(order) },
-        { name: '立即签署', class: '', handler: () => {} },
-        { name: '订单进度', class: '', handler: () => {} },
-        { name: '验收授权', class: '', handler: () => {} },
-        { name: '确认收货', class: '', handler: () => {} },
+        { name: '立即签署', class: '', handler: order => this.handleSignOrder(order) },
+        { name: '订单进度', class: '', handler: order => this.handleOrderProgress(order) },
+        { name: '验收授权', class: '', handler: order => this.handleCheckOrder(order) },
+        { name: '确认收货', class: '', handler: order => this.handleConfirmOrder(order) },
         { name: '寄回GPS', class: '', handler: order => this.handleReturnGps(order) },
         { name: '立即评价', class: '', handler: order => this.handleEvaluateOrder(order) },
         { name: '删除订单', class: '', handler: order => this.apiErrorToast(order) },
@@ -257,6 +200,48 @@ export default {
         url: `/pages/order-center/add/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
       })
     },
+    // 签署订单
+    async handleSignOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/sign/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
+    // 订单进度
+    handleOrderProgress(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/progress/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
+    // 订单详情
+    handleOrderDetail(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/detail/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
+    // 验收授权
+    handleCheckOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/check/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
+    // 确认收货
+    handleConfirmOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/confirm/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
+    // 照片信息
+    handleOrderPhoto(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/photo/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+      })
+    },
     // 评价订单
     handleEvaluateOrder(order) {
       console.log('order', order)
@@ -334,6 +319,7 @@ export default {
           class="card_item" :style="{
             marginBottom: (currentTab === OrderStatus.Accepted || currentTab === OrderStatus.GpsInstalled) ? '90rpx' : '30rpx',
           }"
+          @click="() => handleOrderDetail(item)"
         >
           <view>
             <view class="text_right">
@@ -382,7 +368,7 @@ export default {
           </view>
 
           <view v-if="currentCardButtonGroup.length > 0" class="button-group">
-            <view v-for="(btn, btnIndex) in currentCardButtonGroup" :key="btnIndex" :class="btn.class" style="margin-left: 20rpx;" @click="() => btn.handler(item)">
+            <view v-for="(btn, btnIndex) in currentCardButtonGroup" :key="btnIndex" :class="btn.class" style="margin-left: 20rpx;" @click.stop="() => btn.handler(item)">
               {{ btn.name }}
             </view>
           </view>
