@@ -8,23 +8,23 @@ export default {
       // 标签栏数据 - 使用OrderStatus枚举替代硬编码数字
       tabList: [
         // 主要业务流程状态
-        { name: '待接单', status: OrderStatus.Paid }, // 1 - 已支付待接单
         { name: '待支付', status: OrderStatus.Created }, // 0 - 已创建待支付
+        { name: '待接单', status: OrderStatus.Paid }, // 1 - 已支付待接单
         { name: '待发车', status: OrderStatus.Signed }, // 3 - 已签署司机前往发车地待验车
         { name: '待签署', status: OrderStatus.Accepted }, // 2 - 已接单待签署（业主和平台）
-        { name: '验车中', status: OrderStatus.Verified }, // 4 - 验车通过待施封
-        { name: '验车失败', status: OrderStatus.Unverified }, // 5 - 验车不通过
-        { name: 'GPS待安装', status: OrderStatus.Sealed }, // 6 - 完成施封待安装GPS
-        { name: '待司机签署', status: OrderStatus.GpsInstalled }, // 7 - 完成GPS安装待司机签署
+        // { name: '验车中', status: OrderStatus.Verified }, // 4 - 验车通过待施封
+        // { name: '验车失败', status: OrderStatus.Unverified }, // 5 - 验车不通过
+        // { name: 'GPS待安装', status: OrderStatus.Sealed }, // 6 - 完成施封待安装GPS
+        // { name: '待司机签署', status: OrderStatus.GpsInstalled }, // 7 - 完成GPS安装待司机签署
         { name: '运输中', status: OrderStatus.DriverSigned }, // 8 - 司机已签署（运输中）
-        { name: '待核验', status: OrderStatus.DeliveryConfirmed }, // 9 - 司机确认送达待核验
-        { name: '待评价', status: OrderStatus.OwnerVerified }, // 10 - 业主核验确认收货后待评价
-        { name: '核验失败', status: OrderStatus.OwnerRejected }, // 11 - 业主核验不通过
-        { name: '已评价', status: OrderStatus.Evaluated }, // 12 - 已评价（用于前端查询）
+        // { name: '待核验', status: OrderStatus.DeliveryConfirmed }, // 9 - 司机确认送达待核验
         { name: 'GPS待回收', status: OrderStatus.WaitingGpsReturn }, // 13 - 确认收货后待邮寄GPS
-        { name: 'GPS已邮寄', status: OrderStatus.GpsShipped }, // 14 - 已邮寄
+        { name: '待评价', status: OrderStatus.OwnerVerified }, // 10 - 业主核验确认收货后待评价
+        // { name: '核验失败', status: OrderStatus.OwnerRejected }, // 11 - 业主核验不通过
+        // { name: '已评价', status: OrderStatus.Evaluated }, // 12 - 已评价（用于前端查询）
+        // { name: 'GPS已邮寄', status: OrderStatus.GpsShipped }, // 14 - 已邮寄
         { name: '已完成', status: OrderStatus.GpsReceived }, // 15 - 后台确认收到GPS订单结束
-        { name: '待退款', status: OrderStatus.RefundSubmitted }, // 16 - 已提交资料待退款
+        // { name: '待退款', status: OrderStatus.RefundSubmitted }, // 16 - 已提交资料待退款
         { name: '已取消', status: OrderStatus.RefundCompleted }, // 17 - 已退款已取消
       ],
       currentTab: 0,
@@ -161,12 +161,21 @@ export default {
       // 	uni.setStorageSync('token', res.data.token)
       // }
 
-      // let data = await this.httpApi.usageOrderList({
-      const data = await orderApi.getOrderList({
-        status: this.tabList[this.currentTab].status,
+      const payload = {
         page: this.page,
         size: this.size,
-      })
+      }
+      // 待评价特殊处理
+      if (this.tabList[this.currentTab].status === OrderStatus.OwnerVerified) {
+        payload.isEvaluate = 0 // 0 未评价 1 已评价
+      }
+      else {
+        payload.status = this.tabList[this.currentTab].status
+      }
+
+      // let data = await this.httpApi.usageOrderList({
+      const data = await orderApi.getOrderList(payload)
+
       if (data?.content && Array.isArray(data.content)) {
         data.content.forEach((item) => {
           item.driverName = item.driverName ? item.driverName.substr(0, 1) : null
