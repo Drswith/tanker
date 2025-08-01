@@ -29,10 +29,10 @@ export default {
     async loadInviteList() {
       try {
         this.pageState.isLoading = true
-        const response = await inviteApi.getInviteList()
+        const { inviter = '', list = [], listSize = 0 } = await inviteApi.getInviteList()
 
         // 适配接口数据到页面显示格式
-        this.inviteList = response.map(item => ({
+        this.inviteList = list.map(item => ({
           id: item.id,
           name: item.extData?.name || '未知用户',
           phone: item.extData?.phone || '未知手机号',
@@ -42,8 +42,11 @@ export default {
           inviterId: item.inviterId,
         }))
 
+        // 更新推荐人姓名
+        this.referrerInfo.name = inviter
+
         // 更新好友总数
-        this.referrerInfo.totalFriends = this.inviteList.length
+        this.referrerInfo.totalFriends = listSize
       }
       catch (error) {
         console.error('加载邀请记录失败:', error)
