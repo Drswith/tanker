@@ -22,6 +22,15 @@ export default {
       duration: 1000,
       indicatorDots: true,
       circular: true,
+
+      list: [
+        { status: '订单完成', time: '2025-01-06 12:00:00', description: '' },
+        { status: '确认收货', time: '2025-01-04 12:00:00', description: '' },
+        { status: '运输中', time: '2025-01-04 12:00:00', description: '当前所在（浙江省杭州市滨江区）' },
+        { status: '发车时间', time: '2025-01-04 12:00:00', description: '' },
+        { status: '接单时间', time: '2025-01-02 12:00:00', description: '' },
+        { status: '下单成功', time: '2025-01-01 12:00:00', description: '' },
+      ],
     }
   },
   onLoad() {},
@@ -73,6 +82,8 @@ export default {
       // #ifdef MP-ALIPAY
       return this.mscrollTop < 30
       // #endif
+
+      // eslint-disable-next-line no-unreachable
       return true
     },
     upper(e) {
@@ -140,39 +151,9 @@ export default {
           :scroll-top="scrollTop" :scroll-y="mExpand" :style="`width: 100%;height :${menuHeight}px` "
           @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
         >
-          <view @click.stop="clickAli">
-            测试支付宝是否透传
+          <view class="time-line">
+            <zfl-logistics :list="list" />
           </view>
-          <swiper
-            :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval"
-            :duration="duration" :circular="circular" style="height:100rpx"
-          >
-            <swiper-item>
-              <view class="swiper-item uni-bg-red">
-                A
-              </view>
-            </swiper-item>
-            <swiper-item>
-              <view class="swiper-item uni-bg-blue">
-                B
-              </view>
-            </swiper-item>
-            <swiper-item>
-              <view class="swiper-item uni-badge-purple">
-                C
-              </view>
-            </swiper-item>
-          </swiper>
-          <uni-grid :column="4" :highlight="false" :show-border="false" @change="onChange">
-            <uni-grid-item v-for="(item, index) in 80" :key="index" :index="index">
-              <view class="grid-item-box" style="background-color: #fff;">
-                <uni-icons type="image" :size="30" color="#777" />
-                <text class="text">
-                  文本信息
-                </text>
-              </view>
-            </uni-grid-item>
-          </uni-grid>
         </scroll-view>
         <!-- end -->
       </slot>
@@ -221,4 +202,7 @@ export default {
 		line-height: 100rpx;
 		text-align: center;
 	}
+  .time-line{
+
+  }
 </style>
