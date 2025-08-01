@@ -217,11 +217,51 @@ export default {
         url: `/pages/order-center/pay/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
       })
     },
+    // 取消订单
+    async handleCancelOrder(order) {
+      // 如果订单状态为0（已创建待支付），直接调用API取消
+      if (order.status === OrderStatus.Created) {
+        const res = await orderApi.cancelOrder({
+          orderNo: order.orderNo,
+        })
+        if (res.code === 200) {
+          uni.showToast({
+            title: '取消订单成功',
+            icon: 'success',
+          })
+          this.getOrder()
+        }
+      }
+      else {
+        // 其他状态跳转到退款页面
+        uni.navigateTo({
+          url: `/pages/order-center/cancel/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+        })
+      }
+    },
+
+    // 删除订单
+    async handleDeleteOrder(order) {
+      try {
+        await orderApi.deleteOrder(order.id)
+        uni.showToast({
+          title: '删除订单成功',
+          icon: 'success',
+        })
+        this.getOrder()
+      }
+      catch (error) {
+        uni.showToast({
+          title: '删除订单失败',
+          icon: 'error',
+        })
+      }
+    },
 
     // 根据订单状态获取按钮组
     getOrderButtonGroup(order) {
       const buttonGroups = [
-        { name: '取消订单', class: '', handler: () => this.apiErrorToast(order) },
+        { name: '取消订单', class: '', handler: () => this.handleCancelOrder(order) },
         { name: '修改订单', class: '', handler: () => this.handleEditOrder(order) },
         { name: '立即签署', class: '', handler: () => this.handleSignOrder(order) },
         { name: '订单进度', class: '', handler: () => this.handleOrderProgress(order) },
@@ -229,7 +269,7 @@ export default {
         { name: '确认收货', class: '', handler: () => this.handleConfirmOrder(order) },
         { name: '寄回GPS', class: '', handler: () => this.handleReturnGps(order) },
         { name: '立即评价', class: '', handler: () => this.handleEvaluateOrder(order) },
-        { name: '删除订单', class: '', handler: () => this.apiErrorToast(order) },
+        { name: '删除订单', class: '', handler: () => this.handleDeleteOrder(order) },
         { name: '再来一单', class: '', handler: () => this.apiErrorToast(order) },
         { name: '立即支付', class: '', handler: () => this.handlePayOrder(order) },
       ]

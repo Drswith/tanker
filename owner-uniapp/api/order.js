@@ -80,9 +80,14 @@ export const orderApi = {
     return request.get('/api/order/current_order', data)
   },
 
+  // 取消订单(退款)
+  cancelOrder(data) {
+    return request.put('/api/order/cancel', data)
+  },
+
   // 删除订单
   deleteOrder(id) {
-    return request.delete(`/api/order/delete/${id}`)
+    return request.delete(`/api/order/delete_order/${id}`)
   },
 
   // 签署合同

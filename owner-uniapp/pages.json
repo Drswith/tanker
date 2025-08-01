@@ -141,6 +141,13 @@
       }
     },
     {
+      "path": "pages/order-center/cancel/index",
+      "style": {
+        "navigationBarTitleText": "填写退款账户",
+        "navigationStyle": "default"
+      }
+    },
+    {
       "path": "pages/login/index/index",
       "style": {
         "navigationBarTitleText": "登录",
