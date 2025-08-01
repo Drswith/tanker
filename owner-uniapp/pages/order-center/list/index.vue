@@ -58,61 +58,6 @@ export default {
       }
     },
 
-    // 当前卡片按钮组
-    currentCardButtonGroup() {
-      const buttonGroups = [
-        { name: '取消订单', class: '', handler: order => this.apiErrorToast(order) },
-        { name: '修改订单', class: '', handler: order => this.handleEditOrder(order) },
-        { name: '立即签署', class: '', handler: order => this.handleSignOrder(order) },
-        { name: '订单进度', class: '', handler: order => this.handleOrderProgress(order) },
-        { name: '验收授权', class: '', handler: order => this.handleCheckOrder(order) },
-        { name: '确认收货', class: '', handler: order => this.handleConfirmOrder(order) },
-        { name: '寄回GPS', class: '', handler: order => this.handleReturnGps(order) },
-        { name: '立即评价', class: '', handler: order => this.handleEvaluateOrder(order) },
-        { name: '删除订单', class: '', handler: order => this.apiErrorToast(order) },
-        { name: '再来一单', class: '', handler: order => this.apiErrorToast(order) },
-        { name: '立即支付', class: '', handler: order => this.handlePayOrder(order) },
-      ]
-
-      const statusButtonGroupMap = {
-        [OrderStatus.Created]: buttonGroups.filter(item => ['取消订单', '立即支付'].includes(item.name)), // 0 - 已创建待支付
-        [OrderStatus.Paid]: buttonGroups.filter(item => ['修改订单', '取消订单'].includes(item.name)), // 1 - 已支付待接单
-        [OrderStatus.Accepted]: buttonGroups.filter(item => ['修改订单', '取消订单', '立即签署'].includes(item.name)), // 2 - 已接单待签署（业主和平台）
-        [OrderStatus.Signed]: buttonGroups.filter(item => [].includes(item.name)), // 3 - 已签署待发车
-        [OrderStatus.Verified]: buttonGroups.filter(item => ['寄回GPS'].includes(item.name)), // 4 - 验车通过待施封
-        [OrderStatus.Unverified]: buttonGroups.filter(item => [].includes(item.name)), // 5 - 验车不通过
-        [OrderStatus.Sealed]: buttonGroups.filter(item => [].includes(item.name)), // 6 - 完成施封待安装GPS
-        [OrderStatus.GpsInstalled]: buttonGroups.filter(item => ['取消订单', '立即签署'].includes(item.name)), // 7 - 完成GPS安装待司机签署
-        [OrderStatus.DriverSigned]: buttonGroups.filter(item => ['订单进度', '验收授权', '确认收货'].includes(item.name)), // 8 - 司机已签署（运输中）
-        [OrderStatus.DeliveryConfirmed]: buttonGroups.filter(item => ['验收授权'].includes(item.name)), // 9 - 司机确认送达待核验
-        [OrderStatus.OwnerVerified]: buttonGroups.filter(item => ['立即评价'].includes(item.name)), // 10 - 业主核验确认收货后待评价
-        [OrderStatus.OwnerRejected]: buttonGroups.filter(item => [].includes(item.name)), // 11 - 业主核验不通过
-        [OrderStatus.Evaluated]: buttonGroups.filter(item => [].includes(item.name)), // 12 - 已评价（用于前端查询）
-        [OrderStatus.WaitingGpsReturn]: buttonGroups.filter(item => ['寄回GPS'].includes(item.name)), // 13 - 确认收货后待邮寄GPS
-        [OrderStatus.GpsShipped]: buttonGroups.filter(item => [].includes(item.name)), // 14 - 已邮寄
-        [OrderStatus.GpsReceived]: buttonGroups.filter(item => [].includes(item.name)), // 15 - 后台确认收到GPS订单结束
-        [OrderStatus.RefundSubmitted]: buttonGroups.filter(item => ['删除订单'].includes(item.name)), // 16 - 已提交资料待退款
-        [OrderStatus.RefundCompleted]: buttonGroups.filter(item => ['删除订单'].includes(item.name)), // 17 - 已退款已取消
-      }
-
-      // inject class
-      console.log('this.tabList[this.currentTab].status', this.currentTab, this.tabList[this.currentTab].status, statusButtonGroupMap[this.tabList[this.currentTab].status])
-      const result = statusButtonGroupMap[this.tabList[this.currentTab].status]?.reverse() || []
-      for (let index = 0; index < result.length; index++) {
-        const element = result[index]
-        if (index === 1) {
-          element.class = 'modify-btn'
-        }
-        else if (index === 2) {
-          element.class = 'cancel-btn'
-        }
-        else {
-          element.class = 'sign-btn'
-        }
-      }
-
-      return result.reverse()
-    },
   },
   async onShow() {
     this.dataList = await this.getOrder()
@@ -272,6 +217,70 @@ export default {
         url: `/pages/order-center/pay/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
       })
     },
+
+    // 根据订单状态获取按钮组
+    getOrderButtonGroup(order) {
+      const buttonGroups = [
+        { name: '取消订单', class: '', handler: () => this.apiErrorToast(order) },
+        { name: '修改订单', class: '', handler: () => this.handleEditOrder(order) },
+        { name: '立即签署', class: '', handler: () => this.handleSignOrder(order) },
+        { name: '订单进度', class: '', handler: () => this.handleOrderProgress(order) },
+        { name: '验收授权', class: '', handler: () => this.handleCheckOrder(order) },
+        { name: '确认收货', class: '', handler: () => this.handleConfirmOrder(order) },
+        { name: '寄回GPS', class: '', handler: () => this.handleReturnGps(order) },
+        { name: '立即评价', class: '', handler: () => this.handleEvaluateOrder(order) },
+        { name: '删除订单', class: '', handler: () => this.apiErrorToast(order) },
+        { name: '再来一单', class: '', handler: () => this.apiErrorToast(order) },
+        { name: '立即支付', class: '', handler: () => this.handlePayOrder(order) },
+      ]
+
+      const statusButtonGroupMap = {
+        [OrderStatus.Created]: buttonGroups.filter(item => ['取消订单', '立即支付'].includes(item.name)), // 0 - 已创建待支付
+        [OrderStatus.Paid]: buttonGroups.filter(item => ['修改订单', '取消订单'].includes(item.name)), // 1 - 已支付待接单
+        [OrderStatus.Accepted]: buttonGroups.filter(item => ['修改订单', '取消订单', '立即签署'].includes(item.name)), // 2 - 已接单待签署（业主和平台）
+        [OrderStatus.Signed]: buttonGroups.filter(item => [].includes(item.name)), // 3 - 已签署待发车
+        [OrderStatus.Verified]: buttonGroups.filter(item => ['寄回GPS'].includes(item.name)), // 4 - 验车通过待施封
+        [OrderStatus.Unverified]: buttonGroups.filter(item => [].includes(item.name)), // 5 - 验车不通过
+        [OrderStatus.Sealed]: buttonGroups.filter(item => [].includes(item.name)), // 6 - 完成施封待安装GPS
+        [OrderStatus.GpsInstalled]: buttonGroups.filter(item => ['取消订单', '立即签署'].includes(item.name)), // 7 - 完成GPS安装待司机签署
+        [OrderStatus.DriverSigned]: buttonGroups.filter(item => ['订单进度', '验收授权', '确认收货'].includes(item.name)), // 8 - 司机已签署（运输中）
+        [OrderStatus.DeliveryConfirmed]: buttonGroups.filter(item => ['验收授权'].includes(item.name)), // 9 - 司机确认送达待核验
+        [OrderStatus.OwnerVerified]: buttonGroups.filter(item => ['立即评价'].includes(item.name)), // 10 - 业主核验确认收货后待评价
+        [OrderStatus.OwnerRejected]: buttonGroups.filter(item => [].includes(item.name)), // 11 - 业主核验不通过
+        [OrderStatus.Evaluated]: buttonGroups.filter(item => [].includes(item.name)), // 12 - 已评价（用于前端查询）
+        [OrderStatus.WaitingGpsReturn]: buttonGroups.filter(item => ['寄回GPS'].includes(item.name)), // 13 - 确认收货后待邮寄GPS
+        [OrderStatus.GpsShipped]: buttonGroups.filter(item => [].includes(item.name)), // 14 - 已邮寄
+        [OrderStatus.GpsReceived]: buttonGroups.filter(item => [].includes(item.name)), // 15 - 后台确认收到GPS订单结束
+        [OrderStatus.RefundSubmitted]: buttonGroups.filter(item => ['删除订单'].includes(item.name)), // 16 - 已提交资料待退款
+        [OrderStatus.RefundCompleted]: buttonGroups.filter(item => ['删除订单'].includes(item.name)), // 17 - 已退款已取消
+      }
+
+      // 根据订单的实际状态获取按钮组
+      let result = []
+      // tab待评价特殊处理
+      if (this.tabList[this.currentTab].status === OrderStatus.OwnerVerified) {
+        result = statusButtonGroupMap[this.tabList[this.currentTab].status]?.reverse()
+      }
+      else {
+        result = statusButtonGroupMap[order.status]?.reverse()
+      }
+
+      // 设置按钮样式
+      for (let index = 0; index < result.length; index++) {
+        const element = result[index]
+        if (index === 1) {
+          element.class = 'modify-btn'
+        }
+        else if (index === 2) {
+          element.class = 'cancel-btn'
+        }
+        else {
+          element.class = 'sign-btn'
+        }
+      }
+
+      return result.reverse()
+    },
   },
 }
 </script>
@@ -376,8 +385,8 @@ export default {
             />
           </view>
 
-          <view v-if="currentCardButtonGroup.length > 0" class="button-group">
-            <view v-for="(btn, btnIndex) in currentCardButtonGroup" :key="btnIndex" :class="btn.class" style="margin-left: 20rpx;" @click.stop="() => btn.handler(item)">
+          <view v-if="getOrderButtonGroup(item).length > 0" class="button-group">
+            <view v-for="(btn, btnIndex) in getOrderButtonGroup(item)" :key="btnIndex" :class="btn.class" style="margin-left: 20rpx;" @click.stop="btn.handler">
               {{ btn.name }}
             </view>
           </view>
