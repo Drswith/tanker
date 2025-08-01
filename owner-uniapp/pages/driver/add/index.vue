@@ -107,7 +107,7 @@ export default {
     async loadDriverDetail(id) {
       try {
         this.pageState.isLoading = true
-        const response = await driverApi.getDriverDetail(this.routeParams.id)
+        const response = await driverApi.getDriverDetail(id)
         this.mapDriverData(response)
       }
       catch (error) {

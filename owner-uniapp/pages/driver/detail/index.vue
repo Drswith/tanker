@@ -62,9 +62,6 @@ export default {
     async loadDriverDetail(id) {
       try {
         this.pageState.isLoading = true
-        // TODO: 调用获取司机详情接口
-        // const response = await this.httpApi.getDriverDetail(this.routeParams.id);
-        // this.driverDetail = response.data;
         const response = await driverApi.getDriverDetail(id)
         this.mapDriverData(response)
       }
