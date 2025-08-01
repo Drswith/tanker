@@ -33,6 +33,14 @@ export default {
       ],
     }
   },
+  computed: {
+    scrollViewStyle() {
+      return {
+        width: '100%',
+        height: `${this.menuHeight}px`
+      }
+    }
+  },
   onLoad() {},
   onReady() {
     this.$refs.drag.initTop()
@@ -52,6 +60,22 @@ export default {
     },
     originCss() {
       return 'transform: translateY(0px);transition-property: transform;transition-duration: 1s;'
+    },
+    getStyleObject() {
+      if (this.mExpand) {
+        return {
+          transform: 'translateY(100%)',
+          transitionProperty: 'transform',
+          transitionDuration: '1s',
+        }
+      }
+      else {
+        return {
+          transform: 'translateY(0px)',
+          transitionProperty: 'transform',
+          transitionDuration: '1s',
+        }
+      }
     },
 
     onChange(e) {
@@ -136,7 +160,7 @@ export default {
     >
       <cover-view @click="expandDrawer()">展开收缩</cover-view>
       <!-- 替代解决nvue动画属性top不兼容问题  vue可行，nvue的uni还是不兼容 使用其他替代方案 -->
-      <cover-view v-if="false" ref="Item" class="tipNvue" :style="`background-color: red;${styleCss()}`" @click="expandDrawer">11111111111111</cover-view>
+      <cover-view v-if="false" ref="Item" class="tipNvue" :style="{ backgroundColor: 'red', ...getStyleObject() }" @click="expandDrawer">11111111111111</cover-view>
     </map>
     <!-- #endif -->
 
@@ -148,7 +172,7 @@ export default {
       <slot>
         <!-- 填充内容 -->
         <scroll-view
-          :scroll-top="scrollTop" :scroll-y="mExpand" :style="`width: 100%;height :${menuHeight}px` "
+          :scroll-top="scrollTop" :scroll-y="mExpand" :style="scrollViewStyle"
           @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
         >
           <view class="time-line">

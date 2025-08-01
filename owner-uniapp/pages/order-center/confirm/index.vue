@@ -232,17 +232,6 @@ export default {
       }
     },
 
-    // 获取设备状态样式
-    getDeviceStatusClass(status) {
-      const statusMap = {
-        sealed: 'status-sealed',
-        verified: 'status-success',
-        failed: 'status-failed',
-        pending: 'status-pending',
-      }
-      return statusMap[status] || 'status-pending'
-    },
-
     // 获取按钮文本
     getButtonText(status) {
       const textMap = {
@@ -252,17 +241,6 @@ export default {
         pending: '待核验',
       }
       return textMap[status] || '核验'
-    },
-
-    // 获取按钮样式
-    getButtonClass(status) {
-      const classMap = {
-        sealed: 'verify-btn',
-        verified: 'success-btn',
-        failed: 'failed-btn',
-        pending: 'verify-btn',
-      }
-      return classMap[status] || 'verify-btn'
     },
   },
 }
@@ -336,7 +314,14 @@ export default {
             <view class="gps-title">
               {{ device.name }}
             </view>
-            <view class="gps-status" :class="getDeviceStatusClass(device.status)">
+            <view
+              class="gps-status" :class="{
+                'status-sealed': device.status === 'sealed',
+                'status-success': device.status === 'verified',
+                'status-failed': device.status === 'failed',
+                'status-pending': device.status === 'pending',
+              }"
+            >
               {{ device.statusText }}
             </view>
           </view>
@@ -351,7 +336,11 @@ export default {
               </view>
               <view
                 class="info-action"
-                :class="getButtonClass(device.status)"
+                :class="{
+                  'verify-btn': device.status === 'sealed' || device.status === 'pending',
+                  'success-btn': device.status === 'verified',
+                  'failed-btn': device.status === 'failed',
+                }"
                 @click="device.status === 'sealed' || device.status === 'pending' ? verifyDevice(device) : null"
               >
                 <text class="action-text">
@@ -368,7 +357,11 @@ export default {
               </view>
               <view
                 class="info-action"
-                :class="getButtonClass(device.status)"
+                :class="{
+                  'verify-btn': device.status === 'sealed' || device.status === 'pending',
+                  'success-btn': device.status === 'verified',
+                  'failed-btn': device.status === 'failed',
+                }"
                 @click="device.status === 'sealed' || device.status === 'pending' ? verifyDevice(device) : null"
               >
                 <text class="action-text">
@@ -385,7 +378,11 @@ export default {
               </view>
               <view
                 class="info-action"
-                :class="getButtonClass(device.status)"
+                :class="{
+                  'verify-btn': device.status === 'sealed' || device.status === 'pending',
+                  'success-btn': device.status === 'verified',
+                  'failed-btn': device.status === 'failed',
+                }"
                 @click="device.status === 'sealed' || device.status === 'pending' ? verifyDevice(device) : null"
               >
                 <text class="action-text">
