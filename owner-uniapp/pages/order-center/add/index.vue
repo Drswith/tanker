@@ -118,7 +118,7 @@ export default {
     if (options.id) {
       this.isEdit = true
       this.orderId = options.id
-      this.loadDetail(options.orderData)
+      this.loadDetail()
       // 修改页面标题
       uni.setNavigationBarTitle({
         title: '修改订单',
@@ -243,10 +243,10 @@ export default {
     },
 
     // 加载订单详情（编辑时使用）
-    async loadDetail(orderData) {
+    async loadDetail() {
       try {
         this.isLoading = true
-        const order = JSON.parse(decodeURIComponent(orderData))
+        const order = await orderApi.getOrderDetail(this.orderId)
         console.log(order)
         this.formData = {
           name: order.takeName,
@@ -265,8 +265,9 @@ export default {
         }
       }
       catch (error) {
+        console.error('加载订单详情失败:', error)
         uni.showToast({
-          title: '加载失败，请重试',
+          title: '加载订单详情失败',
           icon: 'none',
         })
       }

@@ -18,7 +18,6 @@ export default {
       // 路由参数
       routeParams: {
         orderId: null,
-        orderNo: '',
       },
 
       // 订单数据
@@ -46,21 +45,32 @@ export default {
 
   onLoad(options) {
     this.routeParams.orderId = options.id
-    this.routeParams.orderNo = options.orderNo || ''
-
-    // 如果有传递的订单数据，直接使用
-    if (options.orderData) {
-      try {
-        this.orderData = JSON.parse(decodeURIComponent(options.orderData))
-        this.routeParams.orderNo = this.orderData.orderNo || ''
-      }
-      catch (error) {
-        console.error('解析订单数据失败:', error)
-      }
+    if (this.routeParams.orderId) {
+      // 加载订单详情
+      this.loadOrderDetail()
     }
   },
 
   methods: {
+    // 加载订单详情
+    async loadOrderDetail() {
+      try {
+        this.pageState.isLoading = true
+        const response = await orderApi.getOrderDetail(this.routeParams.orderId)
+        this.orderData = response
+      }
+      catch (error) {
+        console.error('加载订单详情失败:', error)
+        uni.showToast({
+          title: '加载订单详情失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.pageState.isLoading = false
+      }
+    },
+
     // 表单验证
     validateForm() {
       console.log('验证表单数据:', this.formData)
@@ -80,7 +90,7 @@ export default {
         // 构建API请求数据 - 根据接口文档构建完整的OilOrder对象
         const gpsReturnData = {
           ...this.orderData, // 保留原有订单数据
-          orderNo: this.routeParams.orderNo,
+          orderNo: this.orderData.orderNo,
           gpsReturnType: this.formData.gpsReturnType,
           gpsReturnOrderNo: this.formData.gpsReturnOrderNo,
           gpsReturnTime: new Date().toISOString(), // 当前时间作为寄回时间

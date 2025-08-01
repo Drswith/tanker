@@ -235,7 +235,7 @@ export default {
       else {
         // 其他状态跳转到退款页面
         uni.navigateTo({
-          url: `/pages/order-center/cancel/index?id=${order.id}&orderData=${encodeURIComponent(JSON.stringify(order))}`,
+          url: `/pages/order-center/cancel/index?id=${order.id}`,
         })
       }
     },

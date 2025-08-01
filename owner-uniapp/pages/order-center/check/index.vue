@@ -1,4 +1,6 @@
 <script>
+import { orderApi } from '@/api/order'
+
 export default {
   components: {
 
@@ -11,12 +13,15 @@ export default {
       // 路由参数
       routeParams: {
         orderId: null,
-        orderNo: '',
-        driverId: null,
       },
 
       // 订单数据
       orderData: null,
+
+      // 页面状态
+      pageState: {
+        isLoading: false,
+      },
     }
   },
   computed: {
@@ -27,19 +32,9 @@ export default {
   },
   onLoad(options) {
     this.routeParams.orderId = options.id
-    this.routeParams.orderNo = options.orderNo || ''
-    this.routeParams.driverId = options.driverId || null
-
-    // 如果有传递的订单数据，直接使用
-    if (options.orderData) {
-      try {
-        this.orderData = JSON.parse(decodeURIComponent(options.orderData))
-        this.routeParams.orderNo = this.orderData.orderNo || ''
-        this.routeParams.driverId = this.orderData.driverId || null
-      }
-      catch (error) {
-        console.error('解析订单数据失败:', error)
-      }
+    if (this.routeParams.orderId) {
+      // 加载订单详情
+      this.loadOrderDetail()
     }
   },
   created() {
@@ -49,10 +44,26 @@ export default {
 
   },
   methods: {
-
+    // 加载订单详情
+    async loadOrderDetail() {
+      try {
+        this.pageState.isLoading = true
+        const response = await orderApi.getOrderDetail(this.routeParams.orderId)
+        this.orderData = response
+      }
+      catch (error) {
+        console.error('加载订单详情失败:', error)
+        uni.showToast({
+          title: '加载订单详情失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.pageState.isLoading = false
+      }
+    },
   },
-}
-</script>
+}</script>
 
 <template>
   <div>
