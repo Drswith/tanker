@@ -34,10 +34,10 @@ export default {
         // 适配接口数据到页面显示格式
         this.inviteList = list.map(item => ({
           id: item.id,
-          name: item.extData?.name || '未知用户',
-          phone: item.extData?.phone || '未知手机号',
-          inviteTime: item.creationTime || '',
-          avatar: item.extData?.avatar || '/static/images/default-avatar.png',
+          name: item.extData?.userInfo?.realName || '未知用户',
+          phone: item.extData?.userInfo?.mobile || '未知手机号',
+          inviteTime: item.extData?.userInfo?.creationTime || '',
+          avatar: item.extData?.userInfo?.avatar || '/static/images/default-avatar.png',
           userId: item.userId,
           inviterId: item.inviterId,
         }))
