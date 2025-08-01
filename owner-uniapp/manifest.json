@@ -74,5 +74,14 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "2"
+    "vueVersion" : "2",
+    "h5" : {
+        "sdkConfigs" : {
+            "maps" : {
+                "tencent" : {
+                    "key" : "DHZBZ-7MHY3-PF63K-O627C-I2GBE-DPFYX"
+                }
+            }
+        }
+    }
 }
