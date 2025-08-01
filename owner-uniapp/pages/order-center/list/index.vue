@@ -10,14 +10,14 @@ export default {
   },
   data() {
     return {
-      OrderStatus,
+      OrderStatus: Object.freeze(OrderStatus),
       // 标签栏数据 - 使用OrderStatus枚举替代硬编码数字
-      tabList: [
+      tabList: Object.freeze([
         // 主要业务流程状态
         { name: '待支付', status: OrderStatus.Created, operations: ['取消订单', '立即支付'] }, // 0 - 已创建待支付
         { name: '待接单', status: OrderStatus.Paid, operations: ['取消订单', '立即支付'] }, // 1 - 已支付待接单
         { name: '待发车', status: OrderStatus.Signed, operations: [] }, // 3 - 已签署司机前往发车地待验车
-        { name: '待签署', status: OrderStatus.Accepted, operations: ['修改订单', '取消订单', '立即签署'] }, // 2 - 已接单待签署（业主和平台）
+        { name: '待签署', status: OrderStatus.Accepted, operations: ['取消订单', '修改订单', '立即签署'] }, // 2 - 已接单待签署（业主和平台）
         // { name: '验车中', status: OrderStatus.Verified , operations: ['寄回GPS'] }, // 4 - 验车通过待施封
         // { name: '验车失败', status: OrderStatus.Unverified , operations: [] }, // 5 - 验车不通过
         // { name: 'GPS待安装', status: OrderStatus.Sealed , operations: [] }, // 6 - 完成施封待安装GPS
@@ -32,7 +32,7 @@ export default {
         { name: '已完成', status: OrderStatus.GpsReceived, operations: [] }, // 15 - 后台确认收到GPS订单结束
         // { name: '待退款', status: OrderStatus.RefundSubmitted , operations: [] }, // 16 - 已提交资料待退款
         { name: '已取消', status: OrderStatus.RefundCompleted, operations: ['删除订单'] }, // 17 - 已退款已取消
-      ],
+      ]),
       currentTab: 3,
       page: 1,
       size: 20,
@@ -248,75 +248,19 @@ export default {
       }
     },
 
-    // 根据订单状态获取按钮组
-    getOrderButtonGroup(order) {
-      const buttonGroups = [
-        // { name: '取消订单', class: '', handler: this.handleCancelOrder(order) },
-        // { name: '修改订单', class: '', handler: this.handleEditOrder(order) },
-        // { name: '立即签署', class: '', handler: this.handleSignOrder(order) },
-        // { name: '订单进度', class: '', handler: this.handleOrderProgress(order) },
-        // { name: '验收授权', class: '', handler: this.handleCheckOrder(order) },
-        // { name: '确认收货', class: '', handler: this.handleConfirmOrder(order) },
-        // { name: '寄回GPS', class: '', handler: this.handleReturnGps(order) },
-        // { name: '立即评价', class: '', handler: this.handleEvaluateOrder(order) },
-        // { name: '删除订单', class: '', handler: this.handleDeleteOrder(order) },
-        // { name: '再来一单', class: '', handler: this.apiErrorToast(order) },
-        // { name: '立即支付', class: '', handler: this.handlePayOrder(order) },
-      ]
+    getOperationButtonClass(index, totalLength) {
+      // 计算倒数位置：0表示最后一个，1表示倒数第二个，2表示倒数第三个
+      const reverseIndex = totalLength - 1 - index
 
-      const statusButtonGroupMap = {
-        [OrderStatus.Created]: buttonGroups.filter(item => ['取消订单', '立即支付'].includes(item.name)), // 0 - 已创建待支付
-        [OrderStatus.Paid]: buttonGroups.filter(item => ['修改订单', '取消订单'].includes(item.name)), // 1 - 已支付待接单
-        [OrderStatus.Accepted]: buttonGroups.filter(item => ['修改订单', '取消订单', '立即签署'].includes(item.name)), // 2 - 已接单待签署（业主和平台）
-        [OrderStatus.Signed]: buttonGroups.filter(item => [].includes(item.name)), // 3 - 已签署待发车
-        [OrderStatus.Verified]: buttonGroups.filter(item => ['寄回GPS'].includes(item.name)), // 4 - 验车通过待施封
-        [OrderStatus.Unverified]: buttonGroups.filter(item => [].includes(item.name)), // 5 - 验车不通过
-        [OrderStatus.Sealed]: buttonGroups.filter(item => [].includes(item.name)), // 6 - 完成施封待安装GPS
-        [OrderStatus.GpsInstalled]: buttonGroups.filter(item => ['取消订单', '立即签署'].includes(item.name)), // 7 - 完成GPS安装待司机签署
-        [OrderStatus.DriverSigned]: buttonGroups.filter(item => ['订单进度', '验收授权', '确认收货'].includes(item.name)), // 8 - 司机已签署（运输中）
-        [OrderStatus.DeliveryConfirmed]: buttonGroups.filter(item => ['验收授权'].includes(item.name)), // 9 - 司机确认送达待核验
-        [OrderStatus.OwnerVerified]: buttonGroups.filter(item => ['立即评价'].includes(item.name)), // 10 - 业主核验确认收货后待评价
-        [OrderStatus.OwnerRejected]: buttonGroups.filter(item => [].includes(item.name)), // 11 - 业主核验不通过
-        [OrderStatus.Evaluated]: buttonGroups.filter(item => [].includes(item.name)), // 12 - 已评价（用于前端查询）
-        [OrderStatus.WaitingGpsReturn]: buttonGroups.filter(item => ['寄回GPS'].includes(item.name)), // 13 - 确认收货后待邮寄GPS
-        [OrderStatus.GpsShipped]: buttonGroups.filter(item => [].includes(item.name)), // 14 - 已邮寄
-        [OrderStatus.GpsReceived]: buttonGroups.filter(item => [].includes(item.name)), // 15 - 后台确认收到GPS订单结束
-        [OrderStatus.RefundSubmitted]: buttonGroups.filter(item => ['删除订单'].includes(item.name)), // 16 - 已提交资料待退款
-        [OrderStatus.RefundCompleted]: buttonGroups.filter(item => ['删除订单'].includes(item.name)), // 17 - 已退款已取消
+      if (reverseIndex === 0) {
+        return 'sign-btn' // 最后一个按钮
       }
-
-      // 根据订单的实际状态获取按钮组
-      let result = []
-      // tab待评价特殊处理
-      if (this.tabList[this.currentTab].status === OrderStatus.OwnerVerified) {
-        result = statusButtonGroupMap[this.tabList[this.currentTab].status]?.reverse()
+      else if (reverseIndex === 1) {
+        return 'modify-btn' // 倒数第二个按钮
       }
       else {
-        result = statusButtonGroupMap[order.status]?.reverse()
+        return 'cancel-btn' // 倒数第三个及之前的所有按钮
       }
-
-      // 设置按钮样式：最后一个sign-btn，倒数第二个modify-btn，倒数第三个到第一个都是cancel-btn
-      const buttonClasses = ['cancel-btn', 'modify-btn', 'sign-btn']
-      for (let index = 0; index < result.length; index++) {
-        const element = result[index]
-        const reverseIndex = result.length - 1 - index
-        if (reverseIndex <= buttonClasses.length - 3) {
-          element.class = 'cancel-btn'
-        }
-        else {
-          element.class = buttonClasses[reverseIndex]
-        }
-      }
-
-      return result.reverse()
-    },
-    getOperationButtonClass(index) {
-      const buttonClasses = ['cancel-btn', 'modify-btn', 'sign-btn']
-      // 倒数第三个到第一个元素都是cancel-btn，倒数第二个是modify-btn，最后一个是sign-btn
-      if (index <= buttonClasses.length - 3) {
-        return 'cancel-btn'
-      }
-      return buttonClasses[index]
     },
     handleOperationButtonClick(order, btnName) {
       switch (btnName) {
@@ -395,11 +339,6 @@ export default {
       />
     </view>
 
-    <!-- 订单状态 0 已创建待支付 1 已支付待接单 2已接单待签署（业主和平台）
-			3已签署司机前往发车地待验车 4 验车通过待施封 5 验车不通过 6 完成施封待安装gps
-			7完成gps安装待司机签署 8司机已签署（运输中）9司机确认送达待核验 10业主核验确认收货后 待评价（用于查询）
-			11业主核验不通过12 已评价(用于前端查询) 13确认收货后待邮寄gps 14已邮寄
-			15后台确认收到gps订单结束 16已提交资料待退款 17已退款已取消 -->
     <scroll-view class="order" scroll-y @scroll="onScroll">
       <view v-for="(item, index) in orderDataList" :key="index" class="card">
         <Tag :status="item.status" :text="tabList[currentTab].name" />
@@ -458,7 +397,7 @@ export default {
 
           <!-- 订单操作按钮组 -->
           <view v-if="tabList[currentTab].operations.length > 0" class="button-group">
-            <view v-for="(btn, btnIndex) in tabList[currentTab].operations" :key="btnIndex" :class="[getOperationButtonClass(btnIndex)]" style="margin-left: 20rpx;" @click.stop="handleOperationButtonClick(item, btn)">
+            <view v-for="(btn, btnIndex) in tabList[currentTab].operations" :key="btnIndex" :class="[getOperationButtonClass(btnIndex, tabList[currentTab].operations.length)]" style="margin-left: 20rpx;" @click.stop="handleOperationButtonClick(item, btn)">
               {{ btn }}
             </view>
           </view>
