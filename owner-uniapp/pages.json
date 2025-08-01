@@ -78,6 +78,41 @@
       }
     },
     {
+      "path": "pages/order-center/check/index",
+      "style": {
+        "navigationBarTitleText": "验收授权",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/order-center/confirm/index",
+      "style": {
+        "navigationBarTitleText": "确认收货",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/order-center/progress/index",
+      "style": {
+        "navigationBarTitleText": "订单进度",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/order-center/detail/index",
+      "style": {
+        "navigationBarTitleText": "订单详情",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/order-center/photo/index",
+      "style": {
+        "navigationBarTitleText": "照片信息",
+        "navigationStyle": "default"
+      }
+    },
+    {
       "path": "pages/order-center/gps-return/index",
       "style": {
         "navigationBarTitleText": "GPS寄回",
