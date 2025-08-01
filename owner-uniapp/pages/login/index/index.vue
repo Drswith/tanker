@@ -1,17 +1,22 @@
 <script>
+import { userApi } from '@/api/user'
+import { setToken, setTokenInfos, setUserInfo } from '@/utils/auth'
+
 export default {
   data() {
     return {
       // 登录方式：'password' 或 'sms'
-      loginType: 'sms',
+      loginType: 'password',
 
       // 协议同意状态
       isAgreed: false,
 
       // 表单数据
       formData: {
-        phoneNumber: '', // 手机号
-        password: '', // 密码
+        phoneNumber: '15145645622', // 手机号
+        password: '123456', // 密码
+        // phoneNumber: '', // 手机号
+        // password: '', // 密码
         verificationCode: '', // 验证码
       },
 
@@ -144,8 +149,7 @@ export default {
       }, 1000)
 
       try {
-        // TODO: 调用发送验证码接口
-        // await this.httpApi.sendVerificationCode({ phone: this.formData.phoneNumber });
+        await userApi.getVerifyCode({ mobile: this.formData.phoneNumber })
         uni.showToast({
           title: '验证码已发送',
           icon: 'success',
@@ -183,23 +187,38 @@ export default {
         this.pageState.isLoading = true
 
         if (this.loginType === 'password') {
-          // TODO: 调用密码登录接口
-          // await this.httpApi.passwordLogin({
-          //   phoneNumber: this.formData.phoneNumber,
-          //   password: this.formData.password
-          // });
+          const res = await userApi.login({
+            userKey: this.formData.phoneNumber,
+            password: this.formData.password,
+          })
+          console.log('登录结果', res)
+          const { token, profile, tokenInfos } = res
+          if (!token) {
+            throw new Error('登录失败')
+          }
+          setToken(token)
+          setTokenInfos(tokenInfos)
+          setUserInfo(profile)
         }
         else {
-          // TODO: 调用验证码登录接口
-          // await this.httpApi.smsLogin({
-          //   phoneNumber: this.formData.phoneNumber,
-          //   verificationCode: this.formData.verificationCode
-          // });
+          const res = await userApi.smsLogin({
+            mobile: this.formData.phoneNumber,
+            verifyCode: this.formData.verificationCode,
+          })
+          console.log('登录结果', res)
+          const { token, profile, tokenInfos } = res
+          if (!token) {
+            throw new Error('登录失败')
+          }
+          setToken(token)
+          setTokenInfos(tokenInfos)
+          setUserInfo(profile)
         }
 
         uni.showToast({
           title: '登录成功',
           icon: 'success',
+          duration: 1000,
         })
 
         // 延迟跳转到首页
@@ -207,11 +226,12 @@ export default {
           uni.switchTab({
             url: '/pages/home/index/index',
           })
-        }, 1500)
+        }, 1000)
       }
       catch (error) {
+        console.log(error)
         uni.showToast({
-          title: error.message || '登录失败，请重试',
+          title: error.errMsg || error.message || '登录失败，请重试',
           icon: 'none',
         })
       }
