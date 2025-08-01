@@ -1,4 +1,7 @@
 <script>
+import { userApi } from '@/api/user'
+import { request } from '@/utils/http'
+
 export default {
   data() {
     return {
@@ -37,11 +40,6 @@ export default {
           {
             required: true,
             message: '请输入手机号码',
-            trigger: ['blur', 'change'],
-          },
-          {
-            pattern: /^1[3-9]\d{9}$/,
-            message: '请输入正确的手机号码',
             trigger: ['blur', 'change'],
           },
         ],
@@ -115,13 +113,14 @@ export default {
 
       try {
         // TODO: 调用发送验证码接口
-        // await this.httpApi.sendVerificationCode({ phone: this.formData.phoneNumber });
+        await userApi.getVerifyCode({ mobile: this.formData.phoneNumber })
         uni.showToast({
           title: '验证码已发送',
           icon: 'success',
         })
       }
       catch (error) {
+        console.error('发送验证码失败:', error)
         uni.showToast({
           title: '发送失败，请重试',
           icon: 'none',
@@ -134,16 +133,53 @@ export default {
     },
 
     // 营业执照上传后处理
-    afterReadLicense(event) {
+    async afterReadLicense(event) {
       const { file } = event
-      this.licenseFileList = [file]
-      this.formData.businessLicense = file.url || file.path
+      console.log('营业执照上传:', file)
 
-      // TODO: 上传到服务器
-      uni.showToast({
-        title: '营业执照上传成功',
-        icon: 'success',
-      })
+      // 验证文件
+      if (!file) {
+        uni.showToast({
+          title: '未选择文件',
+          icon: 'none',
+        })
+        return
+      }
+
+      try {
+        // 使用file.path或file.url作为文件路径，优先使用path
+        const filePath = file.path || file.url
+
+        if (!filePath) {
+          throw new Error('无法获取文件路径')
+        }
+
+        // 显示上传中状态
+        uni.showLoading({
+          title: '上传中...',
+          mask: true,
+        })
+
+        const res = await request.upload('/api/upload/file', filePath)
+        console.log('上传成功:', res)
+
+        this.licenseFileList = [file]
+        this.formData.businessLicense = res // request.upload已经返回data.data
+
+        uni.hideLoading()
+        uni.showToast({
+          title: '营业执照上传成功',
+          icon: 'success',
+        })
+      }
+      catch (error) {
+        console.error('上传失败:', error)
+        uni.hideLoading()
+
+        // 上传失败时清空文件列表
+        this.licenseFileList = []
+        this.formData.businessLicense = ''
+      }
     },
 
     // 删除营业执照
@@ -167,8 +203,7 @@ export default {
 
         this.pageState.isLoading = true
 
-        // TODO: 调用注册接口
-        // await this.httpApi.register(this.formData);
+        await userApi.register(this.formData)
 
         uni.showToast({
           title: '注册成功',
@@ -267,9 +302,14 @@ export default {
           class="form-item-custom"
         >
           <template #label>
-            <text class="field-label">
-              验证码
-            </text>
+            <view class="field-label-required">
+              <text class="required-asterisk">
+                *
+              </text>
+              <text class="field-label">
+                验证码
+              </text>
+            </view>
           </template>
           <view class="input-field input-field--with-button flex-row justify-between">
             <u--input
