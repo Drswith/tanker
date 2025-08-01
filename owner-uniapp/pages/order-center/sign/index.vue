@@ -1,4 +1,5 @@
 <script>
+import { orderApi } from '@/api/order'
 import baseUrl from '@/utils/baseUrl.js'
 
 export default {
@@ -13,13 +14,20 @@ export default {
     }
   },
   onLoad(options) {
-    this.contractId = options.contractId
+    if (!options.id) {
+      uni.showToast({
+        title: '参数错误',
+        icon: 'none',
+      })
+      return
+    }
+    this.contractId = options.id
   },
   mounted() {
     // 监听签名图片
     uni.$on('getSignImg', (e) => {
       // 多签名场景下可根据 sid 区分不同签名
-      if (e.sid == 'sign-board-popup') {
+      if (e.sid === 'sign-board-popup') {
         this.signBase64 = e.base64
         this.signTempimg = e.path
         this.uploadFile(e.path)
@@ -50,15 +58,39 @@ export default {
     },
 
     // 签署合同
-    signContract() {
-      this.httpApi.signContract(this.contractId, {
-        imgPath: this.signUrl,
-      }).then((res) => {
-        uni.$u.toast('签署成功!')
+    // signContract() {
+    //   this.httpApi.signContract(this.contractId, {
+    //     imgPath: this.signUrl,
+    //   }).then((res) => {
+    //     uni.$u.toast('签署成功!')
+    //     setTimeout(() => {
+    //       this.$com.goBack(true, 'getContractDetail')
+    //     }, 800)
+    //   })
+    // },
+    async signContract() {
+      try {
+        await orderApi.signContract({
+          id: Number.parseInt(this.contractId),
+          imgPath: this.signUrl,
+        })
+        uni.showToast({
+          title: '签署成功!',
+          icon: 'success',
+        })
         setTimeout(() => {
-          this.$com.goBack(true, 'getContractDetail')
-        }, 800)
-      })
+          uni.switchTab({
+            url: '/pages/order-center/list/index',
+          })
+        }, 1000)
+      }
+      catch (error) {
+        console.error(error)
+        uni.showToast({
+          title: error.message,
+          icon: 'none',
+        })
+      }
     },
 
     // 打开弹窗
@@ -66,7 +98,10 @@ export default {
       this.showPopup = true
       this.$nextTick(() => {
         this.showSign = true // 微信小程序需要此步骤来初始化签字板
-        uni.$u.toast('请横屏签字')
+        uni.showToast({
+          title: '请横屏签字',
+          icon: 'none',
+        })
       })
     },
 
@@ -129,9 +164,15 @@ export default {
         <view class="sign-box">
           <!-- :markText="['签字', 'sign']"  bgColor="#f8f8f8" -->
           <sp-sign-board
-            v-if="showSign" ref="signBoardRef" sid="sign-board-popup" horizontal :need-back="false"
-            :popup-mode="false" :exp-file="{ fileType: 'png' }" @cancel="close"
+            v-if="showSign"
+            ref="signBoardRef"
+            sid="sign-board-popup"
+            horizontal
+            :need-back="false"
+            :popup-mode="false"
+            :exp-file="{ fileType: 'png' }"
             :pen-style="{ lineWidth: '6' }"
+            @cancel="close"
           />
         </view>
       </view>
