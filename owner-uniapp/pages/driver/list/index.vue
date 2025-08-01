@@ -30,8 +30,8 @@ export default {
         if (data && Array.isArray(data)) {
           this.driverList = data.map(driver => ({
             id: driver.id,
-            name: driver.realName || driver.nickname || '未知',
-            phone: driver.mobile || '未知',
+            name: driver.username || '',
+            phone: driver.mobile || '',
             rating: driver.score || 0,
             avatar: driver.avatar || '/static/images/default-avatar.png',
             // 保留原始数据用于详情页面
@@ -56,30 +56,22 @@ export default {
 
     // 编辑司机
     editDriver(driver) {
-      uni.showToast({
-        title: '缺少api接口',
-        icon: 'none',
+      uni.navigateTo({
+        url: `/pages/driver/add/index?id=${driver.id}`,
       })
-      // uni.navigateTo({
-      //   url: `/pages/driver/detail/index?id=${driver.id}&mode=edit&driverData=${encodeURIComponent(JSON.stringify(driver.originalData))}`,
-      // })
     },
 
     // 删除司机
     deleteDriver(driver) {
-      uni.showToast({
-        title: '缺少api接口',
-        icon: 'none',
+      uni.showModal({
+        title: '确认删除',
+        content: `确定要删除司机"${driver.name}"吗？`,
+        success: (res) => {
+          if (res.confirm) {
+            this.confirmDeleteDriver(driver)
+          }
+        },
       })
-      // uni.showModal({
-      //   title: '确认删除',
-      //   content: `确定要删除司机"${driver.name}"吗？`,
-      //   success: (res) => {
-      //     if (res.confirm) {
-      //       this.confirmDeleteDriver(driver)
-      //     }
-      //   },
-      // })
     },
 
     // 确认删除司机
@@ -87,6 +79,8 @@ export default {
       try {
         // TODO: 调用删除司机接口
         // await this.httpApi.deleteDriver(driver.id);
+
+        await driverApi.deleteDriver(driver.id)
 
         // 从列表中移除
         const index = this.driverList.findIndex(item => item.id === driver.id)
@@ -110,7 +104,14 @@ export default {
     // 查看司机详情
     viewDriverDetail(driver) {
       uni.navigateTo({
-        url: `/pages/driver/detail/index?id=${driver.id}&driverData=${encodeURIComponent(JSON.stringify(driver.originalData))}`,
+        url: `/pages/driver/detail/index?id=${driver.id}`,
+      })
+    },
+
+    // 添加新司机
+    addNewDriver() {
+      uni.navigateTo({
+        url: '/pages/driver/add/index',
       })
     },
   },
@@ -185,6 +186,13 @@ export default {
     <view v-else class="empty-container">
       <text class="empty-text">
         暂无司机数据
+      </text>
+    </view>
+
+    <!-- 添加按钮 -->
+    <view class="add-btn" @click="addNewDriver">
+      <text class="add-btn-text">
+        添加司机
       </text>
     </view>
   </view>
@@ -319,5 +327,27 @@ export default {
 .empty-text {
   font-size: 28rpx;
   color: #999;
+}
+
+/* 添加按钮 */
+.add-btn {
+  position: fixed;
+  bottom: 40rpx;
+  left: 32rpx;
+  right: 32rpx;
+  height: 96rpx;
+  background: linear-gradient(326deg, #FFD100 0%, #FFA500 100%);
+  border-radius: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(255, 165, 0, 0.3);
+  cursor: pointer;
+}
+
+.add-btn-text {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 600;
 }
 </style>

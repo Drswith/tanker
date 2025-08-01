@@ -21,7 +21,6 @@ export default {
       // 路由参数
       routeParams: {
         id: null,
-        mode: 'add', // add | edit
       },
 
       // 原始司机数据（编辑模式下使用）
@@ -86,23 +85,10 @@ export default {
 
   onLoad(options) {
     this.routeParams.id = options.id
-    this.routeParams.mode = options.mode || 'add'
-    this.pageState.isEditMode = this.routeParams.mode === 'edit'
-
-    // 如果是编辑模式且有传递的司机数据，直接使用
-    if (this.pageState.isEditMode && options.driverData) {
-      try {
-        const driverData = JSON.parse(decodeURIComponent(options.driverData))
-        this.mapDriverData(driverData)
-      }
-      catch (error) {
-        console.error('解析司机数据失败:', error)
-        this.loadDriverDetail()
-      }
+    if (this.routeParams.id) {
+      this.pageState.isEditMode = true
     }
-    else if (this.pageState.isEditMode && this.routeParams.id) {
-      this.loadDriverDetail()
-    }
+    this.loadDriverDetail(this.routeParams.id)
   },
 
   methods: {
@@ -110,7 +96,7 @@ export default {
     mapDriverData(driverData) {
       this.originalDriverData = driverData
       this.formData = {
-        driverName: driverData.realName || driverData.nickname || '',
+        driverName: driverData.realName || '',
         phoneNumber: driverData.mobile || '',
         vehicleType: driverData.type || '',
         licensePlate: driverData.carNumber || '',
@@ -118,11 +104,11 @@ export default {
     },
 
     // 加载司机详情（编辑模式下使用）
-    async loadDriverDetail() {
+    async loadDriverDetail(id) {
       try {
         this.pageState.isLoading = true
         const response = await driverApi.getDriverDetail(this.routeParams.id)
-        this.mapDriverData(response.data)
+        this.mapDriverData(response)
       }
       catch (error) {
         console.error('加载司机详情失败:', error)
@@ -153,7 +139,7 @@ export default {
         // 构建API请求数据，映射表单字段到API字段
         const driverData = {
           memberUserId: 1,
-          realName: this.formData.driverName, // 司机姓名 -> realName
+          username: this.formData.driverName, // 司机姓名 -> realName
           mobile: this.formData.phoneNumber, // 手机号 -> mobile
           type: this.formData.vehicleType, // 车辆类型 -> type
           carNumber: this.formData.licensePlate, // 车牌号 -> carNumber

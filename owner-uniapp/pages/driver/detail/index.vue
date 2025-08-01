@@ -1,18 +1,20 @@
 <script>
+import { driverApi } from '@/api/driver'
+
 export default {
   data() {
     return {
       // 司机详情数据
       driverDetail: {
         id: 1,
-        name: '小红',
-        phone: '19512344321',
-        rating: 5.0,
-        orderCount: 30,
+        name: '',
+        phone: '',
+        rating: 0,
+        orderCount: 0,
         avatar: '/static/images/default-avatar.png',
-        plateNumber: '浙A66666',
-        vehicleType: '大卡车',
-        vehicleWeight: '10 吨',
+        plateNumber: '',
+        vehicleType: '',
+        vehicleWeight: '',
         vehiclePhoto: '/static/images/fallback-image.png',
       },
 
@@ -25,30 +27,16 @@ export default {
       // 路由参数
       routeParams: {
         id: null,
-        mode: 'view', // view | edit
       },
     }
   },
 
   onLoad(options) {
     this.routeParams.id = options.id
-    this.routeParams.mode = options.mode || 'view'
-    this.pageState.isEditMode = this.routeParams.mode === 'edit'
-
-    // 如果有传递的司机数据，直接使用
-    if (options.driverData) {
-      try {
-        const driverData = JSON.parse(decodeURIComponent(options.driverData))
-        this.mapDriverData(driverData)
-      }
-      catch (error) {
-        console.error('解析司机数据失败:', error)
-        this.loadDriverDetail()
-      }
+    if (this.routeParams.id) {
+      this.pageState.isEditMode = true
     }
-    else {
-      this.loadDriverDetail()
-    }
+    this.loadDriverDetail(this.routeParams.id)
   },
 
   methods: {
@@ -56,7 +44,7 @@ export default {
     mapDriverData(driverData) {
       this.driverDetail = {
         id: driverData.id,
-        name: driverData.realName || driverData.nickname || '未知',
+        name: driverData.username || '未知',
         phone: driverData.mobile || '未知',
         rating: driverData.score || 0,
         orderCount: 0, // 接口暂无此字段，设为默认值
@@ -71,12 +59,14 @@ export default {
     },
 
     // 加载司机详情
-    async loadDriverDetail() {
+    async loadDriverDetail(id) {
       try {
         this.pageState.isLoading = true
         // TODO: 调用获取司机详情接口
         // const response = await this.httpApi.getDriverDetail(this.routeParams.id);
         // this.driverDetail = response.data;
+        const response = await driverApi.getDriverDetail(id)
+        this.mapDriverData(response)
       }
       catch (error) {
         uni.showToast({
