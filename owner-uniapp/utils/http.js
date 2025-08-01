@@ -21,7 +21,7 @@ const http = new UniAxios({
 http.interceptors.request.use(
   (config) => {
     // 获取token
-    const token = uni.getStorageSync('token') || 'member_user eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtXzE1MTQ1NjQ1NjIyIiwicm9sZSI6Im1lbWJlcl91c2VyIiwiZXhwIjoxNzg0MDgyODkzLCJ1c2VySWQiOjEsImNyZWF0ZWQiOjE3NTI1NDY4OTM3MTd9.cDL1OuAml72fTippb8ivyrF_AsTDGIJnpgioY_iwcgPLMGBUP-PKOef1H-SIYWEBXEy5XDNMOU9eVfvG8jTN4A'
+    const token = uni.getStorageSync('token')
 
     // 自动添加Authorization头
     if (token && !config.headers.Authorization) {
