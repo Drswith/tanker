@@ -16,10 +16,15 @@ export const addressApi = {
     return request.put('/api/users/me/update_address', data)
   },
 
-  // 删除地址?
-  // deleteAddress(data) {
-  //   return request.post('/api/users/me/delete_address', data)
-  // },
+  // 获取地址详情
+  getAddressDetail(id) {
+    return request.get(`/api/users/me/user_address_detail/${id}`)
+  },
+
+  // 删除地址
+  deleteAddress(id) {
+    return request.delete(`/api/users/me/delete_address/${id}`)
+  },
 
   // 设置默认地址
   setDefaultAddress(data) {
