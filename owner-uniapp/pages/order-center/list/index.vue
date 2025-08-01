@@ -224,13 +224,13 @@ export default {
         const res = await orderApi.cancelOrder({
           orderNo: order.orderNo,
         })
-        if (res.code === 200) {
-          uni.showToast({
-            title: '取消订单成功',
-            icon: 'success',
-          })
-          this.getOrder()
-        }
+        console.log('res', res)
+        uni.showToast({
+          title: '取消订单成功',
+          icon: 'success',
+        })
+        this.dataList = await this.getOrder()
+        this.orderDataList = this.dataList
       }
       else {
         // 其他状态跳转到退款页面
@@ -248,7 +248,8 @@ export default {
           title: '删除订单成功',
           icon: 'success',
         })
-        this.getOrder()
+        this.dataList = await this.getOrder()
+        this.orderDataList = this.dataList
       }
       catch (error) {
         uni.showToast({
@@ -446,21 +447,17 @@ export default {
 </template>
 
 <style scoped lang="scss">
+page {
+  background-color: #F8F8F8;
+}
   /* 订单中心页面主容器 */
 .order-center {
 	width: 100vw;
-	min-height: 100vh;
-	background-color: #F8F8F8;
-	overflow: auto;
+  position: relative;
 }
 
 .order-tabs {
-	background-color: #F8F8F8;
   padding: 32rpx 32rpx 0 32rpx;
-	position: fixed;
-	top: calc(88rpx + env(safe-area-inset-top));
-	left: 0;
-	right: 0;
 	z-index: 100;
 	height: calc(44rpx + 32rpx);
 }
@@ -468,7 +465,7 @@ export default {
 /* 订单列表滚动容器 */
 .order {
 	overflow: scroll;
-	padding: calc(44rpx + 32rpx) 32rpx 0 32rpx;
+	padding: 32rpx;
 }
 
 /* 订单卡片容器 */
