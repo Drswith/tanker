@@ -1,33 +1,39 @@
 <script>
 import { orderApi, OrderStatus } from '@/api/order'
+import Notes from './components/Notes.vue'
+import Tag from './components/Tag.vue'
 
 export default {
+  components: {
+    Tag,
+    Notes,
+  },
   data() {
     return {
       OrderStatus,
       // 标签栏数据 - 使用OrderStatus枚举替代硬编码数字
       tabList: [
         // 主要业务流程状态
-        { name: '待支付', status: OrderStatus.Created }, // 0 - 已创建待支付
-        { name: '待接单', status: OrderStatus.Paid }, // 1 - 已支付待接单
-        { name: '待发车', status: OrderStatus.Signed }, // 3 - 已签署司机前往发车地待验车
-        { name: '待签署', status: OrderStatus.Accepted }, // 2 - 已接单待签署（业主和平台）
-        // { name: '验车中', status: OrderStatus.Verified }, // 4 - 验车通过待施封
-        // { name: '验车失败', status: OrderStatus.Unverified }, // 5 - 验车不通过
-        // { name: 'GPS待安装', status: OrderStatus.Sealed }, // 6 - 完成施封待安装GPS
-        // { name: '待司机签署', status: OrderStatus.GpsInstalled }, // 7 - 完成GPS安装待司机签署
-        { name: '运输中', status: OrderStatus.DriverSigned }, // 8 - 司机已签署（运输中）
-        // { name: '待核验', status: OrderStatus.DeliveryConfirmed }, // 9 - 司机确认送达待核验
-        { name: 'GPS待回收', status: OrderStatus.WaitingGpsReturn }, // 13 - 确认收货后待邮寄GPS
-        { name: '待评价', status: OrderStatus.OwnerVerified }, // 10 - 业主核验确认收货后待评价
-        // { name: '核验失败', status: OrderStatus.OwnerRejected }, // 11 - 业主核验不通过
-        // { name: '已评价', status: OrderStatus.Evaluated }, // 12 - 已评价（用于前端查询）
-        // { name: 'GPS已邮寄', status: OrderStatus.GpsShipped }, // 14 - 已邮寄
-        { name: '已完成', status: OrderStatus.GpsReceived }, // 15 - 后台确认收到GPS订单结束
-        // { name: '待退款', status: OrderStatus.RefundSubmitted }, // 16 - 已提交资料待退款
-        { name: '已取消', status: OrderStatus.RefundCompleted }, // 17 - 已退款已取消
+        { name: '待支付', status: OrderStatus.Created, operations: ['取消订单', '立即支付'] }, // 0 - 已创建待支付
+        { name: '待接单', status: OrderStatus.Paid, operations: ['取消订单', '立即支付'] }, // 1 - 已支付待接单
+        { name: '待发车', status: OrderStatus.Signed, operations: [] }, // 3 - 已签署司机前往发车地待验车
+        { name: '待签署', status: OrderStatus.Accepted, operations: ['修改订单', '取消订单', '立即签署'] }, // 2 - 已接单待签署（业主和平台）
+        // { name: '验车中', status: OrderStatus.Verified , operations: ['寄回GPS'] }, // 4 - 验车通过待施封
+        // { name: '验车失败', status: OrderStatus.Unverified , operations: [] }, // 5 - 验车不通过
+        // { name: 'GPS待安装', status: OrderStatus.Sealed , operations: [] }, // 6 - 完成施封待安装GPS
+        // { name: '待司机签署', status: OrderStatus.GpsInstalled , operations: [] }, // 7 - 完成GPS安装待司机签署
+        { name: '运输中', status: OrderStatus.DriverSigned, operations: ['订单进度', '验收授权', '确认收货'] }, // 8 - 司机已签署（运输中）
+        // { name: '待核验', status: OrderStatus.DeliveryConfirmed , operations: [] }, // 9 - 司机确认送达待核验
+        { name: 'GPS待回收', status: OrderStatus.WaitingGpsReturn, operations: ['寄回GPS'] }, // 13 - 确认收货后待邮寄GPS
+        { name: '待评价', status: OrderStatus.OwnerVerified, operations: ['立即评价'] }, // 10 - 业主核验确认收货后待评价
+        // { name: '核验失败', status: OrderStatus.OwnerRejected , operations: [] }, // 11 - 业主核验不通过
+        // { name: '已评价', status: OrderStatus.Evaluated , operations: [] }, // 12 - 已评价（用于前端查询）
+        // { name: 'GPS已邮寄', status: OrderStatus.GpsShipped , operations: [] }, // 14 - 已邮寄
+        { name: '已完成', status: OrderStatus.GpsReceived, operations: [] }, // 15 - 后台确认收到GPS订单结束
+        // { name: '待退款', status: OrderStatus.RefundSubmitted , operations: [] }, // 16 - 已提交资料待退款
+        { name: '已取消', status: OrderStatus.RefundCompleted, operations: ['删除订单'] }, // 17 - 已退款已取消
       ],
-      currentTab: 0,
+      currentTab: 3,
       page: 1,
       size: 20,
       // 订单数据，实际可从接口获取
@@ -41,23 +47,6 @@ export default {
       // 模拟，实际可根据不同标签逻辑复杂处理，比如接口按状态筛选
       return this.orderDataList
     },
-
-    // 当前卡片角标
-    currentStatusConfig() {
-      const styleConfigs = {
-        [OrderStatus.Accepted]: { background: 'linear-gradient(to right, #FD4641, #FD7966)' },
-        [OrderStatus.Signed]: { background: 'linear-gradient(to right, #FD4641, #FD7966)' },
-      }
-
-      const style = styleConfigs[this.tabList[this.currentTab].status] || null
-      if (style) {
-        return { name: this.tabList[this.currentTab].name, style }
-      }
-      else {
-        return { name: this.tabList[this.currentTab].name, style: { background: 'linear-gradient(to right, #0975FF, #62CBFD)' } }
-      }
-    },
-
   },
   async onShow() {
     this.dataList = await this.getOrder()
@@ -262,17 +251,17 @@ export default {
     // 根据订单状态获取按钮组
     getOrderButtonGroup(order) {
       const buttonGroups = [
-        { name: '取消订单', class: '', handler: () => this.handleCancelOrder(order) },
-        { name: '修改订单', class: '', handler: () => this.handleEditOrder(order) },
-        { name: '立即签署', class: '', handler: () => this.handleSignOrder(order) },
-        { name: '订单进度', class: '', handler: () => this.handleOrderProgress(order) },
-        { name: '验收授权', class: '', handler: () => this.handleCheckOrder(order) },
-        { name: '确认收货', class: '', handler: () => this.handleConfirmOrder(order) },
-        { name: '寄回GPS', class: '', handler: () => this.handleReturnGps(order) },
-        { name: '立即评价', class: '', handler: () => this.handleEvaluateOrder(order) },
-        { name: '删除订单', class: '', handler: () => this.handleDeleteOrder(order) },
-        { name: '再来一单', class: '', handler: () => this.apiErrorToast(order) },
-        { name: '立即支付', class: '', handler: () => this.handlePayOrder(order) },
+        // { name: '取消订单', class: '', handler: this.handleCancelOrder(order) },
+        // { name: '修改订单', class: '', handler: this.handleEditOrder(order) },
+        // { name: '立即签署', class: '', handler: this.handleSignOrder(order) },
+        // { name: '订单进度', class: '', handler: this.handleOrderProgress(order) },
+        // { name: '验收授权', class: '', handler: this.handleCheckOrder(order) },
+        // { name: '确认收货', class: '', handler: this.handleConfirmOrder(order) },
+        // { name: '寄回GPS', class: '', handler: this.handleReturnGps(order) },
+        // { name: '立即评价', class: '', handler: this.handleEvaluateOrder(order) },
+        // { name: '删除订单', class: '', handler: this.handleDeleteOrder(order) },
+        // { name: '再来一单', class: '', handler: this.apiErrorToast(order) },
+        // { name: '立即支付', class: '', handler: this.handlePayOrder(order) },
       ]
 
       const statusButtonGroupMap = {
@@ -306,21 +295,68 @@ export default {
         result = statusButtonGroupMap[order.status]?.reverse()
       }
 
-      // 设置按钮样式
+      // 设置按钮样式：最后一个sign-btn，倒数第二个modify-btn，倒数第三个到第一个都是cancel-btn
+      const buttonClasses = ['cancel-btn', 'modify-btn', 'sign-btn']
       for (let index = 0; index < result.length; index++) {
         const element = result[index]
-        if (index === 1) {
-          element.class = 'modify-btn'
-        }
-        else if (index === 2) {
+        const reverseIndex = result.length - 1 - index
+        if (reverseIndex <= buttonClasses.length - 3) {
           element.class = 'cancel-btn'
         }
         else {
-          element.class = 'sign-btn'
+          element.class = buttonClasses[reverseIndex]
         }
       }
 
       return result.reverse()
+    },
+    getOperationButtonClass(index) {
+      const buttonClasses = ['cancel-btn', 'modify-btn', 'sign-btn']
+      // 倒数第三个到第一个元素都是cancel-btn，倒数第二个是modify-btn，最后一个是sign-btn
+      if (index <= buttonClasses.length - 3) {
+        return 'cancel-btn'
+      }
+      return buttonClasses[index]
+    },
+    handleOperationButtonClick(order, btnName) {
+      switch (btnName) {
+        case '取消订单':
+          this.handleCancelOrder(order)
+          break
+        case '修改订单':
+          this.handleEditOrder(order)
+          break
+        case '立即签署':
+          this.handleSignOrder(order)
+          break
+        case '订单进度':
+          this.handleOrderProgress(order)
+          break
+        case '验收授权':
+          this.handleCheckOrder(order)
+          break
+        case '确认收货':
+          this.handleConfirmOrder(order)
+          break
+        case '寄回GPS':
+          this.handleReturnGps(order)
+          break
+        case '立即评价':
+          this.handleEvaluateOrder(order)
+          break
+        case '删除订单':
+          this.handleDeleteOrder(order)
+          break
+        case '再来一单':
+          this.apiErrorToast(order)
+          break
+        case '立即支付':
+          this.handlePayOrder(order)
+          break
+        default:
+          this.apiErrorToast(order)
+          break
+      }
     },
   },
 }
@@ -366,13 +402,7 @@ export default {
 			15后台确认收到gps订单结束 16已提交资料待退款 17已退款已取消 -->
     <scroll-view class="order" scroll-y @scroll="onScroll">
       <view v-for="(item, index) in orderDataList" :key="index" class="card">
-        <view
-          v-if="currentStatusConfig"
-          class="treetop"
-          :style="currentStatusConfig.style"
-        >
-          <text>{{ currentStatusConfig.name }}</text>
-        </view>
+        <Tag :status="item.status" :text="tabList[currentTab].name" />
 
         <view
           class="card_item" :style="{
@@ -426,22 +456,16 @@ export default {
             />
           </view>
 
-          <view v-if="getOrderButtonGroup(item).length > 0" class="button-group">
-            <view v-for="(btn, btnIndex) in getOrderButtonGroup(item)" :key="btnIndex" :class="btn.class" style="margin-left: 20rpx;" @click.stop="btn.handler">
-              {{ btn.name }}
+          <!-- 订单操作按钮组 -->
+          <view v-if="tabList[currentTab].operations.length > 0" class="button-group">
+            <view v-for="(btn, btnIndex) in tabList[currentTab].operations" :key="btnIndex" :class="[getOperationButtonClass(btnIndex)]" style="margin-left: 20rpx;" @click.stop="handleOperationButtonClick(item, btn)">
+              {{ btn }}
             </view>
           </view>
         </view>
 
-        <template v-if="item.status === OrderStatus.Accepted || item.status === OrderStatus.GpsInstalled">
-          <view class="notes">
-            <text style="margin-left: 20rpx;">
-              {{ item.status === OrderStatus.Accepted ? '备注：平台服务协议' : '备注：司机承运协议' }}
-            </text>
-          </view>
-        </template>
+        <Notes v-if="item" :status="item.status" />
       </view>
-      <view style="height: 100rpx;background-color: #F8F8F8;" />
     </scroll-view>
   </view>
 </template>
@@ -475,18 +499,6 @@ page {
 	z-index: 10;
 }
 
-/* 订单状态角标 */
-.treetop {
-	position: absolute;
-	top: 0;
-	right: 0;
-	color: #fff;
-	font-size: 20rpx;
-	font-weight: 400;
-	padding: 8rpx 20rpx;
-	border-radius: 0 10rpx 0 10rpx;
-}
-
 /* 订单卡片内容 */
 .order .card_item {
 	padding: 20rpx;
@@ -515,24 +527,6 @@ page {
 	font-size: 24rpx;
 	font-weight: 300;
 	color: #999999;
-}
-
-/* 订单备注信息 */
-.notes {
-	width: 100%;
-	background-color: #FFF3E0;
-	font-size: 24rpx;
-	color: #797063;
-	display: flex;
-	align-items: center;
-	box-shadow: 0rpx 4rpx 4rpx 0rpx rgba(0,0,0,0.1);
-	border-radius: 0rpx 0rpx 16rpx 16rpx;
-	position: absolute;
-	bottom: 0px;
-	transform: translateY(calc(100% - 16rpx));
-	z-index: -2;
-	padding-top: 32rpx;
-	padding-bottom: 16rpx;
 }
 
 /* 按钮组容器 */
