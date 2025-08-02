@@ -1,5 +1,5 @@
 <script>
-import { orderApi } from '@/api/order'
+import { orderApi, OrderStatusText } from '@/api/order'
 
 export default {
   components: {},
@@ -28,21 +28,9 @@ export default {
     }
   },
   computed: {
-    // 完整的收货地址
-    fullDeliveryAddress() {
-      if (!this.orderData)
-        return ''
-      const { province, city, district, address } = this.orderData
-      return `${province || ''}${city || ''}${district || ''}${address || ''}`
+    statusText() {
+      return OrderStatusText[this.orderData.status] || '未知状态'
     },
-    // 发货地址
-    pickupAddress() {
-      if (!this.orderData)
-        return ''
-      const { shippingLocationName, shippingLocationAddress } = this.orderData
-      return `${shippingLocationName || ''}(${shippingLocationAddress || ''})`
-    },
-
     // 验车照片
     vehicleInspectionImg() {
       return this.orderData?.vehicleInspectionImg || []
@@ -183,7 +171,7 @@ export default {
       <view class="info-card delivery-card">
         <view class="card-header">
           <text class="card-title">
-            待收货
+            {{ statusText }}
           </text>
         </view>
         <view class="card-content">
