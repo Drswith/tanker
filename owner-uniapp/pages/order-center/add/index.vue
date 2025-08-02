@@ -24,7 +24,7 @@ export default {
         driverPhone: '15012341232',
         plateNumber: '浙A123',
         vehicleType: '大货车',
-        totalCost: 675.0,
+        totalCost: 0.0,
       },
       rules: {
         name: [
@@ -150,12 +150,13 @@ export default {
         uni.showToast({
           title: this.isEdit ? '订单更新成功' : '订单创建成功',
           icon: 'success',
+          mask: true,
           duration: 2000,
         })
 
         // 延迟跳转到订单列表页面
         setTimeout(() => {
-          uni.navigateTo({
+          uni.switchTab({
             url: '/pages/order-center/list/index',
           })
         }, 2000)
