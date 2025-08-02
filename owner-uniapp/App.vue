@@ -64,6 +64,7 @@ export default {
   @import './static/css/uni.css';
 	@import "./static/css/common.scss";
 	@import "./static/css/base.scss";
+	@import "./static/css/button.scss";
 </style>
 
 <style>
