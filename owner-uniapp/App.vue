@@ -1,6 +1,22 @@
 <script>
+// #ifdef MP-WEIXIN
+import QQMapWX from '@/utils/qqmap-wx-jssdk1.2/qqmap-wx-jssdk.js'
+// #endif
+
+// #ifdef H5 || MP-WEIXIN
+const mapKey = 'D6ABZ-7O73L-UXXPG-E4RBT-S4GGE-5ABV5'
+// #endif
+
 export default {
   globalData: {
+    mapKey,
+    // 实例化腾讯地图API核心类
+    // #ifdef MP-WEIXIN
+    qqmapsdk: new QQMapWX({
+      key: mapKey,
+    }),
+    // #endif
+
     delayedSearchTimeOutMs: 500, // 搜索延时
   },
   onLaunch() {

@@ -60,7 +60,11 @@
         },
         "usingComponents" : true,
         "requiredPrivateInfos" : [ "getLocation" ],
-        "permission" : {}
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "需要地图定位"
+            }
+        }
     },
     "mp-alipay" : {
         "usingComponents" : true
