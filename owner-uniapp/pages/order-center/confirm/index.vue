@@ -89,6 +89,10 @@ export default {
         currentDevice: null,
         verifyType: '', // 'serial' 或 'qr'
       },
+
+      nfcAdapter: null,
+      nfcIsDiscovering: false,
+
     }
   },
   computed: {
@@ -109,6 +113,30 @@ export default {
     },
 
   },
+  watch: {
+    'codeInputModal.show': {
+      handler(newVal, oldVal) {
+        // 弹窗关闭时
+        if (!newVal) {
+          // #ifdef MP-WEIXIN
+          // 尝试停止发现nfc设备
+          this.nfcAdapter.stopDiscovery({
+            success: (res) => {
+              console.log('停止发现nfc设备成功:', res)
+            },
+            fail: (err) => {
+              console.log('停止发现nfc设备失败:', err)
+            },
+            complete: () => {
+              this.nfcIsDiscovering = false
+            },
+          })
+          // #endif
+        }
+      },
+      immediate: true,
+    },
+  },
   async onLoad(options) {
     this.routeParams.orderId = options.orderId
     if (this.routeParams.orderId) {
@@ -120,6 +148,41 @@ export default {
       // 加载GPS设备信息
       this.loadGpsDevices(this.orderData.orderNo)
     }
+
+    // #ifdef MP-WEIXIN
+    // 初始化NFC适配器 只支持安卓
+    // eslint-disable-next-line no-undef
+    if (this.nfcAdapter === null && getApp().globalData.os === 'android') {
+      this.nfcAdapter = uni.getNFCAdapter()
+    }
+    // #endif
+  },
+  onHide() {
+    // #ifdef MP-WEIXIN
+    // eslint-disable-next-line no-undef
+    if (this.nfcAdapter !== null && getApp().globalData.os === 'android') {
+      this.nfcAdapter.stopDiscovery({
+        success: (res) => {
+          console.log('停止发现nfc设备成功:', res)
+        },
+        fail: (err) => {
+          console.log('停止发现nfc设备失败:', err)
+        },
+        complete: () => {
+          this.nfcIsDiscovering = false
+        },
+      })
+    }
+    // #endif
+  },
+  onUnload() {
+    // #ifdef MP-WEIXIN
+    // eslint-disable-next-line no-undef
+    if (this.nfcAdapter !== null && getApp().globalData.os === 'android') {
+      this.nfcAdapter = null
+      this.nfcIsDiscovering = false
+    }
+    // #endif
   },
   methods: {
     // 加载订单详情
@@ -188,7 +251,7 @@ export default {
         itemList,
         success: (res) => {
           const verifyType = itemList[res.tapIndex]
-          this.performVerification(device, verifyType, res.tapIndex)
+          this.performVerification(device, res.tapIndex, verifyType)
         },
         fail: (res) => {
           console.log('取消选择核验方式')
@@ -197,8 +260,8 @@ export default {
     },
 
     // 执行具体的核验操作
-    performVerification(device, verifyType, typeIndex) {
-      switch (typeIndex) {
+    performVerification(device, verifyTypeIndex, verifyType) {
+      switch (verifyTypeIndex) {
         case 0: // NFC编码核验
           this.performNFCVerification(device)
           break
@@ -213,47 +276,57 @@ export default {
 
     // NFC编码核验
     performNFCVerification(device) {
-      uni.showLoading({
-        title: 'NFC编码核验中...',
-      })
+      this.codeInputModal.show = true
+      this.codeInputModal.title = 'NFC编码核验'
+      this.codeInputModal.inputValue = ''
+      this.codeInputModal.currentDevice = device
+      this.codeInputModal.verifyType = 'nfc'
 
-      // 调用uni NFC接口
-      uni.startHCE({
-        aid_list: ['F0010203040506'],
-        success: () => {
-          // 模拟NFC扫描结果
-          setTimeout(() => {
-            uni.hideLoading()
+      // #ifdef MP-WEIXIN
+      // eslint-disable-next-line no-undef
+      if (this.nfcAdapter !== null && getApp().globalData.os === 'android') {
+        // 绑定监听 NFC Tag
+        this.nfcAdapter.onDiscovered((res) => {
+          console.log(res)
+          // 回调函数中res有3个属性，id,techs,messages,因为我们要获取NFC Tag,所以只处理id
+          // 返回的id属性值是一个ArrayBuffer类型
+          // 使用 new Uint8Array处理返回一个数组
+          const data = new Uint8Array(res.id)
+          console.log(data)
 
-            // 模拟扫描到的NFC编码
-            const scannedNFC = '187239739712937129893' // 模拟扫描结果
-
-            // 与设备的NFC编码进行完全匹配
-            if (scannedNFC === device.nfcCode) {
-              device.nfcVerified = 'verified'
-              uni.showToast({
-                title: 'NFC编码核验成功',
-                icon: 'success',
-              })
+          let str = ''
+          data.forEach((e) => {
+            // 因为我们的卡号是16位制的，所以这里选择转换成16位数字
+            let item = e.toString(16)
+            if (item.length === 1) {
+              item = `0${item}`
             }
-            else {
-              device.nfcVerified = 'failed'
-              uni.showToast({
-                title: 'NFC编码核验失败',
-                icon: 'error',
-              })
-            }
-          }, 1500)
-        },
-        fail: (error) => {
-          uni.hideLoading()
-          console.error('NFC启动失败:', error)
-          uni.showToast({
-            title: 'NFC功能启动失败',
-            icon: 'none',
+            // 因为我们需要的是大写，所以要转
+            item = item.toUpperCase()
+            str = item + str
           })
-        },
-      })
+
+          // nfc扫描最终结果
+          console.log('发现NFC编码:', str)
+          this.codeInputModal.inputValue = str
+        })
+
+        // 开始监听nfc
+        this.nfcAdapter.startDiscovery({
+          success: () => {
+            this.nfcIsDiscovering = true
+          },
+          fail(err) {
+            console.error('NFC启动失败:', err)
+            this.nfcIsDiscovering = false
+            uni.showToast({
+              title: 'NFC功能启动失败',
+              icon: 'none',
+            })
+          },
+        })
+      }
+      // #endif
     },
 
     // 二维码核验
@@ -314,6 +387,13 @@ export default {
         isSuccess = inputCode === targetCode
         device.qrVerified = isSuccess ? 'verified' : 'failed'
       }
+      else if (verifyType === 'nfc') {
+        targetCode = device.nfcCode
+        successMessage = 'NFC编码核验成功'
+        failMessage = 'NFC编码核验失败'
+        isSuccess = inputCode === targetCode
+        device.nfcVerified = isSuccess ? 'verified' : 'failed'
+      }
       this.codeInputModal.show = false
 
       uni.showToast({
@@ -328,6 +408,32 @@ export default {
       this.codeInputModal.inputValue = ''
       this.codeInputModal.currentDevice = null
       this.codeInputModal.verifyType = ''
+    },
+
+    // 获取输入框占位符文本
+    getInputPlaceholder() {
+      switch (this.codeInputModal.verifyType) {
+        case 'serial':
+          return '请输入编码'
+        case 'qr':
+          return '请输入二维码或点击扫描'
+        case 'nfc':
+
+          // eslint-disable-next-line no-undef
+          if (getApp().globalData.os === 'android') {
+            // #ifdef MP-WEIXIN
+            return '请将手机背面贴近读卡器'
+            // #endif
+
+            // eslint-disable-next-line no-unreachable
+            return '请输入NFC编码'
+          }
+
+          return '请输入NFC编码'
+
+        default:
+          return '请输入编码'
+      }
     },
 
     // 编码核验
@@ -493,6 +599,7 @@ export default {
 
               <u-tag size="mini" :text="getDeviceStatusText(device.nfcVerified)" :type="getDeviceStatusTagType(device.nfcVerified)" plain plain-fill />
             </view>
+
             <view class="info-row">
               <view class="info-label">
                 二维码：
@@ -502,6 +609,7 @@ export default {
               </view>
               <u-tag size="mini" :text="getDeviceStatusText(device.qrVerified)" :type="getDeviceStatusTagType(device.qrVerified)" plain plain-fill />
             </view>
+
             <view class="info-row">
               <view class="info-label">
                 编码：
@@ -570,28 +678,26 @@ export default {
       @confirm="confirmCodeInput"
       @cancel="cancelCodeInput"
     >
-      <view class="code-input-content flex-row align-center ">
-        <view class="input-section">
-          <u-input
-            v-model="codeInputModal.inputValue"
-            :placeholder="codeInputModal.verifyType === 'serial' ? '请输入编码' : '请输入二维码或点击扫描'"
-            :clearable="true"
-          />
+      <view class="code-input-container ">
+        <view class="code-input-content flex-row align-center ">
+          <view class="input-section">
+            <u-input
+              v-model="codeInputModal.inputValue"
+              :placeholder="getInputPlaceholder()"
+              :clearable="true"
+            />
+          </view>
+          <view v-if="codeInputModal.verifyType === 'qr'" class="scan-section">
+            <image
+              v-if="codeInputModal.verifyType === 'qr'"
+              src="/static/images/icon/qr-scan.svg"
+              mode="aspectFit"
+              style="width: 100%; height: 100%;"
+              @click="scanQRCode"
+            />
+          </view>
         </view>
-        <view v-if="codeInputModal.verifyType === 'qr'" class="scan-section">
-          <image
-            src="/static/images/icon/qr-scan.svg"
-            mode="aspectFit"
-            style="width: 100%; height: 100%;"
-          />
-          <!-- <u-button
-            type="primary"
-            size="small"
-            @click="scanQRCode"
-          >
-            扫描二维码
-          </u-button> -->
-        </view>
+        <u-loading-icon v-if="codeInputModal.verifyType === 'nfc' && nfcIsDiscovering" size="36" text-size="26" style="margin-top: 20rpx;" text="NFC 编码扫描中" />
       </view>
     </u-modal>
   </view>
@@ -847,6 +953,13 @@ export default {
   color: #ffffff;
   background: linear-gradient( 326deg, #FFD100 0%, #FFA500 100%);
 }
+
+.code-input-container{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .code-input-content {
   flex: 1;
 }
@@ -862,6 +975,5 @@ export default {
   width: 72rpx;
   color: red;
   margin-left: 16rpx;
-
 }
 </style>
