@@ -1,5 +1,5 @@
 <script>
-import { authLocation, getCurrentLocation, getCurrentLocationAddress } from '@/api/address'
+import { authLocation, getCurrentLocationAddress } from '@/api/address'
 import { orderApi } from '@/api/order'
 
 export default {
@@ -46,7 +46,7 @@ export default {
       gpsDevices: [
         {
           id: 1,
-          name: '第一组GPS',
+          // name: '第一组GPS',
           status: 'sealed', // sealed: 已施封, verified: 核验成功, failed: 核验失败, pending: 待核验
           nfcCode: '187239739712937129893',
           qrCode: '18723973971',
@@ -54,7 +54,7 @@ export default {
         },
         {
           id: 2,
-          name: '第二组GPS',
+          // name: '第二组GPS',
           status: 'verified',
           nfcCode: '293712983123123123',
           qrCode: '973971218723',
@@ -119,7 +119,10 @@ export default {
       // 加载订单详情
       await this.loadOrderDetail()
       // 获取当前位置
-      await this.updateLocation()
+      this.updateLocation()
+
+      // 加载GPS设备信息
+      this.loadGpsDevices(this.orderData.orderNo)
     }
   },
 
@@ -153,9 +156,13 @@ export default {
     },
 
     // 加载GPS设备信息
-    loadGpsDevices() {
+    async loadGpsDevices(orderNo) {
       // 这里可以根据订单信息加载对应的GPS设备
       // 暂时使用模拟数据
+      const res = await orderApi.getLeadSealCode({
+        orderNo,
+      })
+      console.log('查询铅封码:', res)
     },
 
     // 更新位置
@@ -327,12 +334,12 @@ export default {
 
       <!-- GPS设备列表 -->
       <view class="gps-section">
-        <view v-for="device in gpsDevices" :key="device.id" class="gps-item">
+        <view v-for="(device, deviceIndex) in gpsDevices" :key="device.id" class="gps-item">
           <view class="gps-header">
             <view class="gps-title">
-              {{ device.name }}
+              {{ `铅封码 ${deviceIndex + 1}` }}
             </view>
-            <view
+            <!-- <view
               class="gps-status" :class="{
                 'status-sealed': device.status === 'sealed',
                 'status-success': device.status === 'verified',
@@ -341,6 +348,9 @@ export default {
               }"
             >
               {{ getDeviceStatusText(device.status) }}
+            </view> -->
+            <view class="gps-status btn-gradient-bg">
+              核验
             </view>
           </view>
 
@@ -389,7 +399,7 @@ export default {
             </view>
             <view class="info-row">
               <view class="info-label">
-                编号：
+                编码：
               </view>
               <view class="info-value">
                 {{ device.serialNumber }}
@@ -588,10 +598,15 @@ export default {
       }
 
       .gps-status {
-        padding: 8rpx 16rpx;
-        border-radius: 20rpx;
+        width: 144rpx;
+        height: 56rpx;
+        border-radius: 48rpx;
+        padding: 8rpx 32rpx;
         font-size: 24rpx;
         font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &.status-sealed {
           background: #fff7e6;
@@ -613,6 +628,7 @@ export default {
           color: #999999;
         }
       }
+
     }
 
     .gps-info {
@@ -716,19 +732,8 @@ export default {
   color: #ffffff;
 }
 
-// 响应式适配
-@media screen and (max-width: 750rpx) {
-  .content {
-    padding: 16rpx;
-  }
-
-  .location-section,
-  .gps-item {
-    padding: 24rpx;
-  }
-
-  .notice-card {
-    padding: 20rpx;
-  }
+.btn-gradient-bg {
+  color: #ffffff;
+  background: linear-gradient( 326deg, #FFD100 0%, #FFA500 100%);
 }
 </style>

@@ -133,4 +133,9 @@ export const orderApi = {
   gpsReturn(data) {
     return request.put('/api/order/return_gps', data)
   },
+
+  // 查询铅封码
+  getLeadSealCode(data) {
+    return request.get('/api/order/get_lead_seal_code', data)
+  },
 }
