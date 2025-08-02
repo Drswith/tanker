@@ -1,5 +1,7 @@
 <script>
 export default {
+  components: {
+  },
   data() {
     return {
       shareImage: '',
@@ -21,17 +23,19 @@ export default {
     shareToMoments() {
 
     },
+
     onShareAppMessage() {
       return {
         title: '分享好友123',
         path: '/index/index?id=123',
       }
     },
+
     onShareTimeline() {
       return {
-        title: '分享朋友圈123',
+        title: '分享朋友圈321',
         query: {
-          id: '123',
+          id: '321',
         },
         imageUrl: this.shareImage,
       }
@@ -146,12 +150,9 @@ export default {
         </view>
       </view>
 
-      <!-- 取消按钮 -->
-      <view class="cancel-button-wrapper flex-col">
-        <text class="cancel-button-text">
-          取消
-        </text>
-      </view>
+      <button class="primary-button" open-type="share">
+        取消
+      </button>
     </view>
   </view>
 </template>

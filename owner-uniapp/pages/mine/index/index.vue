@@ -94,6 +94,13 @@ export default {
       })
     },
 
+    // 跳转到邀请页面
+    goToInvite() {
+      uni.navigateTo({
+        url: '/pages/invite/index/index',
+      })
+    },
+
     // 跳转到收货地址页面
     goToAddressList() {
       uni.navigateTo({
@@ -158,7 +165,7 @@ export default {
       </view>
     </view>
 
-    <view class="invite-section flex-row">
+    <view class="invite-section flex-row" @click="goToInvite">
       <view class="invite-info flex-col">
         <text class="invite-title">
           邀请好友
