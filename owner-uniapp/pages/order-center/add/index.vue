@@ -105,9 +105,9 @@ export default {
     }
   },
   onLoad(options) {
-    if (options.id) {
+    if (options.orderId) {
       this.isEdit = true
-      this.orderId = options.id
+      this.orderId = options.orderId
       this.loadDetail()
       // 修改页面标题
       uni.setNavigationBarTitle({

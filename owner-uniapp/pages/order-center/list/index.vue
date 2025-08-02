@@ -140,70 +140,70 @@ export default {
     handleEditOrder(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/add/index?id=${order.id}`,
+        url: `/pages/order-center/add/index?orderId=${order.id}`,
       })
     },
     // 签署订单
     async handleSignOrder(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/sign/index?id=${order.id}`,
+        url: `/pages/order-center/sign/index?orderId=${order.id}`,
       })
     },
     // 订单进度
     handleOrderProgress(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/progress/index?id=${order.id}`,
+        url: `/pages/order-center/progress/index?orderId=${order.id}`,
       })
     },
     // 订单详情
     handleOrderDetail(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/detail/index?id=${order.id}`,
+        url: `/pages/order-center/detail/index?orderId=${order.id}`,
       })
     },
     // 验收授权
     handleCheckOrder(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/check/index?id=${order.id}`,
+        url: `/pages/order-center/check/index?orderId=${order.id}`,
       })
     },
     // 确认收货
     handleConfirmOrder(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/confirm/index?id=${order.id}`,
+        url: `/pages/order-center/confirm/index?orderId=${order.id}`,
       })
     },
     // 照片信息
     handleOrderPhoto(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/photo/index?id=${order.id}`,
+        url: `/pages/order-center/photo/index?orderId=${order.id}`,
       })
     },
     // 评价订单
     handleEvaluateOrder(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/evaluate/index?id=${order.id}`,
+        url: `/pages/order-center/evaluate/index?orderId=${order.id}`,
       })
     },
     // 寄回GPS
     handleReturnGps(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/gps-return/index?id=${order.id}`,
+        url: `/pages/order-center/gps-return/index?orderId=${order.id}`,
       })
     },
     // 立即支付
     handlePayOrder(order) {
       console.log('order', order)
       uni.navigateTo({
-        url: `/pages/order-center/pay/index?id=${order.id}`,
+        url: `/pages/order-center/pay/index?orderId=${order.id}`,
       })
     },
     // 取消订单
@@ -224,7 +224,7 @@ export default {
       else {
         // 其他状态跳转到退款页面
         uni.navigateTo({
-          url: `/pages/order-center/cancel/index?id=${order.id}`,
+          url: `/pages/order-center/cancel/index?orderId=${order.id}`,
         })
       }
     },

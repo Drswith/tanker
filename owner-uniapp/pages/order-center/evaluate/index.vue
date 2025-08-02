@@ -75,7 +75,7 @@ export default {
   },
 
   onLoad(options) {
-    this.routeParams.orderId = options.id
+    this.routeParams.orderId = options.orderId
     if (this.routeParams.orderId) {
       // 加载订单详情
       this.loadOrderDetail()

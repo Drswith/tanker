@@ -14,14 +14,14 @@ export default {
     }
   },
   onLoad(options) {
-    if (!options.id) {
+    if (!options.orderId) {
       uni.showToast({
         title: '参数错误',
         icon: 'none',
       })
       return
     }
-    this.contractId = options.id
+    this.contractId = options.orderId
   },
   mounted() {
     // 监听签名图片
