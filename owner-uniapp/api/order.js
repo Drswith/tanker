@@ -138,4 +138,9 @@ export const orderApi = {
   getLeadSealCode(data) {
     return request.get('/api/order/get_lead_seal_code', data)
   },
+
+  // 确认收货
+  confirmReceipt(data) {
+    return request.put('/api/order/confirm_receipt', data)
+  },
 }

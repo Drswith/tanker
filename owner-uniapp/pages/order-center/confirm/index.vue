@@ -1,6 +1,21 @@
 <script>
 import { authLocation, getCurrentLocationAddress } from '@/api/address'
-import { orderApi } from '@/api/order'
+import { orderApi, OrderStatus } from '@/api/order'
+
+const VerifyStatusMap = Object.freeze({
+  pending: {
+    text: '待核验',
+    tagType: 'warning',
+  },
+  verified: {
+    text: '核验成功',
+    tagType: 'success',
+  },
+  failed: {
+    text: '核验失败',
+    tagType: 'error',
+  },
+})
 
 export default {
   components: {
@@ -22,43 +37,27 @@ export default {
       // 订单数据
       orderData: null,
 
-      // GPS设备状态映射
-      statusMap: {
-        sealed: {
-          text: '已施封',
-          color: '#fa8c16',
-        },
-        verified: {
-          text: '核验成功',
-          color: '#52c41a',
-        },
-        failed: {
-          text: '核验失败',
-          color: '#ff4d4f',
-        },
-        pending: {
-          text: '待核验',
-          color: '#999999',
-        },
-      },
-
       // GPS设备信息
       gpsDevices: [
         {
           id: 1,
-          // name: '第一组GPS',
-          status: 'sealed', // sealed: 已施封, verified: 核验成功, failed: 核验失败, pending: 待核验
           nfcCode: '187239739712937129893',
           qrCode: '18723973971',
           serialNumber: '39739712',
+          // 核验项核验状态
+          nfcVerified: 'pending', // verified: 核验成功, failed: 核验失败, pending: 待核验
+          qrVerified: 'pending',
+          serialVerified: 'pending',
         },
         {
           id: 2,
-          // name: '第二组GPS',
-          status: 'verified',
           nfcCode: '293712983123123123',
           qrCode: '973971218723',
           serialNumber: '9089000',
+          // 核验项核验状态
+          nfcVerified: 'pending', // verified: 核验成功, failed: 核验失败, pending: 待核验
+          qrVerified: 'pending',
+          serialVerified: 'pending',
         },
       ],
 
@@ -81,6 +80,15 @@ export default {
         title: '当前存在接验失败的铅封码，是否继续确认收货！',
         content: '',
       },
+
+      // 编码输入弹窗状态
+      codeInputModal: {
+        show: false,
+        title: '编码核验',
+        inputValue: '',
+        currentDevice: null,
+        verifyType: '', // 'serial' 或 'qr'
+      },
     }
   },
   computed: {
@@ -91,26 +99,14 @@ export default {
       return this.orderData.current
     },
 
-    // 检查是否有验证失败的设备
-    hasFailedDevices() {
-      return this.gpsDevices.some(device => device.status === 'failed')
+    // 检查所有铅封码的所有核验项目是否都成功
+    allChecked() {
+      return this.gpsDevices.every(device =>
+        device.nfcVerified === 'verified'
+        && device.qrVerified === 'verified'
+        && device.serialVerified === 'verified',
+      )
     },
-
-    // 获取设备状态文本
-    getDeviceStatusText() {
-      return (status) => {
-        return this.statusMap[status]?.text || '未知状态'
-      }
-    },
-
-    // 获取设备状态颜色
-    getDeviceStatusColor() {
-      return (status) => {
-        return this.statusMap[status]?.color || '#999999'
-      }
-    },
-  },
-  watch: {
 
   },
   async onLoad(options) {
@@ -124,13 +120,6 @@ export default {
       // 加载GPS设备信息
       this.loadGpsDevices(this.orderData.orderNo)
     }
-  },
-
-  created() {
-
-  },
-  mounted() {
-
   },
   methods: {
     // 加载订单详情
@@ -181,45 +170,200 @@ export default {
       this.fullDeliveryAddress = result?.address || ''
     },
 
+    // 获取核验状态文本
+    getDeviceStatusText(status) {
+      return VerifyStatusMap[status]?.text || '未知状态'
+    },
+
+    // 获取核验状态标签类型
+    getDeviceStatusTagType(status) {
+      return VerifyStatusMap[status]?.tagType || 'info'
+    },
+
     // 核验GPS设备
     verifyDevice(device) {
-      // 模拟核验过程
+      const itemList = ['NFC编码核验', '二维码核验', '编码核验']
+
+      uni.showActionSheet({
+        itemList,
+        success: (res) => {
+          const verifyType = itemList[res.tapIndex]
+          this.performVerification(device, verifyType, res.tapIndex)
+        },
+        fail: (res) => {
+          console.log('取消选择核验方式')
+        },
+      })
+    },
+
+    // 执行具体的核验操作
+    performVerification(device, verifyType, typeIndex) {
+      switch (typeIndex) {
+        case 0: // NFC编码核验
+          this.performNFCVerification(device)
+          break
+        case 1: // 二维码核验
+          this.performQRVerification(device)
+          break
+        case 2: // 编码核验
+          this.performSerialVerification(device)
+          break
+      }
+    },
+
+    // NFC编码核验
+    performNFCVerification(device) {
       uni.showLoading({
-        title: '核验中...',
+        title: 'NFC编码核验中...',
       })
 
-      setTimeout(() => {
-        uni.hideLoading()
+      // 调用uni NFC接口
+      uni.startHCE({
+        aid_list: ['F0010203040506'],
+        success: () => {
+          // 模拟NFC扫描结果
+          setTimeout(() => {
+            uni.hideLoading()
 
-        // 随机模拟核验结果
-        const isSuccess = Math.random() > 0.3
+            // 模拟扫描到的NFC编码
+            const scannedNFC = '187239739712937129893' // 模拟扫描结果
 
-        if (isSuccess) {
-          device.status = 'verified'
+            // 与设备的NFC编码进行完全匹配
+            if (scannedNFC === device.nfcCode) {
+              device.nfcVerified = 'verified'
+              uni.showToast({
+                title: 'NFC编码核验成功',
+                icon: 'success',
+              })
+            }
+            else {
+              device.nfcVerified = 'failed'
+              uni.showToast({
+                title: 'NFC编码核验失败',
+                icon: 'error',
+              })
+            }
+          }, 1500)
+        },
+        fail: (error) => {
+          uni.hideLoading()
+          console.error('NFC启动失败:', error)
           uni.showToast({
-            title: '核验成功',
-            icon: 'success',
+            title: 'NFC功能启动失败',
+            icon: 'none',
           })
-        }
-        else {
-          device.status = 'failed'
+        },
+      })
+    },
+
+    // 二维码核验
+    performQRVerification(device) {
+      this.codeInputModal.show = true
+      this.codeInputModal.title = '二维码核验'
+      this.codeInputModal.inputValue = ''
+      this.codeInputModal.currentDevice = device
+      this.codeInputModal.verifyType = 'qr'
+    },
+
+    // 二维码扫描
+    scanQRCode() {
+      uni.scanCode({
+        success: (res) => {
+          this.codeInputModal.inputValue = res.result
+        },
+        fail: (error) => {
+          console.error('二维码扫描失败:', error)
           uni.showToast({
-            title: '核验失败',
-            icon: 'error',
+            title: '二维码扫描失败',
+            icon: 'none',
           })
-        }
-      }, 1500)
+        },
+      })
+    },
+
+    // 确认编码输入
+    confirmCodeInput() {
+      if (!this.codeInputModal.inputValue.trim()) {
+        uni.showToast({
+          title: '请输入编码',
+          icon: 'none',
+        })
+        return
+      }
+
+      const device = this.codeInputModal.currentDevice
+      const inputCode = this.codeInputModal.inputValue.trim()
+      const verifyType = this.codeInputModal.verifyType
+
+      let isSuccess = false
+      let targetCode = ''
+      let successMessage = ''
+      let failMessage = ''
+
+      if (verifyType === 'serial') {
+        targetCode = device.serialNumber
+        successMessage = '编码核验成功'
+        failMessage = '编码核验失败'
+        isSuccess = inputCode === targetCode
+        device.serialVerified = isSuccess ? 'verified' : 'failed'
+      }
+      else if (verifyType === 'qr') {
+        targetCode = device.qrCode
+        successMessage = '二维码核验成功'
+        failMessage = '二维码核验失败'
+        isSuccess = inputCode === targetCode
+        device.qrVerified = isSuccess ? 'verified' : 'failed'
+      }
+      this.codeInputModal.show = false
+
+      uni.showToast({
+        title: isSuccess ? successMessage : failMessage,
+        icon: isSuccess ? 'success' : 'error',
+      })
+    },
+
+    // 取消编码输入
+    cancelCodeInput() {
+      this.codeInputModal.show = false
+      this.codeInputModal.inputValue = ''
+      this.codeInputModal.currentDevice = null
+      this.codeInputModal.verifyType = ''
+    },
+
+    // 编码核验
+    performSerialVerification(device) {
+      this.codeInputModal.show = true
+      this.codeInputModal.title = '编码核验'
+      this.codeInputModal.inputValue = ''
+      this.codeInputModal.currentDevice = device
+      this.codeInputModal.verifyType = 'serial'
     },
 
     // 确认收货
     confirmReceipt() {
-      if (this.hasFailedDevices) {
-        // 有失败的设备，显示继续确认弹窗
-        this.continueModal.show = true
+      if (this.allChecked) {
+        // 所有核验项目都成功
+        uni.showModal({
+          title: '确认收货',
+          content: '核验信息正确，确认收货成功！',
+          success: (res) => {
+            if (res.confirm) {
+              this.doConfirmReceipt(this.allChecked)
+            }
+          },
+        })
       }
       else {
-        // 所有设备都验证成功，显示确认弹窗
-        this.confirmModal.show = true
+        // 存在核验失败的铅封码
+        uni.showModal({
+          title: '确认收货',
+          content: '当前存在核验失败的铅封码，是否继续确认收货！',
+          success: (res) => {
+            if (res.confirm) {
+              this.doConfirmReceipt(this.allChecked)
+            }
+          },
+        })
       }
     },
 
@@ -230,22 +374,22 @@ export default {
     },
 
     // 确定确认收货
-    async doConfirmReceipt() {
+    async doConfirmReceipt(allChecked) {
       try {
         this.pageState.isConfirming = true
         this.confirmModal.show = false
         this.continueModal.show = false
 
+        // 确认收货
+        // status = 13 收货成功
+        // status = 11 业主核验不通过
+        const updateStatus = allChecked ? OrderStatus.WaitingGpsReturn : OrderStatus.OwnerRejected
+
         // 调用确认收货API
         await orderApi.confirmReceipt({
-          orderId: this.routeParams.orderId,
-          gpsDevices: this.gpsDevices.map(device => ({
-            id: device.id,
-            status: device.status,
-            nfcCode: device.nfcCode,
-            qrCode: device.qrCode,
-            serialNumber: device.serialNumber,
-          })),
+          id: this.orderData.id,
+          orderNo: this.orderData.orderNo,
+          status: updateStatus,
         })
 
         uni.showToast({
@@ -271,13 +415,6 @@ export default {
       }
     },
 
-    // 获取按钮文本
-    getButtonText(status) {
-      if (status === 'sealed' || status === 'pending') {
-        return '核验'
-      }
-      return this.statusMap[status]?.text || '核验'
-    },
   },
 }
 </script>
@@ -339,17 +476,8 @@ export default {
             <view class="gps-title">
               {{ `铅封码 ${deviceIndex + 1}` }}
             </view>
-            <!-- <view
-              class="gps-status" :class="{
-                'status-sealed': device.status === 'sealed',
-                'status-success': device.status === 'verified',
-                'status-failed': device.status === 'failed',
-                'status-pending': device.status === 'pending',
-              }"
-            >
-              {{ getDeviceStatusText(device.status) }}
-            </view> -->
-            <view class="gps-status btn-gradient-bg">
+
+            <view class="gps-status btn-gradient-bg" @click.stop="verifyDevice(device)">
               核验
             </view>
           </view>
@@ -362,19 +490,8 @@ export default {
               <view class="info-value">
                 {{ device.nfcCode }}
               </view>
-              <view
-                class="info-action"
-                :class="{
-                  'verify-btn': device.status === 'sealed' || device.status === 'pending',
-                  'success-btn': device.status === 'verified',
-                  'failed-btn': device.status === 'failed',
-                }"
-                @click="device.status === 'sealed' || device.status === 'pending' ? verifyDevice(device) : null"
-              >
-                <text class="action-text">
-                  {{ getButtonText(device.status) }}
-                </text>
-              </view>
+
+              <u-tag size="mini" :text="getDeviceStatusText(device.nfcVerified)" :type="getDeviceStatusTagType(device.nfcVerified)" plain plain-fill />
             </view>
             <view class="info-row">
               <view class="info-label">
@@ -383,19 +500,7 @@ export default {
               <view class="info-value">
                 {{ device.qrCode }}
               </view>
-              <view
-                class="info-action"
-                :class="{
-                  'verify-btn': device.status === 'sealed' || device.status === 'pending',
-                  'success-btn': device.status === 'verified',
-                  'failed-btn': device.status === 'failed',
-                }"
-                @click="device.status === 'sealed' || device.status === 'pending' ? verifyDevice(device) : null"
-              >
-                <text class="action-text">
-                  {{ getButtonText(device.status) }}
-                </text>
-              </view>
+              <u-tag size="mini" :text="getDeviceStatusText(device.qrVerified)" :type="getDeviceStatusTagType(device.qrVerified)" plain plain-fill />
             </view>
             <view class="info-row">
               <view class="info-label">
@@ -404,19 +509,8 @@ export default {
               <view class="info-value">
                 {{ device.serialNumber }}
               </view>
-              <view
-                class="info-action"
-                :class="{
-                  'verify-btn': device.status === 'sealed' || device.status === 'pending',
-                  'success-btn': device.status === 'verified',
-                  'failed-btn': device.status === 'failed',
-                }"
-                @click="device.status === 'sealed' || device.status === 'pending' ? verifyDevice(device) : null"
-              >
-                <text class="action-text">
-                  {{ getButtonText(device.status) }}
-                </text>
-              </view>
+
+              <u-tag size="mini" :text="getDeviceStatusText(device.serialVerified)" :type="getDeviceStatusTagType(device.serialVerified)" plain plain-fill />
             </view>
           </view>
         </view>
@@ -464,6 +558,42 @@ export default {
       @confirm="doConfirmReceipt"
       @cancel="cancelConfirm"
     />
+
+    <!-- 编码输入弹窗 -->
+    <u-modal
+      :show="codeInputModal.show"
+      :title="codeInputModal.title"
+      :show-cancel-button="true"
+      :show-confirm-button="true"
+      confirm-text="确定"
+      cancel-text="取消"
+      @confirm="confirmCodeInput"
+      @cancel="cancelCodeInput"
+    >
+      <view class="code-input-content flex-row align-center ">
+        <view class="input-section">
+          <u-input
+            v-model="codeInputModal.inputValue"
+            :placeholder="codeInputModal.verifyType === 'serial' ? '请输入编码' : '请输入二维码或点击扫描'"
+            :clearable="true"
+          />
+        </view>
+        <view v-if="codeInputModal.verifyType === 'qr'" class="scan-section">
+          <image
+            src="/static/images/icon/qr-scan.svg"
+            mode="aspectFit"
+            style="width: 100%; height: 100%;"
+          />
+          <!-- <u-button
+            type="primary"
+            size="small"
+            @click="scanQRCode"
+          >
+            扫描二维码
+          </u-button> -->
+        </view>
+      </view>
+    </u-modal>
   </view>
 </template>
 
@@ -608,25 +738,6 @@ export default {
         align-items: center;
         justify-content: center;
 
-        &.status-sealed {
-          background: #fff7e6;
-          color: #fa8c16;
-        }
-
-        &.status-success {
-          background: #f6ffed;
-          color: #52c41a;
-        }
-
-        &.status-failed {
-          background: #fff2f0;
-          color: #ff4d4f;
-        }
-
-        &.status-pending {
-          background: #f0f0f0;
-          color: #999999;
-        }
       }
 
     }
@@ -642,14 +753,14 @@ export default {
         }
 
         .info-label {
-          font-size: 28rpx;
+          font-size: 26rpx;
           color: #666666;
           width: 140rpx;
           flex-shrink: 0;
         }
 
         .info-value {
-          font-size: 28rpx;
+          font-size: 26rpx;
           color: #333333;
           flex: 1;
           margin-right: 20rpx;
@@ -735,5 +846,22 @@ export default {
 .btn-gradient-bg {
   color: #ffffff;
   background: linear-gradient( 326deg, #FFD100 0%, #FFA500 100%);
+}
+.code-input-content {
+  flex: 1;
+}
+
+.input-section {
+  flex: 1;
+}
+
+.scan-section {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  width: 72rpx;
+  color: red;
+  margin-left: 16rpx;
+
 }
 </style>
