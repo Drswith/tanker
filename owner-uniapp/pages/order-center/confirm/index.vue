@@ -1,4 +1,5 @@
 <script>
+import { authLocation, getCurrentLocation, getCurrentLocationAddress } from '@/api/address'
 import { orderApi } from '@/api/order'
 
 export default {
@@ -14,6 +15,9 @@ export default {
       routeParams: {
         orderId: null,
       },
+
+      // 收货地址(用户的位置)
+      fullDeliveryAddress: '',
 
       // 订单数据
       orderData: null,
@@ -80,20 +84,11 @@ export default {
     }
   },
   computed: {
-    // 完整的收货地址
-    fullDeliveryAddress() {
-      if (!this.orderData)
-        return ''
-      const { province, city, district, address } = this.orderData
-      return `${province || ''}${city || ''}${district || ''}${address || ''}`
-    },
-
-    // 发货地址
+    // 发货地址(车的位置)
     pickupAddress() {
-      if (!this.orderData)
+      if (!this.orderData?.current)
         return ''
-      const { shippingLocationName, shippingLocationAddress } = this.orderData
-      return `${shippingLocationName || ''}(${shippingLocationAddress || ''})`
+      return this.orderData.current
     },
 
     // 检查是否有验证失败的设备
@@ -118,13 +113,16 @@ export default {
   watch: {
 
   },
-  onLoad(options) {
+  async onLoad(options) {
     this.routeParams.orderId = options.orderId
     if (this.routeParams.orderId) {
       // 加载订单详情
-      this.loadOrderDetail()
+      await this.loadOrderDetail()
+      // 获取当前位置
+      await this.updateLocation()
     }
   },
+
   created() {
 
   },
@@ -161,11 +159,19 @@ export default {
     },
 
     // 更新位置
-    updateLocation() {
-      uni.showToast({
-        title: '位置更新功能开发中',
-        icon: 'none',
+    async updateLocation() {
+      const authorise = await authLocation()
+      if (!authorise) {
+        return
+      }
+      uni.showLoading({
+        title: '定位中...',
       })
+      const fullAddress = await getCurrentLocationAddress()
+      uni.hideLoading()
+      console.log('当前详细位置:', fullAddress)
+      const { result } = fullAddress
+      this.fullDeliveryAddress = result?.address || ''
     },
 
     // 核验GPS设备
@@ -289,7 +295,7 @@ export default {
       <view class="location-section">
         <view class="section-header">
           <view class="header-title">
-            确认收货
+            位置信息
           </view>
           <view class="location-update" @click="updateLocation">
             <u-icon name="reload" size="16" color="#1890ff" />
