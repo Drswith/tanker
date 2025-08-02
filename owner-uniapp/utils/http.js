@@ -1,3 +1,4 @@
+import { clearToken, clearTokenInfos, clearUserInfo, getToken, setToken } from './auth'
 import baseUrl from './baseUrl'
 import { UniAxios } from './uniAxios'
 
@@ -21,7 +22,7 @@ const http = new UniAxios({
 http.interceptors.request.use(
   (config) => {
     // 获取token
-    const token = uni.getStorageSync('token')
+    const token = getToken()
 
     // 自动添加Authorization头
     if (token && !config.headers.Authorization) {
@@ -72,7 +73,9 @@ http.interceptors.response.use(
         })
 
         // 清除本地token
-        uni.removeStorageSync('token')
+        clearToken()
+        clearTokenInfos()
+        clearUserInfo()
 
         // 延迟跳转到登录页
         setTimeout(() => {
@@ -265,7 +268,7 @@ export const request = {
         name: 'file',
         formData,
         header: {
-          Authorization: uni.getStorageSync('token'),
+          Authorization: getToken(),
         },
         success: (res) => {
           console.log('[Upload] 上传响应:', res)
