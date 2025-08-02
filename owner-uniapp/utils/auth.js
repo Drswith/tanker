@@ -16,8 +16,6 @@ const storage = {
         return JSON.parse(str)
       }
       catch (parseError) {
-        // 如果JSON解析失败，可能是普通字符串，直接返回
-        console.warn(`JSON解析失败，返回原始值: ${key}`, parseError)
         return str
       }
     }
