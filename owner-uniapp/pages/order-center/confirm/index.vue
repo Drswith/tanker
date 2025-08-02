@@ -18,6 +18,26 @@ export default {
       // 订单数据
       orderData: null,
 
+      // GPS设备状态映射
+      statusMap: {
+        sealed: {
+          text: '已施封',
+          color: '#fa8c16',
+        },
+        verified: {
+          text: '核验成功',
+          color: '#52c41a',
+        },
+        failed: {
+          text: '核验失败',
+          color: '#ff4d4f',
+        },
+        pending: {
+          text: '待核验',
+          color: '#999999',
+        },
+      },
+
       // GPS设备信息
       gpsDevices: [
         {
@@ -27,8 +47,6 @@ export default {
           nfcCode: '187239739712937129893',
           qrCode: '18723973971',
           serialNumber: '39739712',
-          statusText: '已施封',
-          statusColor: '#fa8c16',
         },
         {
           id: 2,
@@ -37,8 +55,6 @@ export default {
           nfcCode: '293712983123123123',
           qrCode: '973971218723',
           serialNumber: '9089000',
-          statusText: '核验成功',
-          statusColor: '#52c41a',
         },
       ],
 
@@ -83,6 +99,20 @@ export default {
     // 检查是否有验证失败的设备
     hasFailedDevices() {
       return this.gpsDevices.some(device => device.status === 'failed')
+    },
+
+    // 获取设备状态文本
+    getDeviceStatusText() {
+      return (status) => {
+        return this.statusMap[status]?.text || '未知状态'
+      }
+    },
+
+    // 获取设备状态颜色
+    getDeviceStatusColor() {
+      return (status) => {
+        return this.statusMap[status]?.color || '#999999'
+      }
     },
   },
   watch: {
@@ -153,8 +183,6 @@ export default {
 
         if (isSuccess) {
           device.status = 'verified'
-          device.statusText = '核验成功'
-          device.statusColor = '#52c41a'
           uni.showToast({
             title: '核验成功',
             icon: 'success',
@@ -162,8 +190,6 @@ export default {
         }
         else {
           device.status = 'failed'
-          device.statusText = '核验失败'
-          device.statusColor = '#ff4d4f'
           uni.showToast({
             title: '核验失败',
             icon: 'error',
@@ -234,13 +260,10 @@ export default {
 
     // 获取按钮文本
     getButtonText(status) {
-      const textMap = {
-        sealed: '核验',
-        verified: '核验成功',
-        failed: '核验失败',
-        pending: '待核验',
+      if (status === 'sealed' || status === 'pending') {
+        return '核验'
       }
-      return textMap[status] || '核验'
+      return this.statusMap[status]?.text || '核验'
     },
   },
 }
@@ -311,7 +334,7 @@ export default {
                 'status-pending': device.status === 'pending',
               }"
             >
-              {{ device.statusText }}
+              {{ getDeviceStatusText(device.status) }}
             </view>
           </view>
 
