@@ -122,7 +122,7 @@
     {
       "path": "pages/order-center/gps-return/index",
       "style": {
-        "navigationBarTitleText": "GPS寄回",
+        "navigationBarTitleText": "回填单号",
         "navigationStyle": "default"
       }
     },

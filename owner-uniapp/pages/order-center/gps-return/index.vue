@@ -89,11 +89,12 @@ export default {
 
         // 构建API请求数据 - 根据接口文档构建完整的OilOrder对象
         const gpsReturnData = {
-          ...this.orderData, // 保留原有订单数据
+          // ...this.orderData, // 保留原有订单数据
+          id: this.orderData.id,
           orderNo: this.orderData.orderNo,
           gpsReturnType: this.formData.gpsReturnType,
           gpsReturnOrderNo: this.formData.gpsReturnOrderNo,
-          gpsReturnTime: new Date().toISOString(), // 当前时间作为寄回时间
+          // gpsReturnTime: new Date().toISOString(), // 当前时间作为寄回时间
         }
 
         await orderApi.gpsReturn(gpsReturnData)
@@ -131,11 +132,6 @@ export default {
 <template>
   <view class="flex-col">
     <view class="form-container flex-col">
-      <!-- 页面标题 -->
-      <view class="page-title">
-        <text class="title-text">回填单号</text>
-      </view>
-      
       <!-- uView 表单 -->
       <u--form
         ref="uForm"
@@ -165,7 +161,7 @@ export default {
             <u--input
               v-model="formData.gpsReturnType"
               placeholder="请填写快递公司名称"
-              :placeholder-style="{ color: '#999999', fontSize: '28rpx' }"
+              placeholder-style="color: #999999; font-size: 28rpx;"
               :custom-style="{
                 backgroundColor: 'transparent',
                 padding: '0',
@@ -197,7 +193,7 @@ export default {
             <u--input
               v-model="formData.gpsReturnOrderNo"
               placeholder="请填写寄回GPS设备的快递单号"
-              :placeholder-style="{ color: '#999999', fontSize: '28rpx' }"
+              placeholder-style="color: #999999; font-size: 28rpx;"
               :custom-style="{
                 backgroundColor: 'transparent',
                 padding: '0',
