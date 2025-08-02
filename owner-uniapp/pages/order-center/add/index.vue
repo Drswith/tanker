@@ -135,12 +135,13 @@ export default {
 
         console.log('提交订单数据:', orderData)
 
-        // 调用创建订单API
         let response
         if (this.isEdit) {
+          // 调用更新订单API
           response = await orderApi.updateOrder(orderData)
         }
         else {
+          // 调用创建订单API
           response = await orderApi.createOrder(orderData)
         }
 
@@ -193,7 +194,7 @@ export default {
     // 构建订单数据，映射到API字段格式
     buildOrderData() {
       return {
-        id: this.orderId || null,
+        id: Number(this.orderId) || null,
         // 收货信息
         takeName: this.formData.name, // 收货人姓名
         takeMobile: this.formData.phone, // 收货人手机号
