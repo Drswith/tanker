@@ -1,5 +1,6 @@
 <script>
 import { userApi } from '@/api/user'
+import { getToken, getUserInfo, setUserInfo } from '@/utils/auth'
 
 export default {
   data() {
@@ -15,7 +16,7 @@ export default {
       pageState: {
         isLoading: false,
       },
-      orderStatusList: [
+      gridOptions: [
         {
           icon:
             '/static/images/mine-wait.png',
@@ -64,6 +65,7 @@ export default {
             avatar: response.avatar || '/static/images/mine-avatar.png',
             inviter: response.inviter || '',
           }
+          setUserInfo(this.userInfo)
         }
       }
       catch (error) {
@@ -81,7 +83,7 @@ export default {
     // 跳转到用户信息页面
     goToUserInfo() {
       uni.navigateTo({
-        url: `/pages/mine/info/index?userData=${encodeURIComponent(JSON.stringify(this.userInfo))}`,
+        url: `/pages/mine/info/index?userId=${this.userInfo.id}`,
       })
     },
 
@@ -111,14 +113,7 @@ export default {
 
 <template>
   <view class="page flex-col">
-    <!-- 加载状态 -->
-    <view v-if="pageState.isLoading" class="loading-container flex-col">
-      <text class="loading-text">
-        加载中...
-      </text>
-    </view>
-
-    <view v-else class="header-section flex-col">
+    <view class="header-section flex-col">
       <view class="user-info flex-row justify-between" @click="goToUserInfo">
         <view class="avatar-wrapper flex-col">
           <image
@@ -148,7 +143,7 @@ export default {
         </text>
         <view class="order-status-list flex-row justify-between">
           <view
-            v-for="(item, index) in orderStatusList"
+            v-for="(item, index) in gridOptions"
             :key="index"
             class="order-status-item flex-col"
           >

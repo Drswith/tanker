@@ -14,15 +14,12 @@ export default {
       // 上传文件列表
       avatarFileList: [],
 
+      // userData
+      userData: {},
+
       // 页面状态
       pageState: {
         isLoading: false, // 加载状态
-      },
-
-      // 常量配置
-      constants: {
-        PHONE_REGEX: /^1[3-9]\d{9}$/, // 手机号正则
-        REQUIRED_FIELDS: ['contactPerson', 'phoneNumber'], // 必填字段
       },
 
       // 表单验证规则
@@ -33,12 +30,6 @@ export default {
             message: '请输入联系人姓名',
             trigger: ['blur', 'change'],
           },
-          {
-            min: 2,
-            max: 10,
-            message: '联系人姓名长度为2-10位',
-            trigger: ['blur', 'change'],
-          },
         ],
         phoneNumber: [
           {
@@ -46,43 +37,41 @@ export default {
             message: '请输入手机号码',
             trigger: ['blur', 'change'],
           },
-          {
-            pattern: /^1[3-9]\d{9}$/,
-            message: '请输入正确的手机号码',
-            trigger: ['blur', 'change'],
-          },
         ],
       },
     }
   },
 
-  onLoad(options) {
-    // 接收传递过来的用户数据
-    if (options.userData) {
-      try {
-        const userData = JSON.parse(decodeURIComponent(options.userData))
-        // 适配用户数据到表单字段
-        this.formData = {
-          avatar: userData.avatar || '',
-          contactPerson: userData.nickname || userData.username || '',
-          phoneNumber: userData.mobile || '',
-        }
-
-        // 如果有头像，设置头像文件列表
-        if (userData.avatar) {
-          this.avatarFileList = [{
-            url: userData.avatar,
-            name: 'avatar',
-          }]
-        }
-      }
-      catch (error) {
-        console.error('解析用户数据失败:', error)
-      }
-    }
+  onShow(options) {
+    this.loadUserProfile()
   },
 
   methods: {
+    // 加载用户信息
+    async loadUserProfile() {
+      try {
+        this.pageState.isLoading = true
+        const response = await userApi.getMyProfile()
+        this.userData = response
+
+        // 适配用户数据到表单字段
+        this.formData = {
+          avatar: response.avatar || '',
+          contactPerson: response.username || '',
+          phoneNumber: response.mobile || '',
+        }
+      }
+      catch (error) {
+        console.error('加载用户信息失败:', error)
+        uni.showToast({
+          title: '加载用户信息失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.pageState.isLoading = false
+      }
+    },
     // 头像上传后处理
     afterReadAvatar(event) {
       const { file } = event
@@ -147,7 +136,9 @@ export default {
 
     // 返回上一页
     navigateBack() {
-      uni.navigateBack()
+      uni.switchTab({
+        url: '/pages/mine/index/index',
+      })
     },
   },
 }
@@ -223,7 +214,6 @@ export default {
                 fontSize: '28rpx',
                 lineHeight: '40rpx',
               }"
-              maxlength="10"
             />
           </view>
         </u-form-item>
