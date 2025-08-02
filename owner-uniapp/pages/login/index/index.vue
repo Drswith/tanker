@@ -257,17 +257,15 @@ export default {
 
     // 打开用户协议
     openUserAgreement() {
-      uni.showToast({
-        title: '用户协议功能开发中',
-        icon: 'none',
+      uni.navigateTo({
+        url: '/pages/privacy-policy/index/index',
       })
     },
 
     // 打开隐私政策
     openPrivacyPolicy() {
-      uni.showToast({
-        title: '隐私政策功能开发中',
-        icon: 'none',
+      uni.navigateTo({
+        url: '/pages/privacy-policy/index/index',
       })
     },
 
