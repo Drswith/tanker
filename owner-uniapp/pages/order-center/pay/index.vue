@@ -1,8 +1,11 @@
 <script>
+import { orderApi } from '@/api/order.js'
+import { payApi, PayType } from '@/api/pay.js'
+
 export default {
   data() {
     return {
-      payAmount: '¥300.00',
+      payAmount: null,
       selectedPayMethod: 'wechat', // wechat, alipay_qr, alipay_account, bank
       payMethods: [
         {
@@ -33,23 +36,35 @@ export default {
       showQRCode: false,
       qrCodeData: '',
       orderInfo: {
-        orderNo: '1038021982031',
-        bankInfo: '杭州银行',
-        alipayAccount: '13800138000',
-        alipayName: '张三'
+        orderNo: '',
+        bankAccount: '', // 银行收款账号
+        bankName: '',
+        alipayAccount: '',
       },
-			voucherFileList: [], // 使用u-upload组件的文件列表
-			uploadedVoucher: null, // 上传的支付凭证
-			showUploadSection: false, // 是否显示上传凭证区域
+      voucherFileList: [], // 使用u-upload组件的文件列表
+      uploadedVoucher: null, // 上传的支付凭证
+      showUploadSection: false, // 是否显示上传凭证区域
+
+      // 路由参数
+      routeParams: {
+        orderId: null,
+      },
+
+      // 订单详情数据
+      orderData: {},
+
+      // 页面状态
+      pageState: {
+        isLoading: false,
+      },
     }
   },
   onLoad(options) {
-    // 从路由参数获取支付金额等信息
-    if (options.amount) {
-      this.payAmount = `¥${options.amount}`
-    }
-    if (options.orderNo) {
-      this.orderInfo.orderNo = options.orderNo
+    // 从路由参数获取订单ID
+    if (options.orderId) {
+      this.routeParams.orderId = options.orderId
+      // 加载订单详情
+      this.loadOrderDetail()
     }
   },
   computed: {
@@ -68,37 +83,119 @@ export default {
           return '确认支付'
       }
     },
-    // 是否需要显示上传凭证区域
-    needUploadVoucher() {
-      return (this.selectedPayMethod === 'alipay_account' || this.selectedPayMethod === 'bank') && this.voucherFileList.length === 0
-    }
+  },
+  onShow() {
+    // 页面显示时获取支付配置信息
+    this.getPayConfig()
   },
   methods: {
+    // 加载订单详情
+    async loadOrderDetail() {
+      try {
+        this.pageState.isLoading = true
+        const response = await orderApi.getOrderDetail(this.routeParams.orderId)
+        this.orderData = response
+
+        if (!response.price && response.price !== 0) {
+          throw new Error('订单金额不存在')
+        }
+        if (!response.orderNo) {
+          throw new Error('订单号不存在')
+        }
+
+        // 根据订单详情设置支付金额
+        if (response.price) {
+          this.payAmount = Number(response.price)
+        }
+
+        // 设置订单号
+        if (response.orderNo) {
+          this.orderInfo.orderNo = response.orderNo
+        }
+
+        // 获取支付配置信息
+        await this.getPayConfig()
+      }
+      catch (error) {
+        console.error('加载订单详情失败:', error)
+        uni.showToast({
+          title: '加载订单详情失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.pageState.isLoading = false
+      }
+    },
+
     // 选择支付方式
-    selectPayMethod(methodId) {
+    async selectPayMethod(methodId) {
       this.selectedPayMethod = methodId
       this.payMethods.forEach((method) => {
         method.selected = method.id === methodId
       })
 
+      if (methodId !== 'wechat') {
+        // 每次选择支付方式都获取支付配置确保数据最新
+        await this.getPayConfig()
+      }
+
       // 根据支付方式显示不同内容
-      if (methodId === 'wechat' || methodId === 'alipay_qr') {
+      if (methodId === 'alipay_qr') {
         this.showQRCode = true
-        this.showUploadSection = false
-        this.generateQRCode()
-      } else if (methodId === 'alipay_account' || methodId === 'bank') {
+        this.showUploadSection = true
+      }
+      else if (methodId === 'alipay_account' || methodId === 'bank') {
         this.showQRCode = false
         this.showUploadSection = true
-      } else {
+      }
+      else {
         this.showQRCode = false
         this.showUploadSection = false
       }
     },
 
-    // 生成二维码
-    generateQRCode() {
-      // 模拟生成二维码数据
-      this.qrCodeData = `pay_${this.selectedPayMethod}_${Date.now()}`
+    // 获取支付配置信息
+    async getPayConfig() {
+      try {
+        const response = await payApi.getPayConfig(this.routeParams.orderId)
+        console.log('支付配置信息:', response)
+        /**
+         * 支付配置信息结构
+         * bankAccount: "6666666"
+         * bankName: "工商银行"
+         * zfbAccount: "188888882"
+         * zfbQrcode: "https://windfarmomems.oss-cn-beijing.aliyuncs.com/windfarmomems/c
+         */
+
+        // 对接支付配置数据到页面字段
+        if (response) {
+          // 银行转账信息
+          if (response.bankAccount) {
+            this.orderInfo.bankAccount = response.bankAccount // 银行收款账号
+          }
+          if (response.bankName) {
+            this.orderInfo.bankName = response.bankName // 银行名称
+          }
+
+          // 支付宝转账信息
+          if (response.zfbAccount) {
+            this.orderInfo.alipayAccount = response.zfbAccount // 支付宝账号
+          }
+
+          // 支付宝二维码
+          if (response.zfbQrcode) {
+            this.qrCodeData = response.zfbQrcode // 支付宝二维码链接
+          }
+        }
+      }
+      catch (error) {
+        console.error('获取支付配置失败:', error)
+        uni.showToast({
+          title: '获取支付配置失败',
+          icon: 'none',
+        })
+      }
     },
 
     // u-upload组件读取文件后的回调
@@ -106,10 +203,10 @@ export default {
       const { file } = event
       this.voucherFileList = [file]
       this.uploadedVoucher = file.url
-      
+
       uni.showToast({
         title: '凭证上传成功',
-        icon: 'success'
+        icon: 'success',
       })
     },
 
@@ -117,10 +214,10 @@ export default {
     deleteVoucher(event) {
       this.voucherFileList = []
       this.uploadedVoucher = null
-      
+
       uni.showToast({
         title: '已删除',
-        icon: 'success'
+        icon: 'success',
       })
     },
 
@@ -131,9 +228,9 @@ export default {
         success: () => {
           uni.showToast({
             title: `${type}已复制`,
-            icon: 'success'
+            icon: 'success',
           })
-        }
+        },
       })
     },
 
@@ -162,7 +259,7 @@ export default {
       if (!this.uploadedVoucher) {
         uni.showToast({
           title: '请先上传支付凭证',
-          icon: 'none'
+          icon: 'none',
         })
         return
       }
@@ -174,7 +271,7 @@ export default {
           if (res.confirm) {
             this.processTransfer()
           }
-        }
+        },
       })
     },
 
@@ -203,7 +300,7 @@ export default {
       uni.showModal({
         title: '银行转账说明',
         content: '请按照页面显示的收款信息进行银行转账，完成后上传转账凭证',
-        showCancel: false
+        showCancel: false,
       })
     },
 
@@ -239,10 +336,9 @@ export default {
         请尽快支付本次服务费用
       </text>
       <text class="amount-value">
-        {{ payAmount }}
+        ¥{{ payAmount === null ? 'error' : payAmount }}
       </text>
     </view>
-
     <!-- 支付方式选择 -->
     <view class="payment-methods">
       <view
@@ -274,7 +370,8 @@ export default {
     <view v-if="showQRCode" class="qr-code-section">
       <view class="qr-code-container">
         <view class="qr-code-placeholder">
-          <view class="qr-grid">
+          <image v-if="qrCodeData && qrCodeData.startsWith('http')" :src="qrCodeData" class="qr-code-image" mode="aspectFit" />
+          <view v-else class="qr-grid">
             <view v-for="i in 25" :key="i" class="qr-dot" :class="{ filled: Math.random() > 0.3 }" />
           </view>
         </view>
@@ -287,58 +384,81 @@ export default {
     <!-- 支付宝账号转账信息 -->
     <view v-if="selectedPayMethod === 'alipay_account'" class="account-info-section">
       <view class="section-title">
-        <text class="title-text">支付宝转账信息</text>
+        <text class="title-text">
+          支付宝转账信息
+        </text>
       </view>
       <view class="account-info-item">
-        <text class="account-label">收款账号：</text>
-        <text class="account-value">{{ orderInfo.alipayAccount }}</text>
+        <text class="account-label">
+          收款账号：
+        </text>
+        <text class="account-value">
+          {{ orderInfo.alipayAccount }}
+        </text>
         <view class="copy-btn" @click="copyText(orderInfo.alipayAccount, '账号')">
-          <text class="copy-icon">📋</text>
-        </view>
-      </view>
-      <view class="account-info-item">
-        <text class="account-label">收款人：</text>
-        <text class="account-value">{{ orderInfo.alipayName }}</text>
-        <view class="copy-btn" @click="copyText(orderInfo.alipayName, '姓名')">
-          <text class="copy-icon">📋</text>
+          <text class="copy-icon">
+            📋
+          </text>
         </view>
       </view>
       <view class="transfer-tip">
-        <text class="tip-text">请使用支付宝转账到以上账号，完成后上传转账截图</text>
+        <text class="tip-text">
+          请使用支付宝转账到以上账号，完成后上传转账截图
+        </text>
       </view>
     </view>
 
     <!-- 银行转账信息区域 -->
     <view v-if="selectedPayMethod === 'bank'" class="bank-info-section">
       <view class="section-title">
-        <text class="title-text">银行转账信息</text>
+        <text class="title-text">
+          银行转账信息
+        </text>
         <view class="help-btn" @click="showBankPaymentTip">
-          <text class="help-icon">❓</text>
+          <text class="help-icon">
+            ❓
+          </text>
         </view>
       </view>
       <view class="bank-info-item">
-        <text class="bank-label">收款账号：</text>
-        <text class="bank-value">{{ orderInfo.orderNo }}</text>
-        <view class="copy-btn" @click="copyText(orderInfo.orderNo, '账号')">
-          <text class="copy-icon">📋</text>
+        <text class="bank-label">
+          收款账号：
+        </text>
+        <text class="bank-value">
+          {{ orderInfo.bankAccount }}
+        </text>
+        <view class="copy-btn" @click="copyText(orderInfo.bankAccount, '账号')">
+          <text class="copy-icon">
+            📋
+          </text>
         </view>
       </view>
       <view class="bank-info-item">
-        <text class="bank-label">开户行：</text>
-        <text class="bank-value">{{ orderInfo.bankInfo }}</text>
-        <view class="copy-btn" @click="copyText(orderInfo.bankInfo, '开户行')">
-          <text class="copy-icon">📋</text>
+        <text class="bank-label">
+          开户行：
+        </text>
+        <text class="bank-value">
+          {{ orderInfo.bankName }}
+        </text>
+        <view class="copy-btn" @click="copyText(orderInfo.bankName, '开户行')">
+          <text class="copy-icon">
+            📋
+          </text>
         </view>
       </view>
     </view>
 
     <!-- 上传支付凭证区域 -->
-    <view v-if="needUploadVoucher" class="upload-section">
+    <view v-if="showUploadSection" class="upload-section">
       <view class="section-title">
-        <text class="title-text">上传支付凭证</text>
-        <text class="required-mark">*</text>
+        <text class="title-text">
+          上传支付凭证
+        </text>
+        <text class="required-mark">
+          *
+        </text>
       </view>
-      
+
       <u-upload
         ref="voucherUpload"
         :file-list="voucherFileList"
@@ -351,9 +471,15 @@ export default {
       >
         <view class="upload-area">
           <view class="upload-placeholder">
-            <text class="upload-icon">📷</text>
-            <text class="upload-text">点击上传转账截图</text>
-            <text class="upload-tip">支持jpg、png格式</text>
+            <text class="upload-icon">
+              📷
+            </text>
+            <text class="upload-text">
+              点击上传转账截图
+            </text>
+            <text class="upload-tip">
+              支持jpg、png格式
+            </text>
           </view>
         </view>
       </u-upload>
@@ -367,7 +493,7 @@ export default {
       <text class="warning-text">
         支付过程中请勿关闭页面或退出应用
       </text>
-      <text v-if="needUploadVoucher" class="warning-text">
+      <text v-if="showUploadSection" class="warning-text">
         转账完成后请及时上传支付凭证，以便快速确认到账
       </text>
     </view>
@@ -488,6 +614,12 @@ export default {
       justify-content: center;
       margin-bottom: 32rpx;
       background-color: #fafafa;
+
+      .qr-code-image {
+        width: 280rpx;
+        height: 280rpx;
+        border-radius: 8rpx;
+      }
 
       .qr-grid {
         display: grid;
@@ -659,7 +791,7 @@ export default {
     .u-upload__wrap {
       margin-right: 0;
     }
-    
+
     .u-upload__deletable {
       background-color: rgba(0, 0, 0, 0.5);
       border-radius: 50%;
