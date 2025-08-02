@@ -144,9 +144,6 @@ export default {
       await this.loadOrderDetail()
       // 获取当前位置
       this.updateLocation()
-
-      // 加载GPS设备信息
-      this.loadGpsDevices(this.orderData.orderNo)
     }
 
     // #ifdef MP-WEIXIN
@@ -192,8 +189,8 @@ export default {
         const response = await orderApi.getOrderDetail(this.routeParams.orderId)
         this.orderData = response
 
-        // 模拟加载GPS设备信息
-        this.loadGpsDevices()
+        // 加载GPS设备信息
+        this.loadGpsDevices(this.orderData.orderNo)
       }
       catch (error) {
         console.error('加载订单详情失败:', error)
@@ -504,9 +501,11 @@ export default {
           duration: 2000,
         })
 
-        // 延迟返回上一页
+        // 进入订单详情
         setTimeout(() => {
-          uni.navigateBack()
+          uni.navigateTo({
+            url: `/pages/order-center/detail/index?orderId=${this.orderData.id}`,
+          })
         }, 2000)
       }
       catch (error) {
@@ -627,20 +626,9 @@ export default {
 
     <!-- 底部确认按钮 -->
     <view v-if="!pageState.isLoading && orderData" class="bottom-section">
-      <u-button
-        type="warning"
-        :loading="pageState.isConfirming"
-        loading-text="确认中..."
-        :custom-style="{
-          width: '100%',
-          height: '88rpx',
-          fontSize: '32rpx',
-          fontWeight: 'bold',
-        }"
-        @click="confirmReceipt"
-      >
-        确认收货
-      </u-button>
+      <button class="primary-button" :loading="pageState.isConfirming" :disabled="pageState.isConfirming">
+        {{ pageState.isConfirming ? '确认中...' : '确认收货' }}
+      </button>
     </view>
 
     <!-- 确认收货弹窗 -->
@@ -926,10 +914,8 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-  background: #ffffff;
   padding: 20rpx 32rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.08);
   z-index: 100;
 }
 
