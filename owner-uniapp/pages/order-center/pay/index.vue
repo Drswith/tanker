@@ -1,35 +1,35 @@
 <script>
 import { orderApi } from '@/api/order.js'
 import { payApi, PayType } from '@/api/pay.js'
+import { request } from '@/utils/http'
 
 export default {
   data() {
     return {
-      payAmount: null,
       selectedPayMethod: 'wechat', // wechat, alipay_qr, alipay_account, bank
       payMethods: [
         {
           id: 'wechat',
           name: '微信支付',
-          icon: '💚',
+          icon: '/static/images/icon/wxpay.svg',
           selected: true,
         },
         {
           id: 'alipay_qr',
           name: '支付宝扫码',
-          icon: '🔵',
+          icon: '/static/images/icon/alipay.svg',
           selected: false,
         },
         {
           id: 'alipay_account',
           name: '支付宝转账',
-          icon: '🔵',
+          icon: '/static/images/icon/alipay.svg',
           selected: false,
         },
         {
           id: 'bank',
           name: '银行卡支付',
-          icon: '🟡',
+          icon: '/static/images/icon/unionpay.svg',
           selected: false,
         },
       ],
@@ -37,13 +37,13 @@ export default {
       qrCodeData: '',
       orderInfo: {
         orderNo: '',
+        price: null,
         bankAccount: '', // 银行收款账号
         bankName: '',
         alipayAccount: '',
       },
       voucherFileList: [], // 使用u-upload组件的文件列表
       uploadedVoucher: null, // 上传的支付凭证
-      showUploadSection: false, // 是否显示上传凭证区域
 
       // 路由参数
       routeParams: {
@@ -83,6 +83,10 @@ export default {
           return '确认支付'
       }
     },
+    // 是否需要显示上传凭证区域
+    needUploadVoucher() {
+      return this.selectedPayMethod !== 'wechat'
+    },
   },
   onShow() {
     // 页面显示时获取支付配置信息
@@ -105,7 +109,7 @@ export default {
 
         // 根据订单详情设置支付金额
         if (response.price) {
-          this.payAmount = Number(response.price)
+          this.orderInfo.price = Number(response.price)
         }
 
         // 设置订单号
@@ -131,6 +135,7 @@ export default {
     // 选择支付方式
     async selectPayMethod(methodId) {
       this.selectedPayMethod = methodId
+      console.log('选择支付方式:', methodId)
       this.payMethods.forEach((method) => {
         method.selected = method.id === methodId
       })
@@ -143,15 +148,9 @@ export default {
       // 根据支付方式显示不同内容
       if (methodId === 'alipay_qr') {
         this.showQRCode = true
-        this.showUploadSection = true
-      }
-      else if (methodId === 'alipay_account' || methodId === 'bank') {
-        this.showQRCode = false
-        this.showUploadSection = true
       }
       else {
         this.showQRCode = false
-        this.showUploadSection = false
       }
     },
 
@@ -199,15 +198,58 @@ export default {
     },
 
     // u-upload组件读取文件后的回调
-    afterReadVoucher(event) {
+    async afterReadVoucher(event) {
       const { file } = event
-      this.voucherFileList = [file]
-      this.uploadedVoucher = file.url
+      console.log('支付凭证上传:', file)
 
-      uni.showToast({
-        title: '凭证上传成功',
-        icon: 'success',
-      })
+      // 验证文件
+      if (!file) {
+        uni.showToast({
+          title: '未选择文件',
+          icon: 'none',
+        })
+        return
+      }
+
+      try {
+        // 使用file.path或file.url作为文件路径，优先使用path
+        const filePath = file.path || file.url
+
+        if (!filePath) {
+          throw new Error('无法获取文件路径')
+        }
+
+        // 显示上传中状态
+        uni.showLoading({
+          title: '上传中...',
+          mask: true,
+        })
+
+        const res = await request.upload('/api/upload/file', filePath)
+        console.log('上传成功:', res)
+
+        this.voucherFileList = [file]
+        this.uploadedVoucher = res // request.upload已经返回data.data
+
+        uni.hideLoading()
+        uni.showToast({
+          title: '支付凭证上传成功',
+          icon: 'success',
+        })
+      }
+      catch (error) {
+        console.error('上传失败:', error)
+        uni.hideLoading()
+
+        // 上传失败时清空文件列表
+        this.voucherFileList = []
+        this.uploadedVoucher = null
+
+        uni.showToast({
+          title: '上传失败，请重试',
+          icon: 'none',
+        })
+      }
     },
 
     // u-upload组件删除文件的回调
@@ -216,7 +258,7 @@ export default {
       this.uploadedVoucher = null
 
       uni.showToast({
-        title: '已删除',
+        title: '凭证已删除',
         icon: 'success',
       })
     },
@@ -234,31 +276,123 @@ export default {
       })
     },
 
-    // 确认支付 - 微信/支付宝扫码
-    confirmQRPayment() {
+    // 微信支付
+    async wxPay() {
+      const response = await payApi.wxPay({
+        id: this.orderData.orderId,
+        orderNo: this.orderData.orderNo,
+        userId: 1,
+      })
+      console.log('微信支付:', response)
+    },
+
+    // 轮询微信支付结果
+    pollWechatPayResult() {
+      // 返回promise, 超时时间 60秒， 2秒轮询一次wxPayCallback
+      return new Promise((resolve, reject) => {
+        const pollInterval = setInterval(
+          async () => {
+            const response = await payApi.wxPayCallback({
+              orderNo: this.orderData.orderNo,
+            })
+            console.log('轮询微信支付回调:', response)
+            if (response.code === 200) {
+              clearInterval(pollInterval)
+              resolve(response)
+            }
+          },
+          2000,
+        )
+
+        // 超时时间 60秒
+        setTimeout(() => {
+          clearInterval(pollInterval)
+          reject(new Error('轮询超时'))
+        }, 60000)
+      })
+    },
+
+    // 确认支付 - 微信
+    async confirmWechatPayment() {
       uni.showLoading({
         title: '支付中...',
       })
 
-      // 模拟支付处理
-      setTimeout(() => {
-        uni.hideLoading()
-        uni.showToast({
-          title: '支付成功',
-          icon: 'success',
-        })
+      // 订单对象，从服务器获取
+      let orderInfo = {
+        appid: 'wx499********7c70e', // 应用ID（AppID）
+        partnerid: '148*****52', // 商户号（PartnerID）
+        prepayid: 'wx202254********************fbe90000', // 预支付交易会话ID
+        package: 'Sign=WXPay', // 固定值
+        noncestr: 'c5sEwbaNPiXAF3iv', // 随机字符串
+        timestamp: 1597935292, // 时间戳（单位：秒）
+        sign: 'A842B45937F6EFF60DEC7A2EAA52D5A0', // 签名，这里用的 MD5 签名
+      }
 
-        setTimeout(() => {
-          uni.navigateBack()
-        }, 1500)
-      }, 2000)
+      uni.getProvider({
+        service: 'payment',
+        success(res) {
+          console.log('获取支付服务提供方:', res.provider)
+          if (~res.provider.indexOf('wxpay')) {
+            uni.requestPayment({
+              provider: 'wxpay', // 固定值为"wxpay"
+              orderInfo,
+              success(res) {
+                let rawdata = JSON.parse(res.rawdata)
+                console.log('支付成功')
+              },
+              fail(err) {
+                console.log(`支付失败:${JSON.stringify(err)}`)
+                // uni.hideLoading()
+                uni.showToast({
+                  title: '支付失败',
+                  duration: 2000,
+                  icon: 'error',
+                })
+              },
+            })
+          }
+        },
+      })
+
+      // wx.requestPayment({
+      //   timeStamp: '',
+      //   nonceStr: '',
+      //   package: '',
+      //   signType: 'MD5',
+      //   paySign: '',
+      //   success(res) { },
+      //   fail(res) { },
+      // })
+
+      // // 模拟支付处理
+      // setTimeout(() => {
+      //   uni.hideLoading()
+      //   uni.showToast({
+      //     title: '支付成功',
+      //     icon: 'success',
+      //   })
+
+      //   setTimeout(() => {
+      //     uni.navigateBack()
+      //   }, 1500)
+      // }, 2000)
     },
 
-    // 确认转账 - 支付宝账号/银行卡
+    // 确认转账 - 支付宝二维码/支付宝账号/银行卡
     confirmTransfer() {
       if (!this.uploadedVoucher) {
         uni.showToast({
           title: '请先上传支付凭证',
+          icon: 'none',
+        })
+        return
+      }
+
+      // 验证上传的凭证是否为有效的URL
+      if (typeof this.uploadedVoucher !== 'string' || !this.uploadedVoucher.trim()) {
+        uni.showToast({
+          title: '支付凭证无效，请重新上传',
           icon: 'none',
         })
         return
@@ -276,13 +410,33 @@ export default {
     },
 
     // 处理转账提交
-    processTransfer() {
-      uni.showLoading({
-        title: '提交中...',
-      })
+    async processTransfer() {
+      if (this.selectedPayMethod === 'wechat') {
+        uni.showToast({
+          title: '微信支付请使用微信接口',
+          icon: 'none',
+        })
+        return
+      }
+      try {
+        uni.showLoading({
+          title: '提交中...',
+        })
 
-      // 模拟提交处理
-      setTimeout(() => {
+        // 构建提交数据
+        const submitData = {
+          id: this.orderData.id,
+          orderNo: this.orderData.orderNo,
+          payType: this.selectedPayMethod === 'bank' ? PayType.BANK : PayType.ALIPAY, // 只有支付宝和银行支付调用这个函数
+          payImg: [this.uploadedVoucher], // 上传的支付凭证URL
+          price: this.orderInfo.price,
+        }
+
+        console.log('提交转账凭证:', submitData)
+
+        // 提交支付凭证的API
+        await payApi.otherPay(submitData)
+
         uni.hideLoading()
         uni.showToast({
           title: '提交成功，等待审核',
@@ -290,9 +444,20 @@ export default {
         })
 
         setTimeout(() => {
-          uni.navigateBack()
+          // 订单详情
+          uni.navigateTo({
+            url: `/pages/order-center/order-detail/index?orderId=${this.orderData.id}`,
+          })
         }, 1500)
-      }, 2000)
+      }
+      catch (error) {
+        console.error('提交转账凭证失败:', error)
+        uni.hideLoading()
+        uni.showToast({
+          title: '提交失败，请重试',
+          icon: 'none',
+        })
+      }
     },
 
     // 银行卡支付提示
@@ -306,18 +471,14 @@ export default {
 
     // 主确认按钮点击事件
     confirmPayment() {
-      switch (this.selectedPayMethod) {
-        case 'wechat':
-        case 'alipay_qr':
-          this.confirmQRPayment()
-          break
-        case 'alipay_account':
-        case 'bank':
-          this.confirmTransfer()
-          break
-        default:
-          this.confirmQRPayment()
+      // 微信支付调用微信支付接口
+      if (this.selectedPayMethod === 'wechat') {
+        this.confirmWechatPayment()
+        return
       }
+
+      // 其他支付上传凭证
+      this.confirmTransfer()
     },
 
     // 返回上一页
@@ -336,7 +497,7 @@ export default {
         请尽快支付本次服务费用
       </text>
       <text class="amount-value">
-        ¥{{ payAmount === null ? 'error' : payAmount }}
+        ¥{{ orderInfo.price === null ? 'error' : orderInfo.price }}
       </text>
     </view>
     <!-- 支付方式选择 -->
@@ -349,9 +510,7 @@ export default {
         @click="selectPayMethod(method.id)"
       >
         <view class="method-info">
-          <text class="method-icon">
-            {{ method.icon }}
-          </text>
+          <image :src="method.icon" class="method-icon" />
           <text class="method-name">
             {{ method.name }}
           </text>
@@ -397,7 +556,7 @@ export default {
         </text>
         <view class="copy-btn" @click="copyText(orderInfo.alipayAccount, '账号')">
           <text class="copy-icon">
-            📋
+            复制
           </text>
         </view>
       </view>
@@ -414,11 +573,6 @@ export default {
         <text class="title-text">
           银行转账信息
         </text>
-        <view class="help-btn" @click="showBankPaymentTip">
-          <text class="help-icon">
-            ❓
-          </text>
-        </view>
       </view>
       <view class="bank-info-item">
         <text class="bank-label">
@@ -429,7 +583,7 @@ export default {
         </text>
         <view class="copy-btn" @click="copyText(orderInfo.bankAccount, '账号')">
           <text class="copy-icon">
-            📋
+            复制
           </text>
         </view>
       </view>
@@ -442,14 +596,14 @@ export default {
         </text>
         <view class="copy-btn" @click="copyText(orderInfo.bankName, '开户行')">
           <text class="copy-icon">
-            📋
+            复制
           </text>
         </view>
       </view>
     </view>
 
     <!-- 上传支付凭证区域 -->
-    <view v-if="showUploadSection" class="upload-section">
+    <view v-if="needUploadVoucher" class="upload-section">
       <view class="section-title">
         <text class="title-text">
           上传支付凭证
@@ -472,7 +626,7 @@ export default {
         <view class="upload-area">
           <view class="upload-placeholder">
             <text class="upload-icon">
-              📷
+              +
             </text>
             <text class="upload-text">
               点击上传转账截图
@@ -493,7 +647,7 @@ export default {
       <text class="warning-text">
         支付过程中请勿关闭页面或退出应用
       </text>
-      <text v-if="showUploadSection" class="warning-text">
+      <text v-if="needUploadVoucher" class="warning-text">
         转账完成后请及时上传支付凭证，以便快速确认到账
       </text>
     </view>
@@ -559,7 +713,8 @@ export default {
       align-items: center;
 
       .method-icon {
-        font-size: 40rpx;
+        width: 40rpx;
+        height: 40rpx;
         margin-right: 24rpx;
       }
 
@@ -715,7 +870,7 @@ export default {
 
       .copy-icon {
         font-size: 32rpx;
-        color: #666;
+        color: #ff6b35;
       }
     }
   }

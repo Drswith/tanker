@@ -23,4 +23,19 @@ export const payApi = {
   getPayConfig() {
     return request.get('/api/settings/zf')
   },
+
+  //  微信支付
+  wxPay(data) {
+    return request.post('/api/order/pay', data)
+  },
+
+  // 微信支付回调
+  wxPayCallback(data) {
+    return request.post('/api/order/pay/notify', data)
+  },
+
+  // 其他支付
+  otherPay(data) {
+    return request.post('/api/order/other_pay', data)
+  },
 }
