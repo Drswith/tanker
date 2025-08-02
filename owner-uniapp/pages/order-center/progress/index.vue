@@ -1,5 +1,11 @@
 <script>
+import { orderApi } from '@/api/order'
+import TimeLine from '@/components/TimeLine/TimeLine.vue'
+
 export default {
+  components: {
+    TimeLine,
+  },
   data() {
     return {
       proportionvc: 0.3, // 抽屉初始显示的位置，内容的百分比
@@ -23,25 +29,77 @@ export default {
       indicatorDots: true,
       circular: true,
 
-      list: [
-        { status: '订单完成', time: '2025-01-06 12:00:00', description: '' },
-        { status: '确认收货', time: '2025-01-04 12:00:00', description: '' },
-        { status: '运输中', time: '2025-01-04 12:00:00', description: '当前所在（浙江省杭州市滨江区）' },
-        { status: '发车时间', time: '2025-01-04 12:00:00', description: '' },
-        { status: '接单时间', time: '2025-01-02 12:00:00', description: '' },
-        { status: '下单成功', time: '2025-01-01 12:00:00', description: '' },
-      ],
+      // 路由参数
+      routeParams: {
+        orderId: null,
+      },
+      // 订单数据
+      orderData: null,
+
+      // 页面状态
+      pageState: {
+        isLoading: false,
+        submitting: false,
+      },
     }
   },
   computed: {
     scrollViewStyle() {
       return {
         width: '100%',
-        height: `${this.menuHeight}px`
+        height: `${this.menuHeight}px`,
       }
+    },
+    list() {
+      if (!this.orderData)
+        return []
+      const progress = this.orderData?.extData?.progress || {}
+
+      const {
+        placeOrderTime = '',
+        receiveTime = '',
+        driverSignTime = '',
+        currentTime = '',
+        current = '',
+        receiptTime = '',
+        finishTime = '',
+      } = progress || {}
+
+      const timeline = [
+        { status: '下单成功', time: placeOrderTime, description: '' },
+        { status: '接单时间', time: receiveTime, description: '' },
+        { status: '发车时间', time: driverSignTime, description: '' },
+        { status: '运输中', time: currentTime, description: current ? `当前所在（${current}）` : '' },
+        { status: '确认收货', time: receiptTime, description: '' },
+        { status: '订单完成', time: finishTime, description: '' },
+      ]
+
+      return timeline.reverse() // 最新的在前面
+    },
+    // 计算当前进度索引
+    currentIndex() {
+      let i = 0
+      const list = [...this.list]
+      for (const item of list) {
+        console.log(item.status)
+        if (item.time) {
+          break
+        }
+        else {
+          i++
+        }
+      }
+      return i
+    },
+  },
+  onLoad(options) {
+    this.routeParams.orderId = options.orderId
+
+    if (this.routeParams.orderId) {
+      // 加载订单详情
+      this.loadOrderDetail()
     }
   },
-  onLoad() {},
   onReady() {
     this.$refs.drag.initTop()
   },
@@ -139,55 +197,93 @@ export default {
     mapTap(event) {
       console.log(event)
     },
-
+    // 加载订单详情
+    async loadOrderDetail() {
+      try {
+        this.pageState.isLoading = true
+        const response = await orderApi.getOrderDetail(this.routeParams.orderId)
+        this.orderData = response
+      }
+      catch (error) {
+        console.error('加载订单详情失败:', error)
+        uni.showToast({
+          title: '加载订单详情失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.pageState.isLoading = false
+      }
+    },
   },
 }
 </script>
 
 <template>
   <view>
-    <!-- <text>vue 展示expand的使用和当内容过长，展开后的控制思路</text> -->
+    <!-- 主要内容 -->
+    <view>
+      <!-- <text>vue 展示expand的使用和当内容过长，展开后的控制思路</text> -->
 
-    <!-- #ifdef APP-PLUS -->
-    <cover-view @click="expandDrawer()">
-      展开收缩
-    </cover-view>
-    <!-- #endif -->
-    <!-- #ifndef APP-PLUS -->
-    <map
-      id="map1" ref="map1" class="map-view" :show-location="false" :latitude="latitude" :longitude="longitude"
-      scale="14" @tap="mapTap"
-    >
-      <cover-view @click="expandDrawer()">展开收缩</cover-view>
-      <!-- 替代解决nvue动画属性top不兼容问题  vue可行，nvue的uni还是不兼容 使用其他替代方案 -->
-      <cover-view v-if="false" ref="Item" class="tipNvue" :style="{ backgroundColor: 'red', ...getStyleObject() }" @click="expandDrawer">11111111111111</cover-view>
-    </map>
-    <!-- #endif -->
+      <!-- #ifdef APP-PLUS -->
+      <cover-view @click="expandDrawer()">
+        <!-- 展开收缩 -->
+      </cover-view>
+      <!-- #endif -->
+      <!-- #ifndef APP-PLUS -->
+      <map
+        id="map1" ref="map1" class="map-view" :show-location="false" :latitude="latitude" :longitude="longitude"
+        scale="14" @tap="mapTap"
+      >
+        <cover-view @click="expandDrawer()">展开收缩</cover-view>
+        <!-- 替代解决nvue动画属性top不兼容问题  vue可行，nvue的uni还是不兼容 使用其他替代方案 -->
+        <cover-view v-if="false" ref="Item" class="tipNvue" :style="{ backgroundColor: 'red', ...getStyleObject() }" @click="expandDrawer">11111111111111</cover-view>
+      </map>
+      <!-- #endif -->
 
-    <ww-bottom-drawerapp
-      ref="drag" :proportion-show="proportionvc" :drag-handle-height="handleHeight" :is-expand="mExpand"
-      :can-drag="canDarg()" :drag-length="dragLength" :transition-time="transitionTime"
-      :menu-height="menuHeight" @callExpand="onCallExpand"
-    >
-      <slot>
-        <!-- 填充内容 -->
-        <scroll-view
-          :scroll-top="scrollTop" :scroll-y="mExpand" :style="scrollViewStyle"
-          @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
-        >
-          <view class="time-line">
-            <zfl-logistics :list="list" />
-          </view>
-        </scroll-view>
+      <ww-bottom-drawerapp
+        ref="drag" :proportion-show="proportionvc" :drag-handle-height="handleHeight" :is-expand="mExpand"
+        :can-drag="canDarg()" :drag-length="dragLength" :transition-time="transitionTime"
+        :menu-height="menuHeight" @callExpand="onCallExpand"
+      >
+        <slot>
+          <!-- 填充内容 -->
+          <scroll-view
+            :scroll-top="scrollTop" :scroll-y="mExpand" :style="scrollViewStyle"
+            @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
+          >
+            <!-- 加载状态 -->
+            <view v-if="pageState.isLoading" class="loading-container">
+              <text class="loading-text">
+                加载中...
+              </text>
+            </view>
+            <view v-else class="time-line">
+              <TimeLine :list="list" :current-index="currentIndex" />
+            </view>
+          </scroll-view>
         <!-- end -->
-      </slot>
-    </ww-bottom-drawerapp>
+        </slot>
+      </ww-bottom-drawerapp>
+    </view>
   </view>
 </template>
 
 <style lang="scss" scoped>
 	page {
 		background-color: #f3f3f3;
+	}
+
+	.loading-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 50vh;
+	}
+
+	.loading-text {
+		font-size: 28rpx;
+		color: #666666;
 	}
 
 	.tipNvue {
@@ -227,6 +323,6 @@ export default {
 		text-align: center;
 	}
   .time-line{
-
+    padding: 16rpx 32rpx 32rpx 32rpx;
   }
 </style>
