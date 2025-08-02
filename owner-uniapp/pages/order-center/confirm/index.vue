@@ -248,17 +248,6 @@ export default {
 
 <template>
   <view class="page">
-    <!-- 导航栏 -->
-    <u-navbar
-      title="确认收货"
-      :border-bottom="false"
-      :background="{ backgroundColor: '#ffffff' }"
-    >
-      <view slot="left" class="nav-left" @click="$u.route({ type: 'back' })">
-        <u-icon name="arrow-left" size="20" color="#333" />
-      </view>
-    </u-navbar>
-
     <!-- 加载状态 -->
     <u-loading-page :loading="pageState.isLoading" loading-text="加载中..." />
 
