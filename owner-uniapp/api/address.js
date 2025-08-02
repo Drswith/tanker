@@ -74,15 +74,15 @@ const useMock = true
 // 获取设备当前中文描述地址
 export function getCurrentLocationAddress() {
   return new Promise((resolve, reject) => {
+    // 地图api配额有限,使用mock数据
+    if (useMock) {
+      resolve(mockCurrentLocationAddress)
+      return
+    }
+
     uni.getLocation({
       type: 'wgs84',
       success: (res) => {
-        // 地图api配额有限,使用mock数据
-        if (useMock) {
-          resolve(mockCurrentLocationAddress)
-          return
-        }
-
         // #ifdef H5
         // 调用腾讯地图API进行逆地址解析
         uni.request({
