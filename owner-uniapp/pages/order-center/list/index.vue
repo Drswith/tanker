@@ -43,6 +43,12 @@ export default {
       // 订单数据，从接口获取
       orderDataList: [],
       dataList: [],
+
+      // 验收授权分享订单
+      shareOrder: null,
+      showCheckOrderModal: false,
+      checkOrderLink: '',
+      checkOrderLinkLoading: false,
     }
   },
   computed: {
@@ -168,12 +174,47 @@ export default {
         url: `/pages/order-center/detail/index?orderId=${order.id}`,
       })
     },
+
+    // 复制验收链接到剪贴板
+    copyCheckLink() {
+      uni.setClipboardData({
+        data: this.checkOrderLink,
+        success: () => {
+          uni.showToast({
+            title: '链接复制成功',
+            icon: 'success',
+          })
+          this.showCheckOrderModal = false
+          this.checkOrderLink = ''
+        },
+      })
+    },
     // 验收授权
-    handleCheckOrder(order) {
+    async handleCheckOrder(order) {
       console.log('order', order)
       uni.navigateTo({
         url: `/pages/order-center/check/index?orderId=${order.id}`,
       })
+      // uni.showLoading({
+      //   title: '获取链接中',
+      // })
+      // this.checkOrderLinkLoading = true
+      // const res = await orderApi.getOrderCheckLink({
+      //   orderNo: order.orderNo,
+      // })
+      // this.checkOrderLinkLoading = false
+      // uni.hideLoading()
+      // if (res) {
+      //   this.checkOrderLink = res
+      // }
+      // else {
+      //   uni.showToast({
+      //     title: '获取链接失败',
+      //     icon: 'none',
+      //   })
+      // }
+      // this.showCheckOrderModal = true
+      // this.shareOrder = order
     },
     // 确认收货
     handleConfirmOrder(order) {
@@ -410,14 +451,42 @@ export default {
         <Notes v-if="item" :status="item.status" />
       </view>
     </scroll-view>
+
+    <u-modal
+      :show="showCheckOrderModal"
+      title="验收授权"
+      :show-confirm-button="false"
+      :show-cancel-button="false"
+    >
+      <view class="copy-link-modal">
+        <view>
+          获得链接的人可以对该订单进行 <text style="color:#ff9e00;">
+            验收并确认收货
+          </text> 操作！
+        </view>
+
+        <view style="margin: 32rpx 0 32rpx 0;">
+          链接有效期：<text style="color:#ff9e00;">
+            1 小时
+          </text>
+        </view>
+
+        <button class="primary-button" @click="copyCheckLink">
+          复制链接
+        </button>
+      </view>
+    </u-modal>
   </view>
 </template>
 
-<style scoped lang="scss">
+<style>
 page {
   background-color: #F8F8F8;
 }
-  /* 订单中心页面主容器 */
+</style>
+
+<style scoped lang="scss">
+/* 订单中心页面主容器 */
 .order-center {
   position: relative;
 }
@@ -526,5 +595,29 @@ page {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.copy-link-modal{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  // display: flex;
+  // justify-content: center;
+  font-size: 28rpx;
+}
+
+.copy-btn {
+  width: 100%;
+  background-color: #fff;
+  // color: #EBA932;
+  height: 80rpx;
+  font-size: 24rpx;
+  border: 2rpx solid #EBA932;
+  border-radius: 40rpx;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

@@ -124,6 +124,16 @@ export const orderApi = {
     return request.post('/api/order/contract', data)
   },
 
+  // 获取验收链接
+  getOrderCheckLink(data) {
+    return request.get(`/api/order/copy_link`, data)
+  },
+
+  // 验证验收授权链接
+  verifyOrderCheckLink(data) {
+    return request.get(`/api/order/verify_link`, data)
+  },
+
   // 评价订单
   evaluateOrder(data) {
     return request.post('/api/order/evaluate', data)

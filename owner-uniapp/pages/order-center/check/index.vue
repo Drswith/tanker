@@ -9,6 +9,7 @@ export default {
       // 路由参数
       routeParams: {
         orderId: null,
+        checkLink: null,
       },
       // 订单数据
       orderData: null,
@@ -24,12 +25,6 @@ export default {
         serialNumber: '13492893',
         batteryLevel: '13492893',
       },
-      // 收货照片
-      deliveryPhotos: [
-        '/static/images/fallback-image.png',
-        '/static/images/fallback-image.png',
-        '/static/images/fallback-image.png',
-      ],
     }
   },
   computed: {
@@ -47,10 +42,25 @@ export default {
       const { shippingLocationName, shippingLocationAddress } = this.orderData
       return `${shippingLocationName || ''}(${shippingLocationAddress || ''})`
     },
+
+    // 验车照片
+    vehicleInspectionImg() {
+      return this.orderData?.vehicleInspectionImg || []
+    },
+    // 铅封照片
+    leadSealImg() {
+      return this.orderData?.leadSealImg || []
+    },
+    // GPS安装照片
+    gpsImg() {
+      return this.orderData?.gpsImg || []
+    },
   },
   watch: {},
   onLoad(options) {
     this.routeParams.orderId = options.orderId
+    this.routeParams.checkLink = options.checkLink
+
     if (this.routeParams.orderId) {
       // 加载订单详情
       this.loadOrderDetail()
@@ -97,8 +107,17 @@ export default {
         urls: this.deliveryPhotos,
       })
     },
-    // 确认收货
-    async confirmDelivery() {
+
+    // 验证授权
+    async verifyLink() {
+      if (!this.routeParams.checkLink) {
+        uni.showToast({
+          title: '请先获取验收授权链接',
+          icon: 'none',
+        })
+        return
+      }
+
       if (this.pageState.submitting)
         return
 
@@ -108,32 +127,29 @@ export default {
         // 调用确认收货API
         const { orderId } = this.routeParams
         const { orderNo } = this.orderData
-        const { deviceId: gpsDeviceId, nfcId } = this.gpsInfo
-        const { deliveryPhotos } = this
 
-        await orderApi.confirmDelivery({
-          orderId,
+        await orderApi.verifyOrderCheckLink({
+          id: orderId,
           orderNo,
-          gpsDeviceId,
-          nfcId,
-          deliveryPhotos,
+          uuid: this.routeParams.checkLink,
         })
 
         uni.showToast({
-          title: '确认收货成功',
+          title: '验收授权成功',
           icon: 'success',
           duration: 2000,
         })
 
-        // 延迟返回上一页
-        setTimeout(() => {
-          uni.navigateBack()
-        }, 2000)
+        this.loadOrderDetail()
+        // // 进入订单详情
+        // uni.navigateTo({
+        //   url: `/pages/order-center/detail/index?orderId=${orderId}`,
+        // })
       }
       catch (error) {
-        console.error('确认收货失败:', error)
+        console.error('验收授权失败:', error)
         uni.showToast({
-          title: '确认收货失败',
+          title: '验收授权失败',
           icon: 'none',
         })
       }
@@ -159,7 +175,7 @@ export default {
       <!-- 提示信息 -->
       <view class="tip-banner">
         <text class="tip-text">
-          请在司机送达后进行验收授权
+          穿石科技邀请对您该订单进行验收授权
         </text>
       </view>
 
@@ -187,7 +203,7 @@ export default {
               收货地址：
             </text>
             <text class="info-value">
-              {{ fullDeliveryAddress }}
+              {{ orderData.address }}
             </text>
           </view>
         </view>
@@ -201,22 +217,6 @@ export default {
           </text>
           <text class="detail-value">
             {{ orderData.orderNo }}
-          </text>
-        </view>
-        <view class="detail-row">
-          <text class="detail-label">
-            分装人：
-          </text>
-          <text class="detail-value">
-            {{ orderData.deliveryName || '委托' }}
-          </text>
-        </view>
-        <view class="detail-row">
-          <text class="detail-label">
-            预计有效期：
-          </text>
-          <text class="detail-value">
-            1小时
           </text>
         </view>
         <view class="detail-row">
@@ -246,19 +246,6 @@ export default {
             {{ orderData.type }}，{{ orderData.carNumber }}
           </text>
         </view>
-        <view class="detail-row">
-          <text class="detail-label">
-            车辆运输证：
-          </text>
-          <text class="detail-value">
-            AB6666
-          </text>
-        </view>
-        <view class="detail-row">
-          <text class="detail-label">
-            车辆运输证照片：
-          </text>
-        </view>
       </view>
 
       <!-- GPS设备信息 -->
@@ -267,11 +254,6 @@ export default {
           <text class="title-text">
             GPS设备
           </text>
-          <view class="status-badge active">
-            <text class="status-text">
-              点击确认
-            </text>
-          </view>
         </view>
         <view class="gps-info">
           <view class="gps-row">
@@ -292,7 +274,7 @@ export default {
           </view>
           <view class="gps-row">
             <text class="gps-label">
-              一维码编号：
+              二维码编号：
             </text>
             <text class="gps-value">
               {{ gpsInfo.serialNumber }}
@@ -300,7 +282,7 @@ export default {
           </view>
           <view class="gps-row">
             <text class="gps-label">
-              电量：
+              编号：
             </text>
             <text class="gps-value">
               {{ gpsInfo.batteryLevel }}
@@ -309,22 +291,67 @@ export default {
         </view>
       </view>
 
-      <!-- 收货照片 -->
+      <!-- 验车照片 -->
       <view class="photo-section">
         <view class="section-title">
           <text class="title-text">
-            收货照片
+            验车照片
           </text>
         </view>
-        <view class="photo-grid">
+        <view v-if="vehicleInspectionImg.length > 0" class="photo-grid">
           <view
-            v-for="(photo, index) in deliveryPhotos"
+            v-for="(photo, index) in vehicleInspectionImg"
             :key="index"
             class="photo-item"
             @click="previewImage(photo)"
           >
             <image :src="photo" class="photo-image" mode="aspectFill" />
           </view>
+        </view>
+        <view v-else class="photo-grid">
+          <text>暂无照片</text>
+        </view>
+      </view>
+      <!-- 铅封照片 -->
+      <view class="photo-section">
+        <view class="section-title">
+          <text class="title-text">
+            铅封照片
+          </text>
+        </view>
+        <view v-if="leadSealImg.length > 0" class="photo-grid">
+          <view
+            v-for="(photo, index) in leadSealImg"
+            :key="index"
+            class="photo-item"
+            @click="previewImage(photo)"
+          >
+            <image :src="photo" class="photo-image" mode="aspectFill" />
+          </view>
+        </view>
+        <view v-else class="photo-grid">
+          <text>暂无照片</text>
+        </view>
+      </view>
+      <!-- GPS安装照片 -->
+      <view class="photo-section">
+        <view class="section-title">
+          <text class="title-text">
+            GPS安装照片
+          </text>
+        </view>
+        <view v-if="gpsImg.length > 0" class="photo-grid">
+          <view
+            v-for="(photo, index) in gpsImg"
+            :key="index"
+            class="photo-item"
+            @click="previewImage(photo)"
+          >
+            <image :src="photo" class="photo-image" mode="aspectFill" />
+          </view>
+        </view>
+        <view v-else class="photo-grid">
+          <text>暂无照片</text>
         </view>
       </view>
 
@@ -337,10 +364,10 @@ export default {
       <view
         class="confirm-btn"
         :class="{ submitting: pageState.submitting }"
-        @click="confirmDelivery"
+        @click="verifyLink"
       >
         <text class="btn-text">
-          {{ pageState.submitting ? '确认中...' : '确认收货' }}
+          {{ pageState.submitting ? '验证中...' : '验收授权' }}
         </text>
       </view>
     </view>
@@ -553,6 +580,8 @@ export default {
   display: flex;
   gap: 24rpx;
   flex-wrap: wrap;
+  font-size: 28rpx;
+  color: #999999;
 }
 
 .photo-item {
