@@ -419,7 +419,6 @@ page {
 }
   /* 订单中心页面主容器 */
 .order-center {
-	width: 100vw;
   position: relative;
 }
 
@@ -431,12 +430,15 @@ page {
 
 /* 订单列表滚动容器 */
 .order {
-	overflow: scroll;
-	padding: 32rpx;
+	// overflow: scroll;
+	// padding: 32rpx;
+  padding-top: 32rpx;
 }
 
 /* 订单卡片容器 */
 .card {
+  margin-left: 32rpx;
+  margin-right: 32rpx;
 	margin-top: 10rpx;
 	position: relative;
 	z-index: 10;
