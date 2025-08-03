@@ -114,6 +114,26 @@ export default {
         url: '/pages/driver/list/index',
       })
     },
+
+    // 跳转到修改密码页面
+    goToChangePassword() {
+      uni.navigateTo({
+        url: '/pages/change-password/index/index',
+      })
+    },
+
+    // 拨打客服电话
+    makePhoneCall() {
+      const servicePhone = '13800000000'
+      uni.makePhoneCall({
+        phoneNumber: servicePhone,
+      })
+    },
+    // 联系微信小程序客服
+    handleContact(e) {
+      console.log(e.detail.path)
+      console.log(e.detail.query)
+    },
   },
 }
 </script>
@@ -159,7 +179,9 @@ export default {
               referrerpolicy="no-referrer"
               :src="item.icon"
             />
-            <text class="status-label" v-html="item.label" />
+            <text class="status-label">
+              {{ item.label }}
+            </text>
           </view>
         </view>
       </view>
@@ -219,7 +241,7 @@ export default {
           合作司机
         </text>
       </view>
-      <view class="feature-item flex-row ">
+      <view class="feature-item flex-row " @click="goToChangePassword">
         <image
           class="feature-icon"
           referrerpolicy="no-referrer"
@@ -229,7 +251,7 @@ export default {
           修改密码
         </text>
       </view>
-      <view class="feature-item flex-row ">
+      <view class="feature-item flex-row " @click="makePhoneCall">
         <image
           class="feature-icon"
           referrerpolicy="no-referrer"
@@ -239,16 +261,18 @@ export default {
           电话客服
         </text>
       </view>
-      <view class="feature-item flex-row ">
-        <image
-          class="feature-icon"
-          referrerpolicy="no-referrer"
-          src="/static/images/mine-feedback.png"
-        />
-        <text class="feature-label">
-          咨询反馈
-        </text>
-      </view>
+      <button open-type="contact" bindcontact="handleContact" session-from="sessionFrom" class="contact-btn">
+        <view class="feature-item flex-row ">
+          <image
+            class="feature-icon"
+            referrerpolicy="no-referrer"
+            src="/static/images/mine-feedback.png"
+          />
+          <text class="feature-label">
+            咨询反馈
+          </text>
+        </view>
+      </button>
     </view>
   </view>
 </template>
@@ -267,5 +291,11 @@ export default {
 .loading-text {
   font-size: 28rpx;
   color: #999;
+}
+.contact-btn {
+  border: none;
+    &::after {
+    border: none;
+    }
 }
 </style>
