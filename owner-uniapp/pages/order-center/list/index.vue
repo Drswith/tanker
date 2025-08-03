@@ -414,9 +414,12 @@ export default {
           <view>
             <view class="text_right">
               订单编号：
-            </view>{{ item.orderNo }}
+            </view>
+            <view class="text_right">
+              {{ item.orderNo }}
+            </view>
           </view>
-          <view class="flex">
+          <view class="flex justify-between">
             <view>
               <view class="text_right">
                 购买数量：
@@ -424,8 +427,10 @@ export default {
                 {{ item.buyCount }} 吨
               </text>
             </view>
-            <view style="margin-left: 40rpx;">
-              下单时间：<text id="text" style="color:#000000;">
+            <view>
+              <view class="text_right">
+                下单时间：
+              </view><text id="text" style="color:#000000;">
                 {{ item.placeOrderTime }}
               </text>
             </view>
@@ -555,9 +560,12 @@ page {
 	width: 140rpx;
 	text-align: right;
 	display: inline-block;
-	font-size: 24rpx;
-	font-weight: 300;
-	color: #999999;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 34rpx;
+  font-style: normal;
 }
 
 /* 按钮组容器 */

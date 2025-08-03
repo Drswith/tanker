@@ -35,11 +35,15 @@ export default {
 	position: absolute;
 	top: 0;
 	right: 0;
-	color: #fff;
-	font-size: 20rpx;
-	font-weight: 400;
-	padding: 8rpx 20rpx;
-	border-radius: 0 10rpx 0 10rpx;
+	padding: 8rpx 24rpx;
+	border-radius: 0rpx 8rpx 0rpx 8rpx;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 600;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  line-height: 34rpx;
+  text-align: left;
+  font-style: normal;
 }
 
 .sign-bg {
