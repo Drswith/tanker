@@ -1,105 +1,123 @@
 <script>
+import { getPolyline } from '@/api/address'
 import { orderApi } from '@/api/order'
 import TimeLine from '@/components/TimeLine/TimeLine.vue'
 
-const mockPl2 = [{ latitude: 34.259593, longitude: 108.947548 }, { latitude: 34.259627, longitude: 108.947532 }, { latitude: 34.259736000000004, longitude: 108.947451 }, { latitude: 34.259782, longitude: 108.947404 }, { latitude: 34.259864, longitude: 108.947271 }, { latitude: 34.259864, longitude: 108.947271 }, { latitude: 34.260073, longitude: 108.947156 }, { latitude: 34.260787, longitude: 108.94714 }, { latitude: 34.261255, longitude: 108.94714400000001 }, { latitude: 34.262329, longitude: 108.94718200000001 }, { latitude: 34.263020000000004, longitude: 108.94714800000001 }, { latitude: 34.263597000000004, longitude: 108.94715000000001 }, { latitude: 34.26480300000001, longitude: 108.947197 }, { latitude: 34.265012000000006, longitude: 108.94718900000001 }, { latitude: 34.26518600000001, longitude: 108.947196 }, { latitude: 34.26589700000001, longitude: 108.947168 }, { latitude: 34.26697800000001, longitude: 108.94718 }, { latitude: 34.267981000000006, longitude: 108.947179 }, { latitude: 34.268384000000005, longitude: 108.947192 }, { latitude: 34.26919, longitude: 108.947251 }, { latitude: 34.269648000000004, longitude: 108.947272 }, { latitude: 34.269828000000004, longitude: 108.947274 }, { latitude: 34.269828000000004, longitude: 108.947274 }, { latitude: 34.270011000000004, longitude: 108.947088 }, { latitude: 34.270013000000006, longitude: 108.946822 }, { latitude: 34.27, longitude: 108.946347 }, { latitude: 34.269949000000004, longitude: 108.945721 }, { latitude: 34.26993, longitude: 108.945075 }, { latitude: 34.269921000000004, longitude: 108.943396 }, { latitude: 34.269908, longitude: 108.942946 }, { latitude: 34.269896, longitude: 108.94275800000001 }, { latitude: 34.269896, longitude: 108.94275800000001 }, { latitude: 34.269883, longitude: 108.94255100000001 }, { latitude: 34.269853, longitude: 108.94123700000002 }, { latitude: 34.269791999999995, longitude: 108.93716100000002 }, { latitude: 34.269788, longitude: 108.93698500000002 }, { latitude: 34.269757, longitude: 108.93527900000002 }, { latitude: 34.269754, longitude: 108.93480200000002 }, { latitude: 34.269784, longitude: 108.93373100000002 }, { latitude: 34.269745, longitude: 108.93288200000002 }, { latitude: 34.269745, longitude: 108.93288200000002 }, { latitude: 34.270194000000004, longitude: 108.93290000000002 }, { latitude: 34.270793000000005, longitude: 108.93289900000002 }, { latitude: 34.271416, longitude: 108.93290800000003 }, { latitude: 34.272329, longitude: 108.93293900000003 }, { latitude: 34.273592, longitude: 108.93296600000004 }, { latitude: 34.275747, longitude: 108.93304300000004 }, { latitude: 34.276556, longitude: 108.93305700000003 }, { latitude: 34.276556, longitude: 108.93305700000003 }, { latitude: 34.276586, longitude: 108.93484000000004 }, { latitude: 34.276611, longitude: 108.93696300000003 }, { latitude: 34.276619000000004, longitude: 108.93702200000003 }, { latitude: 34.276685, longitude: 108.93725200000003 }, { latitude: 34.276714, longitude: 108.93931800000003 }, { latitude: 34.2767, longitude: 108.94041600000003 }, { latitude: 34.276717, longitude: 108.94086800000002 }, { latitude: 34.276717, longitude: 108.94086800000002 }, { latitude: 34.276672999999995, longitude: 108.94104000000003 }, { latitude: 34.276661, longitude: 108.94118500000003 }, { latitude: 34.276692, longitude: 108.94313600000004 }, { latitude: 34.276782999999995, longitude: 108.94507600000004 }, { latitude: 34.276861, longitude: 108.94573300000005 }, { latitude: 34.276866999999996, longitude: 108.94585300000004 }]
-const mockPl = [{
+// const mockPl2 = [{ latitude: 34.259593, longitude: 108.947548 }, { latitude: 34.259627, longitude: 108.947532 }, { latitude: 34.259736000000004, longitude: 108.947451 }, { latitude: 34.259782, longitude: 108.947404 }, { latitude: 34.259864, longitude: 108.947271 }, { latitude: 34.259864, longitude: 108.947271 }, { latitude: 34.260073, longitude: 108.947156 }, { latitude: 34.260787, longitude: 108.94714 }, { latitude: 34.261255, longitude: 108.94714400000001 }, { latitude: 34.262329, longitude: 108.94718200000001 }, { latitude: 34.263020000000004, longitude: 108.94714800000001 }, { latitude: 34.263597000000004, longitude: 108.94715000000001 }, { latitude: 34.26480300000001, longitude: 108.947197 }, { latitude: 34.265012000000006, longitude: 108.94718900000001 }, { latitude: 34.26518600000001, longitude: 108.947196 }, { latitude: 34.26589700000001, longitude: 108.947168 }, { latitude: 34.26697800000001, longitude: 108.94718 }, { latitude: 34.267981000000006, longitude: 108.947179 }, { latitude: 34.268384000000005, longitude: 108.947192 }, { latitude: 34.26919, longitude: 108.947251 }, { latitude: 34.269648000000004, longitude: 108.947272 }, { latitude: 34.269828000000004, longitude: 108.947274 }, { latitude: 34.269828000000004, longitude: 108.947274 }, { latitude: 34.270011000000004, longitude: 108.947088 }, { latitude: 34.270013000000006, longitude: 108.946822 }, { latitude: 34.27, longitude: 108.946347 }, { latitude: 34.269949000000004, longitude: 108.945721 }, { latitude: 34.26993, longitude: 108.945075 }, { latitude: 34.269921000000004, longitude: 108.943396 }, { latitude: 34.269908, longitude: 108.942946 }, { latitude: 34.269896, longitude: 108.94275800000001 }, { latitude: 34.269896, longitude: 108.94275800000001 }, { latitude: 34.269883, longitude: 108.94255100000001 }, { latitude: 34.269853, longitude: 108.94123700000002 }, { latitude: 34.269791999999995, longitude: 108.93716100000002 }, { latitude: 34.269788, longitude: 108.93698500000002 }, { latitude: 34.269757, longitude: 108.93527900000002 }, { latitude: 34.269754, longitude: 108.93480200000002 }, { latitude: 34.269784, longitude: 108.93373100000002 }, { latitude: 34.269745, longitude: 108.93288200000002 }, { latitude: 34.269745, longitude: 108.93288200000002 }, { latitude: 34.270194000000004, longitude: 108.93290000000002 }, { latitude: 34.270793000000005, longitude: 108.93289900000002 }, { latitude: 34.271416, longitude: 108.93290800000003 }, { latitude: 34.272329, longitude: 108.93293900000003 }, { latitude: 34.273592, longitude: 108.93296600000004 }, { latitude: 34.275747, longitude: 108.93304300000004 }, { latitude: 34.276556, longitude: 108.93305700000003 }, { latitude: 34.276556, longitude: 108.93305700000003 }, { latitude: 34.276586, longitude: 108.93484000000004 }, { latitude: 34.276611, longitude: 108.93696300000003 }, { latitude: 34.276619000000004, longitude: 108.93702200000003 }, { latitude: 34.276685, longitude: 108.93725200000003 }, { latitude: 34.276714, longitude: 108.93931800000003 }, { latitude: 34.2767, longitude: 108.94041600000003 }, { latitude: 34.276717, longitude: 108.94086800000002 }, { latitude: 34.276717, longitude: 108.94086800000002 }, { latitude: 34.276672999999995, longitude: 108.94104000000003 }, { latitude: 34.276661, longitude: 108.94118500000003 }, { latitude: 34.276692, longitude: 108.94313600000004 }, { latitude: 34.276782999999995, longitude: 108.94507600000004 }, { latitude: 34.276861, longitude: 108.94573300000005 }, { latitude: 34.276866999999996, longitude: 108.94585300000004 }]
+// const mockPl = [{
+//   latitude: 34.259428,
+//   longitude: 108.947040,
+//   problem: false,
+// }, {
+//   latitude: 34.252918,
+//   longitude: 108.946963,
+//   problem: false,
+// }, {
+//   latitude: 34.252408,
+//   longitude: 108.946240,
+//   problem: false,
+// }, {
+//   latitude: 34.249286,
+//   longitude: 108.946184,
+//   problem: false,
+// }, {
+//   latitude: 34.248670,
+//   longitude: 108.946640,
+//   problem: false,
+// }, {
+//   latitude: 34.248129,
+//   longitude: 108.946826,
+//   problem: false,
+// }, {
+//   latitude: 34.243537,
+//   longitude: 108.946816,
+//   problem: true,
+// }, {
+//   latitude: 34.243478,
+//   longitude: 108.939003,
+//   problem: true,
+// }, {
+//   latitude: 34.241218,
+//   longitude: 108.939027,
+//   problem: true,
+// }, {
+//   latitude: 34.241192,
+//   longitude: 108.934802,
+//   problem: true,
+// }, {
+//   latitude: 34.241182,
+//   longitude: 108.932235,
+//   problem: true,
+// }, {
+//   latitude: 34.247227,
+//   longitude: 108.932311,
+//   problem: true,
+// }, {
+//   latitude: 34.250833,
+//   longitude: 108.932352,
+//   problem: true,
+// }, {
+//   latitude: 34.250877,
+//   longitude: 108.931756,
+//   problem: true,
+// }, {
+//   latitude: 34.250944,
+//   longitude: 108.931576,
+//   problem: true,
+// }, {
+//   latitude: 34.250834,
+//   longitude: 108.929662,
+//   problem: true,
+// }, {
+//   latitude: 34.250924,
+//   longitude: 108.926015,
+//   problem: true,
+// }, {
+//   latitude: 34.250802,
+//   longitude: 108.910121,
+//   problem: true,
+// }, {
+//   latitude: 34.269718,
+//   longitude: 108.909921,
+//   problem: true,
+// }, {
+//   latitude: 34.269221,
+//   longitude: 108.922366,
+//   problem: false,
+// }, {
+//   latitude: 34.274531,
+//   longitude: 108.922388,
+//   problem: false,
+// }, {
+//   latitude: 34.276201,
+//   longitude: 108.923433,
+//   problem: false,
+// }, {
+//   latitude: 34.276559,
+//   longitude: 108.924004,
+//   problem: false,
+// }, {
+//   latitude: 34.276785,
+//   longitude: 108.945855,
+//   problem: false,
+// }]
+const start = {
   latitude: 34.259428,
   longitude: 108.947040,
   problem: false,
-}, {
-  latitude: 34.252918,
-  longitude: 108.946963,
-  problem: false,
-}, {
-  latitude: 34.252408,
-  longitude: 108.946240,
-  problem: false,
-}, {
-  latitude: 34.249286,
-  longitude: 108.946184,
-  problem: false,
-}, {
-  latitude: 34.248670,
-  longitude: 108.946640,
-  problem: false,
-}, {
-  latitude: 34.248129,
-  longitude: 108.946826,
-  problem: false,
-}, {
+}
+
+const myLocation = {
   latitude: 34.243537,
   longitude: 108.946816,
   problem: true,
-}, {
-  latitude: 34.243478,
-  longitude: 108.939003,
-  problem: true,
-}, {
-  latitude: 34.241218,
-  longitude: 108.939027,
-  problem: true,
-}, {
-  latitude: 34.241192,
-  longitude: 108.934802,
-  problem: true,
-}, {
-  latitude: 34.241182,
-  longitude: 108.932235,
-  problem: true,
-}, {
-  latitude: 34.247227,
-  longitude: 108.932311,
-  problem: true,
-}, {
-  latitude: 34.250833,
-  longitude: 108.932352,
-  problem: true,
-}, {
-  latitude: 34.250877,
-  longitude: 108.931756,
-  problem: true,
-}, {
-  latitude: 34.250944,
-  longitude: 108.931576,
-  problem: true,
-}, {
-  latitude: 34.250834,
-  longitude: 108.929662,
-  problem: true,
-}, {
-  latitude: 34.250924,
-  longitude: 108.926015,
-  problem: true,
-}, {
-  latitude: 34.250802,
-  longitude: 108.910121,
-  problem: true,
-}, {
-  latitude: 34.269718,
-  longitude: 108.909921,
-  problem: true,
-}, {
-  latitude: 34.269221,
-  longitude: 108.922366,
-  problem: false,
-}, {
-  latitude: 34.274531,
-  longitude: 108.922388,
-  problem: false,
-}, {
-  latitude: 34.276201,
-  longitude: 108.923433,
-  problem: false,
-}, {
-  latitude: 34.276559,
-  longitude: 108.924004,
-  problem: false,
-}, {
+}
+
+const dest = {
   latitude: 34.276785,
   longitude: 108.945855,
   problem: false,
-}]
+}
 
 export default {
   components: {
@@ -119,31 +137,35 @@ export default {
       scrollTop: 0, // 支付宝使用
       mscrollTop: 0,
       title: 'Hello',
-      longitude: mockPl[0].longitude,
-      latitude: mockPl[0].latitude,
-      covers: [{
-        id: 0,
-        latitude: mockPl[0].latitude,
-        longitude: mockPl[0].longitude,
+      longitude: myLocation.longitude,
+      latitude: myLocation.latitude,
+      covers: [
+        {
+          id: 0,
+          latitude: start.latitude,
+          longitude: start.longitude,
         // width: 64,
         // height: 64,
         // iconPath: '/static/images/icon/wxpay.svg',
-      }, {
-        id: 999,
-        latitude: mockPl[10].latitude,
-        longitude: mockPl[10].longitude,
-        width: 64,
-        height: 64,
-        iconPath: '/static/images/icon/positioning.png',
-      }, {
-        id: 1,
-        latitude: mockPl[mockPl.length - 1].latitude,
-        longitude: mockPl[mockPl.length - 1].longitude,
-        width: 64,
-        height: 64,
-        // iconPath: 'http://ottms.innoforce.cc/files/cf5853bf-faf5-409c-8e41-5e30129eb170.svg',
-        iconPath: '/static/images/icon/dest.svg',
-      }],
+        },
+        {
+          id: 999,
+          latitude: myLocation.latitude,
+          longitude: myLocation.longitude,
+          width: 64,
+          height: 64,
+          iconPath: '/static/images/icon/positioning.png',
+        },
+        {
+          id: 1,
+          latitude: dest.latitude,
+          longitude: dest.longitude,
+          width: 64,
+          height: 64,
+          // iconPath: 'http://ottms.innoforce.cc/files/cf5853bf-faf5-409c-8e41-5e30129eb170.svg',
+          iconPath: '/static/images/icon/dest.svg',
+        },
+      ],
       polyline: [],
 
       autoplay: true,
@@ -212,7 +234,7 @@ export default {
           i++
         }
       }
-      return i
+      return Number(i)
     },
   },
   onLoad(options) {
@@ -221,86 +243,27 @@ export default {
     if (this.routeParams.orderId) {
       // 加载订单详情
       this.loadOrderDetail()
-      this.initMarkLine()
     }
   },
   onReady() {
     this.$refs.drag.initTop()
+    this.initMarkLine()
   },
 
   methods: {
+    async initMarkLine() {
+      const polyline = await getPolyline({
+        from: start,
+        to: dest,
+        config: {
+          color: '#025ADD',
+          width: 8,
+          dottedLine: false,
+        },
+      })
 
-    // 触发表单提交事件，调用接口
-    initMarkLine(e) {
-      // eslint-disable-next-line no-undef
-      const qqmapsdk = getApp().globalData.qqmapsdk
-      const start = {
-        latitude: 34.259428,
-        longitude: 108.947040,
-        problem: false,
-      }
-      const dest = {
-        latitude: 34.276785,
-        longitude: 108.945855,
-        problem: false,
-      }
-      const pl = mockPl
-      this.latitude = pl[10].latitude
-      this.longitude = pl[10].longitude
-      this.polyline = [{
-        points: pl,
-        color: '#025ADD',
-        width: 8,
-        dottedLine: false,
-      }]
-
-      // 调用距离计算接口
-      // qqmapsdk.direction({
-      //   mode: 'driving', // 可选值：'driving'（驾车）、'walking'（步行）、'bicycling'（骑行），不填默认：'driving',可不填
-      //   // from参数不填默认当前地址
-      //   from: start,
-      //   to: dest,
-      //   success(res) {
-      //     console.log(res)
-      //     let ret = res
-      //     let coors = ret.result.routes[0].polyline; let pl = []
-      //     // 坐标解压（返回的点串坐标，通过前向差分进行压缩）
-      //     let kr = 1000000
-      //     for (var i = 2; i < coors.length; i++) {
-      //       coors[i] = Number(coors[i - 2]) + Number(coors[i]) / kr
-      //     }
-      //     // 将解压后的坐标放入点串数组pl中
-      //     for (var i = 0; i < coors.length; i += 2) {
-      //       pl.push({ latitude: coors[i], longitude: coors[i + 1] })
-      //     }
-      //     console.log(pl)
-      //     console.log(JSON.stringify(pl))
-      //     // 设置polyline属性，将路线显示出来,将解压坐标第一个数据作为起点
-      //     // _this.setData({
-      //     // // 将路线起点展示在当前位置
-      //     //   latitude: pl[0].latitude,
-      //     //   longitude: pl[0].longitude,
-      //     //   polyline: [{
-      //     //     points: pl,
-      //     //     color: '#FF0000DD',
-      //     //     width: 4,
-      //     //   }],
-      //     // })
-      //     this.latitude = pl[0].latitude
-      //     this.longitude = pl[0].longitude
-      //     this.polyline = [{
-      //       points: pl,
-      //       color: '#FF0000DD',
-      //       width: 4,
-      //     }]
-      //   },
-      //   fail(error) {
-      //     console.error(error)
-      //   },
-      //   complete(res) {
-      //     console.log(res)
-      //   },
-      // })
+      this.polyline = polyline
+      console.log('this.polyline', this.polyline)
     },
 
     // nvue对top动画支持不够，使用css的其他的动画转换
@@ -476,12 +439,14 @@ export default {
   </view>
 </template>
 
-<style lang="scss" scoped>
-	page {
-		background-color: #f3f3f3;
-	}
+<style>
+page {
+  background-color: #F8F8F8;
+}
+</style>
 
-	.loading-container {
+<style lang="scss" scoped>
+.loading-container {
 		display: flex;
 		justify-content: center;
 		align-items: center;
