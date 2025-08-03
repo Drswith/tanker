@@ -1,5 +1,12 @@
 <script>
 import { orderApi, OrderStatusText } from '@/api/order'
+import { PayType } from '@/api/pay'
+
+const payMap = {
+  [PayType.WECHAT]: { label: '微信支付', icon: '/static/images/icon/wxpay.svg' },
+  [PayType.ALIPAY]: { label: '支付宝', icon: '/static/images/icon/alipay.svg' },
+  [PayType.BANK]: { label: '银行卡', icon: '/static/images/icon/unionpay.svg' },
+}
 
 export default {
   components: {
@@ -14,6 +21,9 @@ export default {
       routeParams: {
         orderId: null,
       },
+
+      // 支付方式映射
+      payMap: Object.freeze(payMap),
 
       // 订单数据
       orderData: {
@@ -62,29 +72,7 @@ export default {
   computed: {
     // 订单状态文本
     statusText() {
-      return OrderStatusText[this.orderData.status] || '未知状态'
-    },
-
-    // 完整的收货地址
-    fullDeliveryAddress() {
-      const { province, city, district, address } = this.orderData
-      return `${province}${city}${district}${address}`
-    },
-
-    // 发货地址
-    pickupAddress() {
-      const { shippingLocationName, shippingLocationAddress } = this.orderData
-      return `${shippingLocationName}(${shippingLocationAddress})`
-    },
-
-    // 支付方式文本
-    payTypeText() {
-      const payTypeMap = {
-        1: '微信支付',
-        2: '支付宝',
-        3: '银行卡',
-      }
-      return payTypeMap[this.orderData.payType] || '未设置'
+      return OrderStatusText[this.orderData?.status] || '未知状态'
     },
   },
   watch: {
@@ -148,71 +136,33 @@ export default {
       })
     },
 
-    // 查看合同详情
-    viewContract() {
-      uni.showToast({
-        title: '查看合同功能开发中',
-        icon: 'none',
-      })
-    },
-
-    // 查看车辆信息
-    viewVehicleInfo() {
-      uni.navigateTo({
-        url: `/pages/order-center/vehicle-info/index?orderId=${this.routeParams.orderId}`,
-      })
-    },
-
-    // 修改订单
-    editOrder() {
-      uni.navigateTo({
-        url: `/pages/order-center/edit/index?orderId=${this.routeParams.orderId}`,
-      })
-    },
-
-    // 立即签署
-    signOrder() {
-      uni.navigateTo({
-        url: `/pages/order-center/sign/index?orderId=${this.routeParams.orderId}`,
-      })
-    },
-
-    // 取消订单
-    cancelOrder() {
-      // 根据订单状态决定取消逻辑
-      if (this.orderData.status === 0) {
-        // 状态为0时直接取消订单
-        uni.showModal({
-          title: '确认取消',
-          content: '确定要取消这个订单吗？',
-          success: async (res) => {
-            if (res.confirm) {
-              try {
-                await orderApi.cancelOrder({ id: this.orderData.id })
-                uni.showToast({
-                  title: '订单已取消',
-                  icon: 'success',
-                })
-                // 重新加载订单详情
-                this.loadOrderDetail()
-              }
-              catch (error) {
-                console.error('取消订单失败:', error)
-                uni.showToast({
-                  title: '取消订单失败',
-                  icon: 'none',
-                })
-              }
-            }
-          },
+    // 各种信息图片查看
+    handleViewImages(imgType) {
+      if (!this.orderData[imgType] || this.orderData[imgType].length === 0) {
+        uni.showToast({
+          title: '暂无图片',
+          icon: 'none',
         })
+        return
       }
-      else {
-        // 其他状态跳转到退款页面
-        uni.navigateTo({
-          url: `/pages/order-center/cancel/index?orderId=${this.orderData.id}`,
+
+      uni.navigateTo({
+        url: `/pages/order-center/photo/index?orderId=${this.routeParams.orderId}&imgType=${imgType}`,
+      })
+    },
+
+    // gps快递信息
+    handleViewGpsInfos() {
+      if (!this.orderData.gpsImg || this.orderData.gpsImg.length === 0) {
+        uni.showToast({
+          title: '暂无图片',
+          icon: 'none',
         })
+        return
       }
+      uni.navigateTo({
+        url: `/pages/order-center/gps-return/index?orderId=${this.routeParams.orderId}`,
+      })
     },
 
     // 返回上一页
@@ -351,12 +301,10 @@ export default {
               支付方式：
             </text>
             <text class="detail-value">
-              {{ payTypeText }}
+              <image :src="payMap[orderData.payType].icon" style="width: 26rpx; height: 26rpx; margin-right: 8rpx;" />
+              {{ payMap[orderData.payType].label }}
             </text>
-            <!-- <text v-if="orderData.payTime" class="payment-status">
-              已支付
-            </text> -->
-            <text class="link-text" @click="viewVehicleInfo">
+            <text class="link-text" @click="handleViewImages('payImg')">
               支付凭证
             </text>
           </view>
@@ -395,7 +343,7 @@ export default {
             <text class="detail-value">
               {{ orderData.signDate }}
             </text>
-            <text class="link-text" @click="viewContract">
+            <text class="link-text" @click="handleViewImages('signImgPath')">
               合同详情
             </text>
           </view>
@@ -407,7 +355,7 @@ export default {
             <text class="detail-value">
               {{ orderData.driverSignTime }}
             </text>
-            <text class="link-text" @click="viewContract">
+            <text class="link-text" @click="handleViewImages('sjFileImg')">
               合同详情
             </text>
           </view>
@@ -419,79 +367,79 @@ export default {
             <text class="detail-value">
               {{ orderData.vehicleInspectionTime }}
             </text>
-            <text class="link-text" @click="viewVehicleInfo">
+            <text class="link-text" @click="handleViewImages('vehicleInspectionImg')">
               验车信息
             </text>
           </view>
 
-          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+          <view v-if="orderData.leadSealTime" class="detail-row">
             <text class="detail-label">
               施封时间：
             </text>
             <text class="detail-value">
-              {{ orderData.vehicleInspectionTime }}
+              {{ orderData.leadSealTime }}
             </text>
-            <text class="link-text" @click="viewVehicleInfo">
+            <text class="link-text" @click="handleViewImages('leadSealImg')">
               施封信息
             </text>
           </view>
 
-          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+          <view v-if="orderData.gpsTime" class="detail-row">
             <text class="detail-label">
               GPS安装时间：
             </text>
             <text class="detail-value">
-              {{ orderData.vehicleInspectionTime }}
+              {{ orderData.gpsTime }}
             </text>
-            <text class="link-text" @click="viewVehicleInfo">
+            <text class="link-text" @click="handleViewImages('gpsImg')">
               GPS设备信息
             </text>
           </view>
 
-          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+          <view v-if="orderData.deliverTime" class="detail-row">
             <text class="detail-label">
               货物送达时间：
             </text>
             <text class="detail-value">
-              {{ orderData.vehicleInspectionTime }}
+              {{ orderData.deliverTime }}
             </text>
-            <text class="link-text" @click="viewVehicleInfo">
+            <text class="link-text" @click="handleViewImages('deliverImg')">
               送达信息
             </text>
           </view>
 
-          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+          <view v-if="orderData.receiptTime" class="detail-row">
             <text class="detail-label">
               确认收货时间：
             </text>
             <text class="detail-value">
-              {{ orderData.vehicleInspectionTime }}
+              {{ orderData.receiptTime }}
             </text>
-            <text class="link-text" @click="viewVehicleInfo">
+            <!-- <text class="link-text" >
               确认收货信息
-            </text>
+            </text> -->
           </view>
 
-          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+          <view v-if="orderData.address" class="detail-row">
             <text class="detail-label">
               卸货位置：
             </text>
             <text class="detail-value">
-              {{ orderData.vehicleInspectionTime }}
+              {{ orderData.address }}
             </text>
-            <text class="link-text" @click="viewVehicleInfo">
+            <!-- <text class="link-text" >
               卸货信息
-            </text>
+            </text> -->
           </view>
 
-          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+          <view v-if="orderData.gpsReturnTime" class="detail-row">
             <text class="detail-label">
               GPS寄回时间：
             </text>
             <text class="detail-value">
-              {{ orderData.vehicleInspectionTime }}
+              {{ orderData.gpsReturnTime }}
             </text>
-            <text class="link-text" @click="viewVehicleInfo">
+            <text class="link-text" @click="handleViewGpsInfos">
               快递信息
             </text>
           </view>
