@@ -268,10 +268,10 @@ export default {
           <view class="card-content">
             <view class="info-row">
               <text class="info-label">
-                收货人：
+                {{ orderData.memberName }}
               </text>
               <text class="info-value">
-                {{ orderData.takeName || orderData.memberName }}
+                {{ orderData.memberMobile }}
               </text>
             </view>
             <view class="info-row">
@@ -279,7 +279,7 @@ export default {
                 送货地址：
               </text>
               <text class="info-value">
-                {{ fullDeliveryAddress }}
+                {{ orderData.address }}
               </text>
             </view>
             <view class="info-row">
@@ -287,7 +287,7 @@ export default {
                 发货地址：
               </text>
               <text class="info-value">
-                {{ pickupAddress }}
+                {{ orderData.current }}
               </text>
             </view>
           </view>
@@ -353,8 +353,11 @@ export default {
             <text class="detail-value">
               {{ payTypeText }}
             </text>
-            <text v-if="orderData.payTime" class="payment-status">
+            <!-- <text v-if="orderData.payTime" class="payment-status">
               已支付
+            </text> -->
+            <text class="link-text" @click="viewVehicleInfo">
+              支付凭证
             </text>
           </view>
 
@@ -404,6 +407,9 @@ export default {
             <text class="detail-value">
               {{ orderData.driverSignTime }}
             </text>
+            <text class="link-text" @click="viewContract">
+              合同详情
+            </text>
           </view>
 
           <view v-if="orderData.vehicleInspectionTime" class="detail-row">
@@ -417,6 +423,78 @@ export default {
               验车信息
             </text>
           </view>
+
+          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+            <text class="detail-label">
+              施封时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.vehicleInspectionTime }}
+            </text>
+            <text class="link-text" @click="viewVehicleInfo">
+              施封信息
+            </text>
+          </view>
+
+          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+            <text class="detail-label">
+              GPS安装时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.vehicleInspectionTime }}
+            </text>
+            <text class="link-text" @click="viewVehicleInfo">
+              GPS设备信息
+            </text>
+          </view>
+
+          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+            <text class="detail-label">
+              货物送达时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.vehicleInspectionTime }}
+            </text>
+            <text class="link-text" @click="viewVehicleInfo">
+              送达信息
+            </text>
+          </view>
+
+          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+            <text class="detail-label">
+              确认收货时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.vehicleInspectionTime }}
+            </text>
+            <text class="link-text" @click="viewVehicleInfo">
+              确认收货信息
+            </text>
+          </view>
+
+          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+            <text class="detail-label">
+              卸货位置：
+            </text>
+            <text class="detail-value">
+              {{ orderData.vehicleInspectionTime }}
+            </text>
+            <text class="link-text" @click="viewVehicleInfo">
+              卸货信息
+            </text>
+          </view>
+
+          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
+            <text class="detail-label">
+              GPS寄回时间：
+            </text>
+            <text class="detail-value">
+              {{ orderData.vehicleInspectionTime }}
+            </text>
+            <text class="link-text" @click="viewVehicleInfo">
+              快递信息
+            </text>
+          </view>
         </view>
 
         <!-- 底部占位空间，避免内容被固定按钮遮挡 -->
@@ -425,33 +503,18 @@ export default {
 
       <!-- 固定底部按钮 -->
       <view class="fixed-bottom-actions">
-        <!-- 取消订单按钮 - 所有状态都可以取消 -->
-        <view class="action-btn cancel-btn" @click="cancelOrder">
-          <text class="btn-text">
-            {{ orderData.status === 0 ? '取消订单' : '申请退款' }}
-          </text>
+        <view class="bottom-btn-left space-x-10">
+          <button class="mr-20 bottom-btn cancel-btn">
+            取消订单
+          </button>
         </view>
-
-        <!-- 修改订单按钮 - 只有待支付和待接单状态可以修改 -->
-        <view
-          v-if="orderData.status <= 1"
-          class="action-btn edit-btn"
-          @click="editOrder"
-        >
-          <text class="btn-text">
+        <view class="bottom-btn-right space-x-10">
+          <button class="ml-20 bottom-btn modify-btn">
             修改订单
-          </text>
-        </view>
-
-        <!-- 立即签署按钮 - 只有已接单待签署状态显示 -->
-        <view
-          v-if="orderData.status === 2"
-          class="action-btn sign-btn"
-          @click="signOrder"
-        >
-          <text class="btn-text">
+          </button>
+          <button class="ml-20 bottom-btn sign-btn">
             立即签署
-          </text>
+          </button>
         </view>
       </view>
     </view>
@@ -662,6 +725,21 @@ export default {
   padding: 20rpx 30rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom)); /* 适配安全区域 */
   z-index: 999;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+}
+
+.bottom-btn-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.bottom-btn-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .action-btn {
@@ -674,33 +752,32 @@ export default {
   margin: 0 10rpx;
 }
 
+.bottom-btn {
+  height: 100%;
+	border-radius: 40rpx;
+	font-size: 26rpx;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  padding: 0 32rpx;
+}
+
+/* 取消订单按钮样式 */
 .cancel-btn {
-  background-color: #f5f5f5;
-  border: 1rpx solid #d9d9d9;
+	background-color: #E9E9E9;
+	color: #AAAAAA;
 }
 
-.cancel-btn .btn-text {
-  color: #666666;
+/* 修改订单按钮样式 */
+.modify-btn {
+	background-color: #fff;
+  border: 2rpx solid #EBA932;
+	color: #EBA932;
 }
 
-.edit-btn {
-  background-color: #ffa940;
-}
-
-.edit-btn .btn-text {
-  color: #ffffff;
-}
-
+/* 立即签署按钮样式 */
 .sign-btn {
-  background-color: #1890ff;
-}
-
-.sign-btn .btn-text {
-  color: #ffffff;
-}
-
-.btn-text {
-  font-size: 28rpx;
-  font-weight: 500;
+	background: linear-gradient(to right, #FFA600, #FFCD01);
+	color: #fff;
 }
 </style>
