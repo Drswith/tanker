@@ -38,7 +38,7 @@ export default {
         ...item,
         name: OrderStatusText[item.status], // 必须有name不然tab渲染不出来
       }))),
-      currentTab: tabList.findIndex(item => OrderStatusText[item.status] === '运输中'),
+      currentTab: tabList.findIndex(item => OrderStatusText[item.status] === '待支付'),
 
       // 分页参数
       page: 1,

@@ -1,16 +1,16 @@
 {
   "pages": [
     {
-      "path": "pages/order-center/list/index",
+      "path": "pages/home/index/index",
       "style": {
-        "navigationBarTitleText": "订单中心",
+        "navigationBarTitleText": "首页",
         "navigationStyle": "default"
       }
     },
     {
-      "path": "pages/home/index/index",
+      "path": "pages/order-center/list/index",
       "style": {
-        "navigationBarTitleText": "首页",
+        "navigationBarTitleText": "订单中心",
         "navigationStyle": "default"
       }
     },
