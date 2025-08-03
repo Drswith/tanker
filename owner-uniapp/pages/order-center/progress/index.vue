@@ -56,7 +56,7 @@ export default {
           longitude: myLocation.longitude,
           width: 40,
           height: 40,
-          iconPath: '/static/images/icon/map-current.png',
+          iconPath: '/static/images/icon/map-current-2.svg',
         },
         {
           id: 1,
@@ -158,7 +158,7 @@ export default {
         to: dest,
         config: {
           color: '#FF9E00',
-          width: 8,
+          width: 6,
           dottedLine: false,
         },
       })
