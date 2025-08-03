@@ -67,15 +67,16 @@ http.interceptors.response.use(
     if (data && typeof data === 'object') {
       // 处理401未授权
       if (data.code === 401) {
-        uni.showToast({
-          title: data.errMsg || '请先登录!',
-          icon: 'none',
-        })
-
         // 清除本地token
         clearToken()
         clearTokenInfos()
         clearUserInfo()
+
+        // #ifdef H5
+        uni.showToast({
+          title: data.errMsg || '请先登录!',
+          icon: 'none',
+        })
 
         // 延迟跳转到登录页
         setTimeout(() => {
@@ -83,6 +84,25 @@ http.interceptors.response.use(
             url: '/pages/login/index/index',
           })
         }, 800)
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        uni.showModal({
+          title: '提示',
+          content: data.errMsg || '请先登录!',
+          success(res) {
+            if (res.confirm) {
+              console.log('用户点击确定')
+              uni.navigateTo({
+                url: '/pages/login/index/index',
+              })
+            }
+            else if (res.cancel) {
+              console.log('用户点击取消')
+            }
+          },
+        })
+        // #endif
 
         return Promise.reject(new Error(data.errMsg || '未授权'))
       }
