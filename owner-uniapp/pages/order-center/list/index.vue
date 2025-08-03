@@ -253,48 +253,63 @@ export default {
         url: `/pages/order-center/pay/index?orderId=${order.id}`,
       })
     },
+
     // 取消订单
-    async handleCancelOrder(order) {
-      // 如果订单状态为0（已创建待支付），直接调用API取消
-      if (order.status === OrderStatus.Created) {
-        const res = await orderApi.cancelOrder({
-          orderNo: order.orderNo,
-        })
-        console.log('res', res)
-        uni.showToast({
-          title: '取消订单成功',
-          icon: 'success',
-        })
-        this.dataList = await this.getOrder()
-        this.orderDataList = this.dataList
-      }
-      else {
-        // 其他状态跳转到退款页面
-        uni.navigateTo({
-          url: `/pages/order-center/cancel/index?orderId=${order.id}`,
-        })
-      }
+    handleCancelOrder(order) {
+      uni.showModal({
+        title: '提示',
+        content: '确认取消订单吗？',
+        success: async (res) => {
+          if (res.confirm) {
+            // 如果订单状态为0（已创建待支付），直接调用API取消
+            if (order.status === OrderStatus.Created) {
+              const res = await orderApi.cancelOrder({
+                orderNo: order.orderNo,
+              })
+              console.log('res', res)
+              uni.showToast({
+                title: '取消订单成功',
+                icon: 'success',
+              })
+              this.dataList = await this.getOrder()
+              this.orderDataList = this.dataList
+            }
+            else {
+              // 其他状态跳转到退款页面
+              uni.navigateTo({
+                url: `/pages/order-center/cancel/index?orderId=${order.id}`,
+              })
+            }
+          }
+        },
+      })
     },
-
     // 删除订单
-    async handleDeleteOrder(order) {
-      try {
-        await orderApi.deleteOrder(order.id)
-        uni.showToast({
-          title: '删除订单成功',
-          icon: 'success',
-        })
-        this.dataList = await this.getOrder()
-        this.orderDataList = this.dataList
-      }
-      catch (error) {
-        uni.showToast({
-          title: '删除订单失败',
-          icon: 'error',
-        })
-      }
+    handleDeleteOrder(order) {
+      uni.showModal({
+        title: '提示',
+        content: '确认删除订单吗？',
+        success: async (res) => {
+          if (res.confirm) {
+            try {
+              await orderApi.deleteOrder(order.id)
+              uni.showToast({
+                title: '删除订单成功',
+                icon: 'success',
+              })
+              this.dataList = await this.getOrder()
+              this.orderDataList = this.dataList
+            }
+            catch (error) {
+              uni.showToast({
+                title: '删除订单失败',
+                icon: 'error',
+              })
+            }
+          }
+        },
+      })
     },
-
     getOperationButtonClass(index, totalLength) {
       // 计算倒数位置：0表示最后一个，1表示倒数第二个，2表示倒数第三个
       const reverseIndex = totalLength - 1 - index

@@ -1,22 +1,57 @@
 <script>
-import { orderApi, OrderStatusText } from '@/api/order'
+import { getPolyline } from '@/api/address'
+import { orderApi, OrderStatus, OrderStatusText } from '@/api/order'
 import { PayType } from '@/api/pay'
+
+const start = {
+  latitude: 34.259428,
+  longitude: 108.947040,
+  problem: false,
+}
+
+const myLocation = {
+  latitude: 34.243537,
+  longitude: 108.946816,
+  problem: true,
+}
+
+const dest = {
+  latitude: 34.276785,
+  longitude: 108.945855,
+  problem: false,
+}
 
 const payMap = {
   [PayType.WECHAT]: { label: '微信支付', icon: '/static/images/icon/wxpay.svg' },
   [PayType.ALIPAY]: { label: '支付宝', icon: '/static/images/icon/alipay.svg' },
   [PayType.BANK]: { label: '银行卡', icon: '/static/images/icon/unionpay.svg' },
 }
+// 底部操作栏数据 - 使用OrderStatus枚举替代硬编码数字
+const operations = [
+  { status: OrderStatus.Created, left: ['取消订单'], right: ['立即支付'] }, // 0 - 已创建待支付
+  { status: OrderStatus.Paid, left: ['取消订单'], right: ['修改订单'] }, // 1 - 已支付待接单
+  { status: OrderStatus.Signed, left: [], right: [] }, // 3 - 已签署司机前往发车地待验车
+  { status: OrderStatus.Accepted, left: ['取消订单'], right: ['修改订单', '立即签署'] }, // 2 - 已接单待签署（业主和平台）
+  { status: OrderStatus.Verified, left: [], right: [] }, // 4 - 验车通过待施封
+  { status: OrderStatus.Unverified, left: [], right: [] }, // 5 - 验车不通过
+  { status: OrderStatus.Sealed, left: [], right: [] }, // 6 - 完成施封待安装GPS
+  { status: OrderStatus.GpsInstalled, left: [], right: [] }, // 7 - 完成GPS安装待司机签署
+  { status: OrderStatus.DriverSigned, left: ['订单进度'], right: ['验收授权', '确认收货'] }, // 8 - 司机已签署（运输中）
+  { status: OrderStatus.DeliveryConfirmed, left: ['订单进度'], right: [] }, // 9 - 司机确认送达待核验
+  { status: OrderStatus.OwnerVerified, left: ['订单进度'], right: ['立即评价'] }, // 10 - 业主核验确认收货后待评价
+  { status: OrderStatus.OwnerRejected, left: ['订单进度'], right: [] }, // 11 - 业主核验不通过
+  { status: OrderStatus.Evaluated, left: ['订单进度'], right: [] }, // 12 - 已评价（用于前端查询）
+  { status: OrderStatus.WaitingGpsReturn, left: ['订单进度'], right: ['寄回GPS'] }, // 13 - 确认收货后待邮寄GPS
+  { status: OrderStatus.GpsShipped, left: ['订单进度'], right: [] }, // 14 - 已邮寄
+  { status: OrderStatus.GpsReceived, left: ['订单进度'], right: [] }, // 15 - 后台确认收到GPS订单结束
+  { status: OrderStatus.RefundSubmitted, left: [], right: [] }, // 16 - 已提交资料待退款
+  { status: OrderStatus.RefundCompleted, left: [], right: ['删除订单'] }, // 17 - 已退款已取消
+]
 
 export default {
-  components: {
-
-  },
-  props: {
-
-  },
   data() {
     return {
+      operations: Object.freeze(operations),
       // 路由参数
       routeParams: {
         orderId: null,
@@ -63,6 +98,37 @@ export default {
         gpsImg: [],
       },
 
+      longitude: myLocation.longitude,
+      latitude: myLocation.latitude,
+      covers: [
+        {
+          id: 0,
+          latitude: start.latitude,
+          longitude: start.longitude,
+        // width: 40,
+        // height: 40,
+        // iconPath: '/static/images/icon/wxpay.svg',
+        },
+        {
+          id: 999,
+          latitude: myLocation.latitude,
+          longitude: myLocation.longitude,
+          width: 40,
+          height: 40,
+          iconPath: '/static/images/icon/positioning.png',
+        },
+        {
+          id: 1,
+          latitude: dest.latitude,
+          longitude: dest.longitude,
+          width: 40,
+          height: 40,
+          // iconPath: 'http://ottms.innoforce.cc/files/cf5853bf-faf5-409c-8e41-5e30129eb170.svg',
+          iconPath: '/static/images/icon/dest.svg',
+        },
+      ],
+      polyline: [],
+
       // 页面状态
       pageState: {
         isLoading: false,
@@ -74,8 +140,20 @@ export default {
     statusText() {
       return OrderStatusText[this.orderData?.status] || '未知状态'
     },
-  },
-  watch: {
+
+    // 底部左侧操作按钮
+    bottomLeftOperations() {
+      const currentStatus = this.orderData?.status
+      const operation = this.operations.find(op => op.status === currentStatus)
+      return operation?.left || []
+    },
+
+    // 底部右侧操作按钮
+    bottomRightOperations() {
+      const currentStatus = this.orderData?.status
+      const operation = this.operations.find(op => op.status === currentStatus)
+      return operation?.right || []
+    },
 
   },
   onLoad(options) {
@@ -83,14 +161,10 @@ export default {
     if (this.routeParams.orderId) {
       // 加载订单详情
       this.loadOrderDetail()
+      this.initMarkLine()
     }
   },
-  created() {
 
-  },
-  mounted() {
-
-  },
   methods: {
     // 加载订单详情
     async loadOrderDetail() {
@@ -121,7 +195,20 @@ export default {
         this.pageState.isLoading = false
       }
     },
+    async initMarkLine() {
+      const polyline = await getPolyline({
+        from: start,
+        to: dest,
+        config: {
+          color: '#025ADD',
+          width: 8,
+          dottedLine: false,
+        },
+      })
 
+      this.polyline = polyline
+      console.log('this.polyline', this.polyline)
+    },
     // 拨打电话
     makePhoneCall(phoneNumber) {
       uni.makePhoneCall({
@@ -165,6 +252,218 @@ export default {
       })
     },
 
+    mapTap(event) {
+      console.log(event)
+    },
+
+    apiErrorToast(params) {
+      console.log('params', params)
+      uni.showToast({
+        title: '缺少API接口',
+        icon: 'none',
+      })
+    },
+
+    handleOperationButtonClick(order, btnName) {
+      switch (btnName) {
+        case '取消订单':
+          this.handleCancelOrder(order)
+          break
+        case '修改订单':
+          this.handleEditOrder(order)
+          break
+        case '立即签署':
+          this.handleSignOrder(order)
+          break
+        case '订单进度':
+          this.handleOrderProgress(order)
+          break
+        case '验收授权':
+          this.handleCheckOrder(order)
+          break
+        case '确认收货':
+          this.handleConfirmOrder(order)
+          break
+        case '寄回GPS':
+          this.handleReturnGps(order)
+          break
+        case '立即评价':
+          this.handleEvaluateOrder(order)
+          break
+        case '删除订单':
+          this.handleDeleteOrder(order)
+          break
+        case '再来一单':
+          this.apiErrorToast(order)
+          break
+        case '立即支付':
+          this.handlePayOrder(order)
+          break
+        default:
+          this.apiErrorToast(order)
+          break
+      }
+    },
+    // 修改订单
+    handleEditOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/add/index?orderId=${order.id}`,
+      })
+    },
+    // 签署订单
+    async handleSignOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/sign/index?orderId=${order.id}`,
+      })
+    },
+    // 订单进度
+    handleOrderProgress(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/progress/index?orderId=${order.id}`,
+      })
+    },
+    // 订单详情
+    handleOrderDetail(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/detail/index?orderId=${order.id}`,
+      })
+    },
+    // 复制验收链接到剪贴板
+    copyCheckLink() {
+      uni.setClipboardData({
+        data: this.checkOrderLink,
+        success: () => {
+          uni.showToast({
+            title: '链接复制成功',
+            icon: 'success',
+          })
+          this.showCheckOrderModal = false
+          this.checkOrderLink = ''
+        },
+      })
+    },
+    // 验收授权
+    async handleCheckOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/check/index?orderId=${order.id}`,
+      })
+      // uni.showLoading({
+      //   title: '获取链接中',
+      // })
+      // this.checkOrderLinkLoading = true
+      // const res = await orderApi.getOrderCheckLink({
+      //   orderNo: order.orderNo,
+      // })
+      // this.checkOrderLinkLoading = false
+      // uni.hideLoading()
+      // if (res) {
+      //   this.checkOrderLink = res
+      // }
+      // else {
+      //   uni.showToast({
+      //     title: '获取链接失败',
+      //     icon: 'none',
+      //   })
+      // }
+      // this.showCheckOrderModal = true
+      // this.shareOrder = order
+    },
+    // 确认收货
+    handleConfirmOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/confirm/index?orderId=${order.id}`,
+      })
+    },
+    // 照片信息
+    handleOrderPhoto(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/photo/index?orderId=${order.id}`,
+      })
+    },
+    // 评价订单
+    handleEvaluateOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/evaluate/index?orderId=${order.id}`,
+      })
+    },
+    // 寄回GPS
+    handleReturnGps(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/gps-return/index?orderId=${order.id}`,
+      })
+    },
+    // 立即支付
+    handlePayOrder(order) {
+      console.log('order', order)
+      uni.navigateTo({
+        url: `/pages/order-center/pay/index?orderId=${order.id}`,
+      })
+    },
+    // 取消订单
+    handleCancelOrder(order) {
+      uni.showModal({
+        title: '提示',
+        content: '确认取消订单吗？',
+        success: async (res) => {
+          if (res.confirm) {
+            // 如果订单状态为0（已创建待支付），直接调用API取消
+            if (order.status === OrderStatus.Created) {
+              const res = await orderApi.cancelOrder({
+                orderNo: order.orderNo,
+              })
+              console.log('res', res)
+              uni.showToast({
+                title: '取消订单成功',
+                icon: 'success',
+              })
+              this.dataList = await this.getOrder()
+              this.orderDataList = this.dataList
+            }
+            else {
+              // 其他状态跳转到退款页面
+              uni.navigateTo({
+                url: `/pages/order-center/cancel/index?orderId=${order.id}`,
+              })
+            }
+          }
+        },
+      })
+    },
+    // 删除订单
+    handleDeleteOrder(order) {
+      uni.showModal({
+        title: '提示',
+        content: '确认删除订单吗？',
+        success: async (res) => {
+          if (res.confirm) {
+            try {
+              await orderApi.deleteOrder(order.id)
+              uni.showToast({
+                title: '删除订单成功',
+                icon: 'success',
+              })
+              this.dataList = await this.getOrder()
+              this.orderDataList = this.dataList
+            }
+            catch (error) {
+              uni.showToast({
+                title: '删除订单失败',
+                icon: 'error',
+              })
+            }
+          }
+        },
+      })
+    },
     // 返回上一页
     navigateBack() {
       uni.navigateBack()
@@ -184,26 +483,19 @@ export default {
     <view v-else>
       <!-- 地图区域 -->
       <view class="map-container">
-        <image
-          src="/static/images/fallback-image.png"
-          class="map-image"
-          mode="aspectFill"
+        <map
+          id="map1"
+          ref="map1"
+          :scale="16"
+          class="map-view"
+          :show-location="true"
+          :latitude="latitude"
+          :longitude="longitude"
+          :markers="covers"
+          :polyline="polyline"
+          :show-compass="true"
+          @tap="mapTap"
         />
-        <!-- 起点和终点标记 -->
-        <view class="map-markers">
-          <view class="marker start-marker">
-            <view class="marker-icon start-icon" />
-            <text class="marker-text">
-              起点地
-            </text>
-          </view>
-          <view class="marker end-marker">
-            <view class="marker-icon end-icon" />
-            <text class="marker-text">
-              发货地址
-            </text>
-          </view>
-        </view>
       </view>
 
       <!-- 内容区域 -->
@@ -452,16 +744,24 @@ export default {
       <!-- 固定底部按钮 -->
       <view class="fixed-bottom-actions">
         <view class="bottom-btn-left space-x-10">
-          <button class="mr-20 bottom-btn cancel-btn">
-            取消订单
+          <button
+            v-for="(leftBtn, leftIndex) in bottomLeftOperations"
+            :key="leftIndex"
+            class="mr-20 bottom-btn cancel-btn"
+            @click.stop="handleOperationButtonClick(orderData, leftBtn)"
+          >
+            {{ leftBtn }}
           </button>
         </view>
         <view class="bottom-btn-right space-x-10">
-          <button class="ml-20 bottom-btn modify-btn">
-            修改订单
-          </button>
-          <button class="ml-20 bottom-btn sign-btn">
-            立即签署
+          <button
+            v-for="(rightBtn, rightIndex) in bottomRightOperations"
+            :key="rightIndex"
+            class="ml-20 bottom-btn"
+            :class="[rightIndex === bottomRightOperations.length - 1 ? 'sign-btn' : 'modify-btn']"
+            @click.stop="handleOperationButtonClick(orderData, rightBtn)"
+          >
+            {{ rightBtn }}
           </button>
         </view>
       </view>
@@ -489,6 +789,12 @@ export default {
   height: 400rpx;
   width: 100%;
   overflow: hidden;
+}
+
+.map-view {
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 .map-image {
