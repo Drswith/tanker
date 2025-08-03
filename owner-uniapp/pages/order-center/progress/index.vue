@@ -27,7 +27,7 @@ export default {
   },
   data() {
     return {
-      proportionvc: 0.3, // 抽屉初始显示的位置，内容的百分比
+      proportionvc: 0.5, // 抽屉初始显示的位置，内容的百分比
       handleHeight: 20, // 抽屉顶部边框高度，可以设置0，隐藏
       mExpand: false,
       dragLength: 100,
@@ -157,7 +157,7 @@ export default {
         from: start,
         to: dest,
         config: {
-          color: '#025ADD',
+          color: '#FF9E00',
           width: 8,
           dottedLine: false,
         },
@@ -347,6 +347,18 @@ page {
 </style>
 
 <style lang="scss" scoped>
+::v-deep .drag-handle{
+  background-color: #fff;
+}
+
+::v-deep .drawer-content{
+  background-color: #fff;
+  border-radius: 60rpx 60rpx 0 0;
+}
+::v-deep .drag-content{
+ background-color: #fff;
+  border-radius: 60rpx 60rpx 0 0;
+}
 .loading-container {
 		display: flex;
 		justify-content: center;

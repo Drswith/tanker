@@ -199,7 +199,7 @@ export default {
         from: start,
         to: dest,
         config: {
-          color: '#025ADD',
+          color: '#FF9E00',
           width: 8,
           dottedLine: false,
         },
