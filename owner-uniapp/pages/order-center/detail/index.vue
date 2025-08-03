@@ -227,7 +227,7 @@ export default {
   <view class="flex-col page-container">
     <!-- 加载状态 -->
     <view v-if="pageState.isLoading" class="loading-container">
-      <uni-load-more status="loading" />
+      <u-loadmore status="loading" />
     </view>
 
     <!-- 主要内容 -->

@@ -635,7 +635,7 @@ export default {
               title="提醒"
               :description="distanceWarningText"
               type="error"
-              font-size="24"
+              font-size="12"
             />
           </view>
         </view>

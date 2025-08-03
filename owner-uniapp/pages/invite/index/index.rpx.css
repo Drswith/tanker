@@ -106,14 +106,6 @@
   line-height: 34rpx;
 }
 
-/* 取消按钮 */
-/* .cancel-button-wrapper {
-  background: url(https://lanhu-oss-2537-2.lanhuapp.com/SketchPnge970a70f1c9c6ab0cfe327d25a84d3a0aebc95e8bd94dcb8feb1b7af52cf8a02) 100% no-repeat;
-  background-size: 100% 100%;
-  margin: 0 2rpx 0 0;
-  padding: 26rpx 280rpx 26rpx 278rpx;
-} */
-
 
 /* 通用flex样式 */
 .flex-col {

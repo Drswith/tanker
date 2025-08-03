@@ -6,7 +6,7 @@
 }
 
 .header-section {
-  background: url("@/static/images/mine-header-bg.png")
+  background: url("http://ottms.innoforce.cc/files/f9ce732d-0d0d-4d56-ac05-945d7981ffcc.png")
     100% no-repeat;
   background-size: 100% 100%;
   position: relative;
@@ -114,7 +114,7 @@
 }
 
 .invite-section {
-  background-image: url("/static/images/mine-invite.png");
+  background-image: url("http://ottms.innoforce.cc/files/5243c32f-5f76-44ce-857c-ee1516e9eb91.png");
   background-size: 100% 100%;
   border-radius: 48px;
   position: relative;
