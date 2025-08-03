@@ -145,11 +145,11 @@ export default {
     if (this.routeParams.orderId) {
       // 加载订单详情
       this.loadOrderDetail()
+      this.initMarkLine()
     }
   },
   onReady() {
     this.$refs.drag.initTop()
-    this.initMarkLine()
   },
 
   methods: {
