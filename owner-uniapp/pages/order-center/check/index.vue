@@ -180,13 +180,10 @@ export default {
         <view class="card-content">
           <view class="info-row">
             <text class="info-label">
-              委托：
+              {{ orderData.memberName }}
             </text>
             <text class="info-value">
-              {{ orderData.takeName || orderData.memberName }}
-            </text>
-            <text class="phone-number">
-              {{ orderData.takeMobile || orderData.memberMobile }}
+              {{ orderData.memberMobile }}
             </text>
           </view>
           <view class="info-row">
