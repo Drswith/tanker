@@ -343,7 +343,7 @@ export default {
             <text class="detail-value">
               {{ orderData.signDate }}
             </text>
-            <text class="link-text" @click="handleViewImages('signImgPath')">
+            <text class="link-text" @click="handleViewImages('yzFileImg')">
               合同详情
             </text>
           </view>
