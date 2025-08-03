@@ -29,19 +29,22 @@ export default {
   },
   computed: {
     statusText() {
-      return OrderStatusText[this.orderData.status] || '未知状态'
+      return OrderStatusText[this.orderData?.status] || '未知状态'
     },
     // 验车照片
     vehicleInspectionImg() {
-      return this.orderData?.vehicleInspectionImg || []
+      const { vehicleInspectionImg = [] } = this.orderData || {}
+      return vehicleInspectionImg
     },
     // 铅封照片
     leadSealImg() {
-      return this.orderData?.leadSealImg || []
+      const { leadSealImg = [] } = this.orderData || {}
+      return leadSealImg
     },
     // GPS安装照片
     gpsImg() {
-      return this.orderData?.gpsImg || []
+      const { gpsImg = [] } = this.orderData || {}
+      return gpsImg
     },
   },
   watch: {},
@@ -89,10 +92,10 @@ export default {
       })
     },
     // 预览照片
-    previewImage(current) {
+    previewImage(current, urls) {
       uni.previewImage({
         current,
-        urls: this.deliveryPhotos,
+        urls,
       })
     },
 
@@ -291,7 +294,7 @@ export default {
             v-for="(photo, index) in vehicleInspectionImg"
             :key="index"
             class="photo-item"
-            @click="previewImage(photo)"
+            @click="previewImage(photo, vehicleInspectionImg)"
           >
             <image :src="photo" class="photo-image" mode="aspectFill" />
           </view>
@@ -312,7 +315,7 @@ export default {
             v-for="(photo, index) in leadSealImg"
             :key="index"
             class="photo-item"
-            @click="previewImage(photo)"
+            @click="previewImage(photo, leadSealImg)"
           >
             <image :src="photo" class="photo-image" mode="aspectFill" />
           </view>
@@ -333,7 +336,7 @@ export default {
             v-for="(photo, index) in gpsImg"
             :key="index"
             class="photo-item"
-            @click="previewImage(photo)"
+            @click="previewImage(photo, gpsImg)"
           >
             <image :src="photo" class="photo-image" mode="aspectFill" />
           </view>
