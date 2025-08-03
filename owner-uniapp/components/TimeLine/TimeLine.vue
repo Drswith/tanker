@@ -48,25 +48,27 @@ export default {
           />
         </view>
         <view class="info">
-          <text
-            class="status" :class="{
-              'text-completed': getNodeStatus(index) === 'completed',
-              'text-current': getNodeStatus(index) === 'current',
-              'text-pending': getNodeStatus(index) === 'pending',
-            }"
-          >
-            {{ item.status }}
-          </text>
-          <text
-            class="time" :class="{
-              'text-completed': getNodeStatus(index) === 'completed',
-              'text-current': getNodeStatus(index) === 'current',
-              'text-pending': getNodeStatus(index) === 'pending',
-            }"
-          >
-            {{ item.time || '-' }}
-          </text>
-          <text
+          <view class="info-content">
+            <view
+              class="status" :class="{
+                'text-completed': getNodeStatus(index) === 'completed',
+                'text-current': getNodeStatus(index) === 'current',
+                'text-pending': getNodeStatus(index) === 'pending',
+              }"
+            >
+              {{ item.status }}
+            </view>
+            <view
+              class="time" :class="{
+                'text-completed': getNodeStatus(index) === 'completed',
+                'text-current': getNodeStatus(index) === 'current',
+                'text-pending': getNodeStatus(index) === 'pending',
+              }"
+            >
+              {{ item.time || '-' }}
+            </view>
+          </view>
+          <view
             class="description" :class="{
               'text-completed': getNodeStatus(index) === 'completed',
               'text-current': getNodeStatus(index) === 'current',
@@ -74,7 +76,7 @@ export default {
             }"
           >
             {{ item.description }}
-          </text>
+          </view>
         </view>
       </view>
     </view>
@@ -101,7 +103,7 @@ export default {
 		// 已完成和当前节点的连接线高亮
 		.item-completed:not(:last-child)::after,
 		.item-current:not(:last-child)::after {
-			background-color: #6c7fff;
+			background-color: #FF9E00;
 		}
 		// 未完成节点的连接线置灰
 		.item-pending:not(:last-child)::after {
@@ -111,12 +113,19 @@ export default {
 		.info {
 			margin-left: 20rpx;
 			flex: 1;
+			.info-content {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 32rpx;
+				position: relative;
+			}
 			.status {
+				line-height: 40rpx;
 				display: block;
 				font-size: 28rpx;
 				color: #333;
 				font-weight: 700;
-				margin-bottom: 4rpx;
 				// 未完成状态文本置灰
 				&.text-pending {
 					color: #ccc;
@@ -124,9 +133,10 @@ export default {
 			}
 
 			.time {
-				font-size: 24rpx;
-				color: #999;
-				margin-bottom: 8rpx;
+				line-height: 40rpx;
+				font-weight: 400;
+				font-size: 28rpx;
+				color: #666666;
 				// 未完成状态文本置灰
 				&.text-pending {
 					color: #ddd;
@@ -134,10 +144,19 @@ export default {
 			}
 
 			.description {
-				display: block;
+				width: 560rpx;
 				font-size: 26rpx;
-				color: #666;
+				color: #999999;
 				line-height: 1.4;
+				// 超长换行
+				word-break: break-word;
+				// 超出部分省略号
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: -webkit-box;
+				-webkit-line-clamp: 10;
+				-webkit-box-orient: vertical;
+
 				// 未完成状态文本置灰
 				&.text-pending {
 					color: #ccc;
@@ -166,14 +185,14 @@ export default {
 			&.completed {
 				width: 16rpx;
 				height: 16rpx;
-				background-color: #6c7fff;
+				background-color: #FF9E00;
 			}
 			// 当前状态
 			&.current {
 				width: 20rpx;
 				height: 20rpx;
-				background-color: #6c7fff;
-				box-shadow: 0 0 0 6rpx rgba(111, 129, 255, 0.2);
+				background-color: #FF9E00;
+				box-shadow: 0 0 0 6rpx rgba(255, 190, 111, 0.2);
 			}
 			// 未完成状态
 			&.pending {
