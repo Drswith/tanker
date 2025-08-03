@@ -1,5 +1,5 @@
 <script>
-import { authLocation, getCurrentLocationAddress } from '@/api/address'
+import { authLocation, calculateDistance, getCurrentLocationAddress } from '@/api/address'
 import { orderApi, OrderStatus } from '@/api/order'
 
 const VerifyStatusMap = Object.freeze({
@@ -33,6 +33,10 @@ export default {
 
       // 收货地址(用户的位置)
       fullDeliveryAddress: '',
+      latitude: 0,
+      longitude: 0,
+      distance: 0,
+      distanceThreshold: 1000, // 距离阈值
 
       // 订单数据
       orderData: null,
@@ -103,6 +107,31 @@ export default {
       return this.orderData.current
     },
 
+    // 距离
+    distanceText() {
+      if (!this.distance) {
+        return '未知'
+      }
+      // 如果不是数字
+      if (Number.isNaN(this.distance)) {
+        return '未知'
+      }
+      if (this.distance <= 0) {
+        return '未知'
+      }
+      return `${this.distance.toFixed(2)} m`
+    },
+    // 距离警告提示
+    distanceWarningText() {
+      if (this.distanceText === '未知') {
+        return `当前您的卸货位置距离油罐车位置 未知，请谨慎卸货！`
+      }
+      if (this.distance > this.distanceThreshold) {
+        return `当前您的卸货位置距离油罐车位置 > ${this.distanceThreshold} 米，请谨慎卸货！`
+      }
+      return ''
+    },
+
     // 检查所有铅封码的所有核验项目是否都成功
     allChecked() {
       return this.gpsDevices.every(device =>
@@ -120,7 +149,7 @@ export default {
         if (!newVal) {
           // #ifdef MP-WEIXIN
           // 尝试停止发现nfc设备
-          this.nfcAdapter.stopDiscovery({
+          this.nfcAdapter?.stopDiscovery({
             success: (res) => {
               console.log('停止发现nfc设备成功:', res)
             },
@@ -143,7 +172,10 @@ export default {
       // 加载订单详情
       await this.loadOrderDetail()
       // 获取当前位置
-      this.updateLocation()
+      await this.updateLocation()
+      // 获取距离阈值
+      this.distanceThreshold = await this.getDistanceThreshold()
+      this.calculateDistance()
     }
 
     // #ifdef MP-WEIXIN
@@ -228,6 +260,28 @@ export default {
       console.log('当前详细位置:', fullAddress)
       const { result } = fullAddress
       this.fullDeliveryAddress = result?.address || ''
+      this.latitude = result?.location?.lat || 0
+      this.longitude = result?.location?.lng || 0
+    },
+
+    // 计算距离
+    calculateDistance() {
+      const { latitude, longitude } = this.orderData.current// 货车位置
+      const { latitude: lat, longitude: lng } = this// 人的位置
+      console.log('货车位置:', latitude, longitude)
+      console.log('人位置:', lat, lng)
+      const distance = calculateDistance(Number(lat), Number(lng), Number(latitude), Number(longitude))
+      this.distance = distance
+    },
+
+    // 获取距离阈值
+    async getDistanceThreshold() {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          // 模拟获取距离阈值
+          resolve(1000)
+        }, 500)
+      })
     },
 
     // 获取核验状态文本
@@ -545,7 +599,11 @@ export default {
         <view class="section-header">
           <view class="header-title">
             位置信息
+            <text style="font-size: 24rpx;margin-left: 20rpx;font-weight: normal;">
+              距您 {{ distanceText }}
+            </text>
           </view>
+
           <view class="location-update" @click="updateLocation">
             <u-icon name="reload" size="16" color="#1890ff" />
             <text class="update-text">
@@ -570,6 +628,15 @@ export default {
             <view class="location-value">
               {{ pickupAddress }}
             </view>
+          </view>
+
+          <view v-if="distanceText === '未知' || distance > distanceThreshold" class="location-item">
+            <u-alert
+              title="提醒"
+              :description="distanceWarningText"
+              type="error"
+              font-size="24"
+            />
           </view>
         </view>
       </view>
