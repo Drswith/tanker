@@ -2,6 +2,7 @@
 import { getPolyline } from '@/api/address'
 import { orderApi, OrderStatus, OrderStatusText } from '@/api/order'
 import { PayType } from '@/api/pay'
+import StatusTag from './components/StatusTag.vue'
 
 const start = {
   latitude: 34.259428,
@@ -49,6 +50,9 @@ const operations = [
 ]
 
 export default {
+  components: {
+    StatusTag,
+  },
   data() {
     return {
       operations: Object.freeze(operations),
@@ -132,6 +136,9 @@ export default {
       pageState: {
         isLoading: false,
       },
+
+      // 滚动位置
+      scrollTop: 0,
     }
   },
   computed: {
@@ -479,7 +486,7 @@ export default {
     </view>
 
     <!-- 主要内容 -->
-    <view v-else>
+    <view v-else class="main-container">
       <!-- 地图区域 -->
       <view class="map-container">
         <map
@@ -500,12 +507,14 @@ export default {
       <!-- 内容区域 -->
       <view class="content-container flex-col">
         <!-- 订单状态信息卡片 -->
-        <view class="info-card pending-card">
+        <view class="info-card">
           <view class="card-header">
-            <text class="card-title">
-              {{ statusText }}
-            </text>
+            <StatusTag
+              :status="orderData.status"
+              :text="statusText"
+            />
           </view>
+
           <view class="card-content">
             <view class="info-row">
               <text class="info-label">
@@ -515,229 +524,252 @@ export default {
                 {{ orderData.memberMobile }}
               </text>
             </view>
+
             <view class="info-row">
-              <text class="info-label">
-                送货地址：
-              </text>
               <text class="info-value">
-                {{ orderData.address }}
+                <text style="color: #FF9E00;">
+                  【默认】
+                </text>{{ orderData.address }}
               </text>
             </view>
-            <view class="info-row">
-              <text class="info-label">
-                发货地址：
-              </text>
-              <text class="info-value">
-                {{ orderData.current }}
-              </text>
-            </view>
+            <image
+              class="arrow-icon"
+              referrerpolicy="no-referrer"
+              src="/static/images/mine-arrow.png"
+            />
           </view>
         </view>
 
         <!-- 订单详情 -->
-        <view class="detail-section">
-          <view class="detail-row">
-            <text class="detail-label">
-              订单编号：
-            </text>
-            <text class="detail-value">
-              {{ orderData.orderNo }}
-            </text>
-          </view>
-
-          <view class="detail-row">
-            <text class="detail-label">
-              购买数量：
-            </text>
-            <text class="detail-value">
-              {{ orderData.buyCount }}吨
-            </text>
-          </view>
-
-          <view v-if="orderData.driverName" class="detail-row">
-            <text class="detail-label">
-              司机：
-            </text>
-            <text class="detail-value">
-              {{ orderData.driverName }}
-            </text>
-            <view class="phone-icon" @click="makePhoneCall(orderData.driverMobile)">
-              <image src="/static/images/icon/phone.png" class="icon-image" />
+        <scroll-view
+          :scroll-top="scrollTop"
+          scroll-y="true"
+          class="detail-section"
+        >
+          <view class="detail-section-view">
+            <view class="detail-row">
+              <text class="detail-label">
+                订单编号
+              </text>
+              <text class="detail-value">
+                {{ orderData.orderNo }}
+              </text>
             </view>
-          </view>
 
-          <view v-if="orderData.carNumber" class="detail-row">
-            <text class="detail-label">
-              车辆信息：
-            </text>
-            <text class="detail-value">
-              {{ orderData.type }}，{{ orderData.carNumber }}
-            </text>
-          </view>
-
-          <view v-if="orderData.deliveryName" class="detail-row">
-            <text class="detail-label">
-              发货员：
-            </text>
-            <text class="detail-value">
-              {{ orderData.deliveryName }}
-            </text>
-            <view v-if="orderData.deliveryMobile" class="phone-icon" @click="makePhoneCall(orderData.deliveryMobile)">
-              <image src="/static/images/icon/phone.png" class="icon-image" />
+            <view class="detail-row">
+              <text class="detail-label">
+                购买数量
+              </text>
+              <text class="detail-value">
+                {{ orderData.buyCount }}
+              </text>
             </view>
-          </view>
 
-          <view v-if="orderData.payType" class="detail-row">
-            <text class="detail-label">
-              支付方式：
-            </text>
-            <text class="detail-value">
-              <image :src="payMap[orderData.payType].icon" style="width: 26rpx; height: 26rpx; margin-right: 8rpx;" />
-              {{ payMap[orderData.payType].label }}
-            </text>
-            <text class="link-text" @click="handleViewImages('payImg')">
-              支付凭证
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                司机
+              </text>
+              <view class="detail-value">
+                <view>
+                  {{ orderData.driverName ? orderData.driverName : '' }}
+                </view>
+                <view v-if="orderData.driverMobile" class="phone-icon" @click="makePhoneCall(orderData.driverMobile)">
+                  <image src="/static/images/icon/phone.png" class="icon-image" />
+                </view>
+              </view>
+            </view>
 
-          <view v-if="orderData.payTime" class="detail-row">
-            <text class="detail-label">
-              支付时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.payTime }}
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                车辆信息
+              </text>
+              <text class="detail-value">
+                {{ orderData.type ? orderData.type : '' }}
+                <text style="margin: 0 16rpx;">
+                  |
+                </text>
+                {{ orderData.carNumber ? orderData.carNumber : '' }}
+              </text>
+            </view>
 
-          <view class="detail-row">
-            <text class="detail-label">
-              下单时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.placeOrderTime }}
-            </text>
-          </view>
+            <view class="detail-row">
+              <view class="detail-label">
+                发货员
+              </view>
+              <view class="detail-value">
+                <view> {{ orderData.deliveryName ? orderData.deliveryName : '' }}</view>
+                <view v-if="orderData.deliveryMobile" class="phone-icon" @click="makePhoneCall(orderData.deliveryMobile)">
+                  <image src="/static/images/icon/phone.png" class="icon-image" />
+                </view>
+              </view>
+            </view>
 
-          <view v-if="orderData.receiveTime" class="detail-row">
-            <text class="detail-label">
-              接单时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.receiveTime }}
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                支付方式
+              </text>
+              <view v-if="orderData.payType" class="detail-value">
+                <image :src="payMap[orderData.payType].icon" style="width: 26rpx; height: 26rpx; margin-right: 8rpx;" />
+                <view>
+                  {{ payMap[orderData.payType].label ? payMap[orderData.payType].label : '' }}
+                </view>
+                <view class="link-text" @click="handleViewImages('payImg')">
+                  支付凭证
+                </view>
+              </view>
+            </view>
 
-          <view v-if="orderData.signDate" class="detail-row">
-            <text class="detail-label">
-              平台服务协议签署时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.signDate }}
-            </text>
-            <text class="link-text" @click="handleViewImages('yzFileImg')">
-              合同详情
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                支付时间
+              </text>
+              <text class="detail-value">
+                {{ orderData.payTime ? orderData.payTime : '' }}
+              </text>
+            </view>
 
-          <view v-if="orderData.driverSignTime" class="detail-row">
-            <text class="detail-label">
-              司机承运协议签署时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.driverSignTime }}
-            </text>
-            <text class="link-text" @click="handleViewImages('sjFileImg')">
-              合同详情
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                下单时间
+              </text>
+              <text class="detail-value">
+                {{ orderData.placeOrderTime ? orderData.placeOrderTime : '' }}
+              </text>
+            </view>
 
-          <view v-if="orderData.vehicleInspectionTime" class="detail-row">
-            <text class="detail-label">
-              验车时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.vehicleInspectionTime }}
-            </text>
-            <text class="link-text" @click="handleViewImages('vehicleInspectionImg')">
-              验车信息
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                接单时间
+              </text>
+              <text class="detail-value">
+                {{ orderData.receiveTime ? orderData.receiveTime : '' }}
+              </text>
+            </view>
 
-          <view v-if="orderData.leadSealTime" class="detail-row">
-            <text class="detail-label">
-              施封时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.leadSealTime }}
-            </text>
-            <text class="link-text" @click="handleViewImages('leadSealImg')">
-              施封信息
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                平台服务协议签署时间
+              </text>
+              <view class="detail-value">
+                <view>
+                  {{ orderData.signDate ? orderData.signDate : '' }}
+                </view>
+                <view v-if="orderData.signDate" class="link-text" @click="handleViewImages('yzFileImg')">
+                  合同详情
+                </view>
+              </view>
+            </view>
 
-          <view v-if="orderData.gpsTime" class="detail-row">
-            <text class="detail-label">
-              GPS安装时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.gpsTime }}
-            </text>
-            <text class="link-text" @click="handleViewImages('gpsImg')">
-              GPS设备信息
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                司机承运协议签署时间
+              </text>
+              <view class="detail-value">
+                <view>
+                  {{ orderData.driverSignTime ? orderData.driverSignTime : '' }}
+                </view>
+                <view v-if="orderData.driverSignTime" class="link-text" @click="handleViewImages('sjFileImg')">
+                  合同详情
+                </view>
+              </view>
+            </view>
 
-          <view v-if="orderData.deliverTime" class="detail-row">
-            <text class="detail-label">
-              货物送达时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.deliverTime }}
-            </text>
-            <text class="link-text" @click="handleViewImages('deliverImg')">
-              送达信息
-            </text>
-          </view>
+            <view class="detail-row">
+              <text class="detail-label">
+                验车时间
+              </text>
 
-          <view v-if="orderData.receiptTime" class="detail-row">
-            <text class="detail-label">
-              确认收货时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.receiptTime }}
-            </text>
+              <view class="detail-value">
+                <view>
+                  {{ orderData.vehicleInspectionTime ? orderData.vehicleInspectionTime : '' }}
+                </view>
+                <view v-if="orderData.vehicleInspectionTime" class="link-text" @click="handleViewImages('vehicleInspectionImg')">
+                  验车信息
+                </view>
+              </view>
+            </view>
+
+            <view class="detail-row">
+              <text class="detail-label">
+                施封时间
+              </text>
+              <view class="detail-value">
+                <view>
+                  {{ orderData.leadSealTime ? orderData.leadSealTime : '' }}
+                </view>
+                <view v-if="orderData.leadSealTime" class="link-text" @click="handleViewImages('leadSealImg')">
+                  施封信息
+                </view>
+              </view>
+            </view>
+
+            <view class="detail-row">
+              <text class="detail-label">
+                GPS安装时间
+              </text>
+              <view class="detail-value">
+                <view>
+                  {{ orderData.gpsTime ? orderData.gpsTime : '' }}
+                </view>
+                <view v-if="orderData.gpsTime" class="link-text" @click="handleViewImages('gpsImg')">
+                  GPS设备信息
+                </view>
+              </view>
+            </view>
+
+            <view class="detail-row">
+              <text class="detail-label">
+                货物送达时间
+              </text>
+              <view class="detail-value">
+                <view>
+                  {{ orderData.deliverTime ? orderData.deliverTime : '' }}
+                </view>
+                <view v-if="orderData.deliverTime" class="link-text" @click="handleViewImages('deliverImg')">
+                  送达信息
+                </view>
+              </view>
+            </view>
+
+            <view class="detail-row">
+              <text class="detail-label">
+                确认收货时间
+              </text>
+              <text class="detail-value">
+                {{ orderData.receiptTime ? orderData.receiptTime : '' }}
+              </text>
             <!-- <text class="link-text" >
               确认收货信息
             </text> -->
-          </view>
+            </view>
 
-          <view v-if="orderData.address" class="detail-row">
-            <text class="detail-label">
-              卸货位置：
-            </text>
-            <text class="detail-value">
-              {{ orderData.address }}
-            </text>
+            <view class="detail-row">
+              <text class="detail-label">
+                卸货位置
+              </text>
+              <text class="detail-value">
+                {{ orderData.address ? orderData.address : '' }}
+              </text>
             <!-- <text class="link-text" >
               卸货信息
             </text> -->
-          </view>
+            </view>
 
-          <view v-if="orderData.gpsReturnTime" class="detail-row">
-            <text class="detail-label">
-              GPS寄回时间：
-            </text>
-            <text class="detail-value">
-              {{ orderData.gpsReturnTime }}
-            </text>
-            <text class="link-text" @click="handleViewGpsInfos">
-              快递信息
-            </text>
+            <view class="detail-row">
+              <text class="detail-label">
+                GPS寄回时间
+              </text>
+              <view class="detail-value">
+                <view>
+                  {{ orderData.gpsReturnTime ? orderData.gpsReturnTime : '' }}
+                </view>
+                <view v-if="orderData.gpsReturnTime" class="link-text" @click="handleViewGpsInfos">
+                  快递信息
+                </view>
+              </view>
+            </view>
           </view>
-        </view>
-
-        <!-- 底部占位空间，避免内容被固定按钮遮挡 -->
-        <view class="bottom-placeholder" />
+        </scroll-view>
       </view>
 
       <!-- 固定底部按钮 -->
@@ -772,8 +804,18 @@ export default {
 @import '@/static/css/form.scss';
 
 .page-container {
-  min-height: 100vh;
+  // #ifdef H5
+  height: calc(100vh - 44px - 50px - constant(safe-area-inset-top) -  constant(safe-area-inset-bottom));
+  height: calc(100vh - 44px - 50px - env(safe-area-inset-top) -  env(safe-area-inset-bottom));
+  // #endif
+  // #ifdef MP-WEIXIN
+  height: 100vh;
+  // #endif
+  width: 100%;
+  overflow: hidden;
   background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
 }
 
 .loading-container {
@@ -783,11 +825,21 @@ export default {
   min-height: 50vh;
 }
 
+.main-container{
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .map-container {
   position: relative;
   height: 400rpx;
   width: 100%;
   overflow: hidden;
+  margin-bottom: -60rpx;
 }
 
 .map-view {
@@ -852,33 +904,61 @@ export default {
 
 .content-container {
   flex: 1;
-  padding: 32rpx;
-  gap: 32rpx;
+  // padding: 32rpx;
+  gap: 16rpx;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 400rpx - 160rpx);
+  overflow: hidden;
 }
 
 .info-card {
+  position: relative;
   background-color: #ffffff;
-  border-radius: 16rpx;
-  padding: 32rpx;
+  // border-radius: 16rpx;
+  // padding: 32rpx;
+  padding: 60rpx 32rpx 0 32rpx;
+  border-radius: 60rpx 60rpx 0rpx 0rpx;
+  overflow: hidden;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-}
-
-.pending-card {
-  border-left: 8rpx solid #1890ff;
 }
 
 .card-header {
   margin-bottom: 24rpx;
+  display: flex;
 }
 
 .card-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1890ff;
+font-family: PingFangSC, PingFang SC;
+font-weight: 600;
+font-size: 28rpx;
+color: #4D4E46;
+line-height: 40rpx;
+text-align: left;
+font-style: normal;
 }
 
 .card-content {
-  gap: 16rpx;
+  // gap: 16rpx;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 28rpx;
+  color: #4D4E46;
+  line-height: 40rpx;
+  text-align: left;
+  font-style: normal;
+  position: relative;
+  margin-bottom: 42rpx;
+}
+
+.arrow-icon {
+  width: 16rpx;
+  height: 32rpx;
+  // margin: 30rpx 0 32rpx 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0;
 }
 
 .info-row {
@@ -901,33 +981,53 @@ export default {
 
 .detail-section {
   background-color: #ffffff;
-  border-radius: 16rpx;
-  padding: 32rpx;
+  // border-radius: 16rpx;
+  // padding: 32rpx;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  flex: 1;
+  height: 0;
+}
+
+.detail-section-view {
+  padding: 0 32rpx 300rpx 32rpx;
 }
 
 .detail-row {
   display: flex;
   align-items: center;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
+  // padding: 24rpx 0;
+  padding: 16rpx 0;
+  // border-bottom: 1rpx solid #f0f0f0;
   position: relative;
+  justify-content: space-between;
 }
 
 .detail-row:last-child {
-  border-bottom: none;
+  // border-bottom: none;
 }
 
 .detail-label {
+  height: 40rpx;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
   font-size: 28rpx;
   color: #666666;
-  min-width: 200rpx;
+  line-height: 40rpx;
+  text-align: left;
+  font-style: normal;
 }
 
 .detail-value {
+  height: 40rpx;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 600;
   font-size: 28rpx;
   color: #333333;
-  flex: 1;
+  line-height: 40rpx;
+  text-align: left;
+  font-style: normal;
+  display: flex;
+  align-items: center;
 }
 
 .phone-icon {
@@ -946,9 +1046,10 @@ export default {
 
 .link-text {
   font-size: 28rpx;
-  color: #1890ff;
+  color: #FF9E00;
   margin-left: 16rpx;
-  text-decoration: underline;
+  line-height: 40rpx;
+  font-weight: 400;
 }
 
 .payment-status {
@@ -963,7 +1064,7 @@ export default {
 
 /* 底部占位空间 */
 .bottom-placeholder {
-  height: 120rpx; /* 为固定按钮留出空间 */
+  height: 160rpx; /* 为固定按钮留出空间 */
 }
 
 /* 固定底部按钮 */
@@ -972,11 +1073,12 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
+  height: 160rpx;
   display: flex;
   background-color: #ffffff;
   border-top: 1rpx solid #e5e5e5;
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom)); /* 适配安全区域 */
+  padding: 30rpx;
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom)); /* 适配安全区域 */
   z-index: 999;
   justify-content: space-between;
   flex-direction: row;
@@ -1006,31 +1108,46 @@ export default {
 }
 
 .bottom-btn {
-  height: 100%;
-	border-radius: 40rpx;
-	font-size: 26rpx;
+  height: 96rpx;
+	border-radius: 48rpx;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-  padding: 0 32rpx;
+  font-style: normal;
 }
 
 /* 取消订单按钮样式 */
 .cancel-btn {
-	background-color: #E9E9E9;
-	color: #AAAAAA;
+  color: #666666;
+  border: none;
+  outline: none;
+  font-weight: 400;
+  font-size: 28rpx;
+  line-height: 40rpx;
+
+  &:after {
+    border: none;
+    outline: none;
+  }
 }
 
 /* 修改订单按钮样式 */
 .modify-btn {
 	background-color: #fff;
-  border: 2rpx solid #EBA932;
-	color: #EBA932;
+  border: 2rpx solid #FF9E00;
+	color: #FF9E00;
+  padding:  0rpx 56rpx;
+  font-weight: 500;
+  font-size: 32rpx;
+  line-height: 44rpx;
 }
 
 /* 立即签署按钮样式 */
 .sign-btn {
-	background: linear-gradient(to right, #FFA600, #FFCD01);
-	color: #fff;
+	background: #FF9E00;
+  color: #FFFFFF;
+  padding:  0rpx 56rpx;
+  font-weight: 500;
+  font-size: 32rpx;
 }
 </style>

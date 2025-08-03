@@ -1,7 +1,7 @@
 <script>
 import { orderApi, OrderStatus, OrderStatusText } from '@/api/order'
 import Notes from './components/Notes.vue'
-import Tag from './components/Tag.vue'
+import StatusTag from './components/StatusTag.vue'
 
 // 顶部标签栏数据 - 使用OrderStatus枚举替代硬编码数字
 const tabList = [
@@ -27,7 +27,7 @@ const tabList = [
 
 export default {
   components: {
-    Tag,
+    StatusTag,
     Notes,
   },
   data() {
@@ -403,7 +403,7 @@ export default {
 
     <scroll-view class="order" scroll-y @scroll="onScroll">
       <view v-for="(item, index) in orderDataList" :key="index" class="card">
-        <Tag :status="item.status" :text="OrderStatusText[tabList[currentTab].status]" />
+        <StatusTag :status="item.status" :text="OrderStatusText[tabList[currentTab].status]" />
 
         <view
           class="card_item" :style="{
@@ -557,7 +557,7 @@ page {
 
 /* 右对齐文本 */
 .text_right {
-	width: 140rpx;
+	min-width: 140rpx;
 	text-align: right;
 	display: inline-block;
   font-family: PingFangSC, PingFang SC;

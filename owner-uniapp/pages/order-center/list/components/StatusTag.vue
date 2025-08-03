@@ -2,7 +2,7 @@
 import { OrderStatus } from '@/api/order'
 
 export default {
-  name: 'Tag',
+  name: 'StatusTag',
   props: {
     status: {
       type: Number,
@@ -47,10 +47,10 @@ export default {
 }
 
 .sign-bg {
-  background: linear-gradient(to right, #FD4641, #FD7966);
+  background: linear-gradient( 326deg, #FFD100 0%, #FFA500 100%);
 }
 
 .other-bg {
-  background: linear-gradient(to right, #0975FF, #62CBFD);
+  background: linear-gradient( 310deg, #73E1FF 0%, #006AFF 100%);;
 }
 </style>
