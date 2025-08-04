@@ -108,6 +108,10 @@ export default {
       shippingAddressList: [], // 发货地址列表
       showUserAddressModal: false, // 显示用户地址选择弹窗
       showShippingAddressModal: false, // 显示发货地址选择弹窗
+
+      // 司机选择相关
+      driverList: [], // 司机列表
+      showDriverModal: false, // 显示司机选择弹窗
     }
   },
   onLoad(options) {
@@ -124,6 +128,7 @@ export default {
 
     this.loadUserAddressList()
     this.loadShippingAddressList()
+    this.loadDriverList()
   },
   methods: {
     // 确认下单
@@ -167,9 +172,16 @@ export default {
 
         // 延迟跳转到订单列表页面
         setTimeout(() => {
-          uni.switchTab({
-            url: '/pages/order-center/list/index',
-          })
+          if (this.isEdit) {
+            uni.reLaunch({
+              url: `/pages/order-center/detail/index?orderId=${response.id}`,
+            })
+          }
+          else {
+            uni.reLaunch({
+              url: '/pages/order-center/list/index',
+            })
+          }
         }, 2000)
       }
       catch (error) {
@@ -332,8 +344,8 @@ export default {
 
     // 选择用户地址
     selectUserAddress(address) {
-      this.formData.name = address.name || address.takeName
-      this.formData.phone = address.phone || address.takeMobile
+      this.formData.name = address.name
+      this.formData.phone = address.mobile
       this.formData.address = address.address
       this.formData.userAddressId = address.id
       this.formData.isDefault = address.isDefault || false
@@ -355,6 +367,47 @@ export default {
     // 关闭发货地址选择弹窗
     closeShippingAddressModal() {
       this.showShippingAddressModal = false
+    },
+
+    // 加载司机列表
+    async loadDriverList() {
+      try {
+        this.isLoading = true
+        const driverList = await driverApi.getDriverList()
+        this.driverList = driverList || []
+        console.log('司机列表:', driverList)
+      }
+      catch (error) {
+        console.error('加载司机列表失败:', error)
+        this.driverList = []
+        uni.showToast({
+          title: '加载司机列表失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.isLoading = false
+      }
+    },
+
+    // 选择司机
+    selectDriver() {
+      this.showDriverModal = true
+    },
+
+    // 选择司机项
+    selectDriverItem(driver) {
+      this.formData.driverUserId = driver.id
+      this.formData.driverName = driver.username
+      this.formData.driverPhone = driver.mobile
+      this.formData.plateNumber = driver.carNumber
+      this.formData.vehicleType = driver.type
+      this.showDriverModal = false
+    },
+
+    // 关闭司机选择弹窗
+    closeDriverModal() {
+      this.showDriverModal = false
     },
   },
 }
@@ -451,8 +504,8 @@ export default {
           </template>
           <view class="input-field flex-col shipping-address-field" @click="selectOriginAddress">
             <view class="shipping-address-content">
-              <text 
-                class="shipping-address-text" 
+              <text
+                class="shipping-address-text"
                 :class="{ 'placeholder-text': !formData.originCity }"
               >
                 {{ formData.originCity || '请选择发货地址' }}
@@ -460,7 +513,7 @@ export default {
               <u-icon name="arrow-down-fill" size="14" color="#999999" />
             </view>
             <!-- 隐藏的输入框用于表单验证 -->
-            <u--input
+            <input
               v-model="formData.originCity"
               style="display: none;"
               border="none"
@@ -478,30 +531,29 @@ export default {
         <u-form-item
           prop="driverName"
           :border-bottom="false"
-          class="form-item-custom"
+          class="form-item-custom driver-name-item"
         >
           <template #label>
             <text class="field-label">
               司机姓名
             </text>
           </template>
-          <view class="input-field flex-col">
-            <u--input
+          <view class="input-field flex-col driver-name-field" @click="selectDriver">
+            <view class="driver-name-content">
+              <text
+                class="driver-name-text"
+                :class="{ 'placeholder-text': !formData.driverName }"
+              >
+                {{ formData.driverName || '请选择司机' }}
+              </text>
+              <u-icon name="arrow-down-fill" size="14" color="#999999" />
+            </view>
+            <!-- 隐藏的输入框用于表单验证 -->
+            <input
               v-model="formData.driverName"
-              placeholder="司机姓名"
-              placeholder-style="color: #999999; font-size: 28rpx;"
+              style="display: none;"
               border="none"
-              :custom-style="{
-                backgroundColor: 'transparent',
-                padding: '0',
-                fontSize: '28rpx',
-                lineHeight: '40rpx',
-              }"
-            >
-              <template slot="suffix">
-                <u-icon name="arrow-down-fill" size="14" />
-              </template>
-            </u--input>
+            />
           </view>
         </u-form-item>
 
@@ -727,6 +779,65 @@ export default {
           <view v-if="shippingAddressList.length === 0" class="empty-state">
             <text class="empty-text">
               暂无发货地址
+            </text>
+          </view>
+        </scroll-view>
+      </view>
+    </u-modal>
+
+    <!-- 司机选择弹窗 -->
+    <u-modal
+      :show="showDriverModal"
+      title="选择司机"
+      :show-cancel-button="true"
+      cancel-text="取消"
+      :show-confirm-button="false"
+      width="680rpx"
+      :duration="200"
+      border-radius="24rpx"
+      @cancel="closeDriverModal"
+    >
+      <view class="address-modal-content">
+        <scroll-view scroll-y class="address-list" style="height: 600rpx;">
+          <view
+            v-for="(driver, index) in driverList"
+            :key="index"
+            class="address-item"
+            :class="{ 'address-item-selected': formData.driverUserId === driver.id }"
+            @click="selectDriverItem(driver)"
+          >
+            <view class="address-item-content">
+              <view class="contact-info">
+                <text class="contact-name">
+                  {{ driver.username }}
+                </text>
+                <text class="contact-phone">
+                  {{ driver.mobile }}
+                </text>
+              </view>
+              <view class="address-detail">
+                <text class="address-text">
+                  {{ driver.carNumber }} - {{ driver.type }}
+                </text>
+              </view>
+            </view>
+            <view class="address-item-radio">
+              <view
+                class="radio-icon"
+                :class="{ 'radio-checked': formData.driverUserId === driver.id }"
+              >
+                <u-icon
+                  v-if="formData.driverUserId === driver.id"
+                  name="checkmark"
+                  color="#FF9E00"
+                  size="16"
+                />
+              </view>
+            </view>
+          </view>
+          <view v-if="driverList.length === 0" class="empty-state">
+            <text class="empty-text">
+              暂无司机信息
             </text>
           </view>
         </scroll-view>

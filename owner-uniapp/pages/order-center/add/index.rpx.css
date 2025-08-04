@@ -364,6 +364,38 @@
   color: #999999 !important;
 }
 
+/* 司机姓名选择区域样式 */
+.driver-name-item {
+  cursor: pointer;
+}
+
+.driver-name-field {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.driver-name-field:hover {
+  background-color: rgba(255, 158, 0, 0.05);
+}
+
+.driver-name-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  min-height: 40rpx;
+}
+
+.driver-name-text {
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  color: rgba(77, 78, 70, 1);
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+}
+
 /* 发货地址项样式 */
 .shipping-name {
   margin-bottom: 8rpx;
