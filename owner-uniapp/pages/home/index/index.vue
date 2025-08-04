@@ -21,22 +21,17 @@ export default {
       show: false,
       scrollTop: 0, // 支付宝使用
       mscrollTop: 0,
-      title: 'Hello',
 
+      // 地图参数
+      // longitude: 116.3974770000, //故宫
+      // latitude: 39.9086920000,//故宫
       longitude: myLocation.longitude,
       latitude: myLocation.latitude,
       covers: [],
       polyline: [],
-      iconItem: [],
-
-      autoplay: true,
-      interval: 3000,
-      duration: 1000,
-      indicatorDots: true,
-      circular: true,
 
       page: 1,
-      size: 10,
+      size: 20,
       // 订单数据
       dataList: [],
       orderList: [],
@@ -46,9 +41,13 @@ export default {
         isLoading: false,
         submitting: false,
       },
+
     }
   },
   computed: {
+    coverViewStyle() {
+      return `background-color: red;${this.styleCss()}`
+    },
     scrollViewStyle() {
       return {
         width: '100%',
@@ -57,13 +56,12 @@ export default {
     },
   },
   onLoad() {
-    this.getData()
+    this.loadOrder()
     this.getMap()
   },
   onReady() {
     this.$refs.drag.initTop()
   },
-
   methods: {
     // nvue对top动画支持不够，使用css的其他的动画转换
     styleCss() {
@@ -80,28 +78,10 @@ export default {
     originCss() {
       return 'transform: translateY(0px);transition-property: transform;transition-duration: 1s;'
     },
-    getStyleObject() {
-      if (this.mExpand) {
-        return {
-          transform: 'translateY(100%)',
-          transitionProperty: 'transform',
-          transitionDuration: '1s',
-        }
-      }
-      else {
-        return {
-          transform: 'translateY(0px)',
-          transitionProperty: 'transform',
-          transitionDuration: '1s',
-        }
-      }
-    },
 
     onChange(e) {
-      let {
-        index,
-      } = e.detail
-      console.warn(index)
+      const { index } = e.detail
+      console.error(index)
       uni.showToast({
         title: `你点击了${index}`,
       })
@@ -116,7 +96,6 @@ export default {
 
       console.log(this.mExpand)
     },
-
     canDarg() {
       // #ifdef MP-ALIPAY
       return this.mscrollTop < 30
@@ -133,6 +112,12 @@ export default {
     },
     scroll(e) {
       this.mscrollTop = e.detail.scrollTop
+
+      if (this.dataList.length >= this.size
+        && e.detail.scrollTop > this.orderList.length * 90) {
+        this.page++
+        this.loadOrder()
+      }
     },
     goTop() {
       this.mExpand = !this.mExpand
@@ -154,31 +139,19 @@ export default {
     mapTap(event) {
       console.log(event)
     },
-
-    // 获取订单数据
-    async getData() {
-      try {
-        this.pageState.isLoading = true
-        const data = await orderApi.getCurrentOrder({
-          page: this.page,
-          size: this.size,
-        })
-
-        this.dataList = data?.content || []
-        this.orderList = [...this.orderList, ...this.dataList]
-      }
-      catch (e) {
-        console.error('订单数据加载失败:', e)
-        uni.showToast({
-          title: '加载订单详情失败',
-          icon: 'none',
-        })
-      }
-      finally {
-        this.pageState.isLoading = false
-      }
+    // 跳转消息列表
+    navgateToMessageList() {
+      uni.navigateTo({
+        url: '/pages/message-center/index/index',
+      })
     },
 
+    // 跳转新增订单
+    navgateToAddOrderCenter() {
+      uni.navigateTo({
+        url: '/pages/order-center/add/index',
+      })
+    },
     // 获取地图坐标数据
     async getMap() {
       try {
@@ -213,148 +186,153 @@ export default {
         })
       }
     },
-    handleTouchStart(e) {
-      this.startY = e.touches[0].clientY
-      this.startTime = Date.now() // 记录起始时间
+    // 加载订单数据
+    async loadOrder() {
+      try {
+        this.pageState.isLoading = true
+        const data = await orderApi.getCurrentOrder({
+          page: this.page,
+          size: this.size,
+        })
+
+        this.dataList = data?.content || []
+        this.orderList = [...this.orderList, ...this.dataList]
+      }
+      catch (e) {
+        console.error('订单数据加载失败:', e)
+        uni.showToast({
+          title: '加载订单详情失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.pageState.isLoading = false
+      }
     },
-    handleTouchEnd(e) {
-      this.endY = e.changedTouches[0].clientY
-      this.endTime = Date.now()
-    },
+
   },
 }
 </script>
 
 <template>
   <view>
-    <!-- 主要内容 -->
-    <view>
-      <!-- <text>vue 展示expand的使用和当内容过长，展开后的控制思路</text> -->
+    <!-- <text>vue 展示expand的使用和当内容过长，展开后的控制思路</text> -->
 
-      <!-- #ifdef APP-PLUS -->
-      <cover-view @click="expandDrawer()">
-        <!-- 展开收缩 -->
-      </cover-view>
-      <!-- #endif -->
-      <!-- #ifndef APP-PLUS -->
-      <map
-        id="map1"
-        ref="map1"
-        class="map-view"
-        :show-location="true"
-        :latitude="latitude"
-        :longitude="longitude"
-        :markers="covers"
-        :polyline="polyline"
-        :show-compass="true"
-        @tap="mapTap"
-      >
-        <cover-view @click="expandDrawer()">
-          <!-- 展开收缩 -->
-        </cover-view>
-      </map>
-      <!-- #endif -->
+    <!-- #ifdef APP-PLUS -->
+    <!-- <cover-view @click="expandDrawer()">
+      展开收缩
+    </cover-view> -->
+    <!-- #endif -->
+    <!-- #ifndef APP-PLUS -->
+    <map
+      id="map1"
+      ref="map1"
+      class="map-view"
+      :show-location="false"
+      :latitude="latitude"
+      :longitude="longitude"
+      :markers="covers"
+      :polyline="polyline"
+      scale="14"
+      @tap="mapTap"
+    >
+      <!-- <cover-view @click="expandDrawer()" >expandDrawer</cover-view> -->
+      <!-- 替代解决nvue动画属性top不兼容问题  vue可行，nvue的uni还是不兼容 使用其他替代方案 -->
+      <!-- <cover-view v-if="false" ref="Item" class="tipNvue" :style="coverViewStyle" @click="expandDrawer">11111111111111</cover-view> -->
+    </map>
+    <!-- #endif -->
+    <button class="message-btn" @click="navgateToMessageList">
+      <image
+        class="message-btn-icon"
+        src="/static/images/icon/bell.png"
+      />
+    </button>
+    <ww-bottom-drawerapp
+      ref="drag" :proportion-show="proportionvc" :drag-handle-height="handleHeight" :is-expand="mExpand"
+      :can-drag="canDarg()" :drag-length="dragLength" :transition-time="transitionTime"
+      :menu-height="menuHeight" @callExpand="onCallExpand"
+    >
+      <slot>
+        <button class="float-btn" @click="navgateToAddOrderCenter">
+          <image
+            class="float-btn-icon"
+            src="/static/images/upload-plus.png"
+          />
+        </button>
 
-      <ww-bottom-drawerapp
-        ref="drag"
-        :proportion-show="proportionvc"
-        :drag-handle-height="handleHeight"
-        :is-expand="mExpand"
-        :can-drag="canDarg()"
-        :drag-length="dragLength"
-        :transition-time="transitionTime"
-        :menu-height="menuHeight"
-        @callExpand="onCallExpand"
-      >
-        <slot>
-          <view style="height: 600px;">
-            <!-- 填充内容 -->
-            <scroll-view
-              :scroll-top="scrollTop" :scroll-y="mExpand" :style="scrollViewStyle"
-              @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
-            >
-              <view class="title">
-                当前订单
-              </view>
-              <!-- 加载状态 -->
-              <view v-if="pageState.isLoading" class="loading-container">
-                <text class="loading-text">
-                  加载中...
+        <!-- 填充内容 -->
+        <scroll-view
+          :scroll-top="scrollTop" :scroll-y="mExpand" :style="scrollViewStyle"
+          @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
+        >
+          <!-- <uni-grid :column="4" :highlight="false" :show-border="false" @change="onChange">
+            <uni-grid-item v-for="(item, index) in 80" :key="index" :index="index">
+              <view class="grid-item-box" style="background-color: #fff;">
+                <uni-icons type="image" :size="30" color="#777" />
+                <text class="text">
+                  文本信息
                 </text>
               </view>
-              <!-- <view class="list">
-              <view
-                @touchstart="handleTouchStart"
-                @touchend="handleTouchEnd"
-              >
-
+            </uni-grid-item>
+          </uni-grid> -->
+          <view v-if="pageState.isLoading" class="loading-container">
+            <uni-load-more icon-type="circle" status="loading" />
+          </view>
+          <view v-else class="">
+            <view class="title">
+              当前订单
+            </view>
+            <view v-for="(item, index) in orderList" :key="index" class="order-card">
+              <view class="order-card-tag">
+                <text>运输中</text>
               </view>
-              <scroll-view
-                scroll-y
-                @scroll="onScroll"
-              > -->
-              <view v-for="(item, index) in orderList" :key="index" class="order-card">
-                <view class="order-card-tag">
-                  <text>运输中</text>
-                </view>
-                <view class="order-card-label">
-                  订单编号：{{ item.orderNo }}
-                </view>
+              <view class="order-card-label">
+                订单编号：{{ item.orderNo }}
+              </view>
 
-                <view class="flex">
-                  <view class="order-card-label" style="flex: 1;">
-                    车牌号码：
-                    <text class="order-card-value">
-                      {{ item.carNumber || "-" }}
-                    </text>
-                  </view>
-
-                  <view class="order-card-label" style="flex: 1;">
-                    已到达：
-                    <text class="order-card-value">
-                      {{ item.district || "-" }}
-                    </text>
-                  </view>
+              <view class="flex">
+                <view class="order-card-label" style="flex: 1;">
+                  车牌号码：
+                  <text class="order-card-value">
+                    {{ item.carNumber || "-" }}
+                  </text>
                 </view>
 
-                <view class="order-card-label">
-                  发车时间：<text class="order-card-value">
-                    {{ item.driverSignTime || "-" }}
+                <view class="order-card-label" style="flex: 1;">
+                  已到达：
+                  <text class="order-card-value">
+                    {{ item.district || "-" }}
                   </text>
                 </view>
               </view>
 
-              <view style="height:50px;" />
-            <!-- </scroll-view> -->
-            <!-- </view> -->
-            </scroll-view>
-            <!-- end -->
+              <view class="order-card-label">
+                发车时间：<text class="order-card-value">
+                  {{ item.driverSignTime || "-" }}
+                </text>
+              </view>
+            </view>
           </view>
-        </slot>
-      </ww-bottom-drawerapp>
-    </view>
+        </scroll-view>
+        <!-- end -->
+      </slot>
+    </ww-bottom-drawerapp>
   </view>
 </template>
 
-<style>
-page {
-  background-color: #F8F8F8;
-}
-</style>
+<style scoped>
+ ::v-deep .drag-handle{
+    background-color: #fff;
+  }
 
-<style lang="scss" scoped>
-	// @import './index.scss';
-.loading-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		min-height: 50vh;
-	}
-
-	.loading-text {
-		font-size: 28rpx;
-		color: #666666;
-	}
+  ::v-deep .drawer-content{
+    background-color: #fff;
+    border-radius: 60rpx 60rpx 0 0;
+  }
+  ::v-deep .drag-content{
+  background-color: #fff;
+    border-radius: 60rpx 60rpx 0 0;
+  }
 
 	.tipNvue {
 		display: flex;
@@ -371,7 +349,6 @@ page {
 
 	.grid-item-box {
 		flex: 1;
-    /* position: relative; */
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
@@ -392,47 +369,75 @@ page {
 		line-height: 100rpx;
 		text-align: center;
 	}
+.message-btn {
+  position: absolute;
+  top: 200rpx;
+  right: 48rpx;
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(255,255,255,0.8);
+  border-radius: 4rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+  z-index: 999999;
+  padding: 8rpx;
+  border: none;
+  outline: none;
+}
+.message-btn::after{
+  border: none;
+  outline: none;
 
-::v-deep .drag-handle{
-  background-color: #F7F8FA;
 }
 
-::v-deep .drawer-content{
-  background-color: #F7F8FA;
-  border-radius: 60rpx 60rpx 0 0;
+.message-btn-icon {
+  width: 100%;
+  height: 100%;
+  color: #333333;
 }
-::v-deep .drag-content{
- background-color: #F7F8FA;
-  border-radius: 60rpx 60rpx 0 0;
+.float-btn {
+  position: absolute;
+  top: -150rpx;
+  right: 48rpx;
+  width: 100rpx;
+  height: 100rpx;
+	background: linear-gradient(to right, #FEA801, #FFCA00);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+  z-index: 999999;
+  padding: 26rpx;
+  border: none;
+  outline: none;
+}
+.float-btn::after{
+  border: none;
+  outline: none;
 }
 
-	.treetop {
-		position: absolute;
-		top: 0;
-		right: 0;
-		/* background-color: #FEA801; */
-		color: #fff;
-		font-size: 12px;
-		font-weight: 400;
-		padding: 4px 10px;
-		border-radius: 0 5px 0 5px;
-		background: linear-gradient(to right, #FEA801, #FFCA00);
+.float-btn-icon {
+  width: 100%;
+  height: 100%;
+}
+
+  .loading-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 20vh;
 	}
-
-  .list {
-    position: relative;
-    background-color: #F7F8FA;;
-    width: 100%;
-  }
-
-.title {
+  .title {
     font-weight: 600;
     font-size: 32rpx;
 		margin-top: -8rpx;
     line-height: 44rpx;
     font-style: normal;
     font-family: PingFangSC, PingFang SC;
-		padding-bottom: 16rpx;
+		margin-bottom: 32rpx;
 		padding-left: 48rpx;
 		color:"#4D4E46"
 	}
@@ -443,7 +448,7 @@ page {
     background: #FFFFFF;
     box-shadow: 0rpx 4rpx 4rpx 0rpx rgba(0,0,0,0.1);
     border-radius: 16rpx;
-    margin: 16rpx 48rpx;
+    margin: 0 48rpx 32rpx 48rpx;
     overflow: hidden;
   }
 
@@ -476,7 +481,6 @@ page {
     background: linear-gradient( 326deg, #FFD100 0%, #FFA500 100%);
     border-radius: 0rpx 8rpx 0rpx 8rpx;
     font-family: PingFangSC, PingFang SC;
-    // font-weight: 600;
     font-size: 24rpx;
     color: #FFFFFF;
     line-height: 34rpx;
@@ -484,22 +488,4 @@ page {
     font-style: normal;
     padding: 8rpx 24rpx;
   }
-
-.card {
-  // width: 90%;
-  margin-top: 15px;
-  background-color: #FFFFFF;
-  border-radius: 5px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
-  // margin-left: 5%;
-  // margin: 0 48rpx;
-}
-
-.card_item {
-  // padding: 10px;
-  font-size: 14px;
-  color: #C3C3C3;
-  line-height: 30px;
-}
 </style>

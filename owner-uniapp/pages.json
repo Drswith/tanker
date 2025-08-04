@@ -4,7 +4,7 @@
       "path": "pages/home/index/index",
       "style": {
         "navigationBarTitleText": "首页",
-        "navigationStyle": "default"
+        "navigationStyle": "custom"
       }
     },
     {
