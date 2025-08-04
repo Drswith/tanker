@@ -278,45 +278,49 @@ export default {
 
     // 微信支付
     async wxPay() {
+      // 获取微信支付需要的信息
       const response = await payApi.wxPay({
-        id: this.orderData.orderId,
+        id: this.orderData.id,
         orderNo: this.orderData.orderNo,
         userId: 1,
       })
       console.log('微信支付:', response)
+      return response
     },
 
     // 轮询微信支付结果
-    pollWechatPayResult() {
-      // 返回promise, 超时时间 60秒， 2秒轮询一次wxPayCallback
-      return new Promise((resolve, reject) => {
-        const pollInterval = setInterval(
-          async () => {
-            const response = await payApi.wxPayCallback({
-              orderNo: this.orderData.orderNo,
-            })
-            console.log('轮询微信支付回调:', response)
-            if (response.code === 200) {
-              clearInterval(pollInterval)
-              resolve(response)
-            }
-          },
-          2000,
-        )
+    // pollWechatPayResult() {
+    //   // 返回promise, 超时时间 60秒， 2秒轮询一次wxPayCallback
+    //   return new Promise((resolve, reject) => {
+    //     const pollInterval = setInterval(
+    //       async () => {
+    //         const response = await payApi.wxPayCallback({
+    //           orderNo: this.orderData.orderNo,
+    //         })
+    //         console.log('轮询微信支付回调:', response)
+    //         if (response.code === 200) {
+    //           clearInterval(pollInterval)
+    //           resolve(response)
+    //         }
+    //       },
+    //       2000,
+    //     )
 
-        // 超时时间 60秒
-        setTimeout(() => {
-          clearInterval(pollInterval)
-          reject(new Error('轮询超时'))
-        }, 60000)
-      })
-    },
+    //     // 超时时间 60秒
+    //     setTimeout(() => {
+    //       clearInterval(pollInterval)
+    //       reject(new Error('轮询超时'))
+    //     }, 60000)
+    //   })
+    // },
 
     // 确认支付 - 微信
     async confirmWechatPayment() {
       uni.showLoading({
         title: '支付中...',
       })
+
+      const res = await this.wxPay()
 
       // 订单对象，从服务器获取
       let orderInfo = {
