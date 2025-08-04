@@ -61,6 +61,13 @@ export default {
       return this.orderDataList
     },
   },
+  onLoad(options) {
+    console.log('options', options)
+    if (options.orderStatus) {
+      this.currentTab = tabList.findIndex(item => item.status === Number.parseInt(options.orderStatus)) || 0
+      console.log('跳转指定标签 this.currentTab=', this.currentTab)
+    }
+  },
   async onShow() {
     this.dataList = await this.getOrder()
     this.orderDataList = this.dataList
