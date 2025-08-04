@@ -6,10 +6,10 @@ export default {
     return {
       // 表单数据
       formData: {
-        driverName: '杨光', // 司机姓名
-        phoneNumber: '13800000000', // 手机号
-        vehicleType: '大货车', // 车辆类型
-        licensePlate: '京A12345', // 车牌号
+        driverName: '', // 司机姓名
+        phoneNumber: new Date().getTime().toString().substring(0, 11), // 手机号
+        type: '大货车', // 车辆类型
+        carNumber: `京A${new Date().getTime().toString().substring(0, 6)}`, // 车牌号
       },
 
       // 页面状态
@@ -30,7 +30,7 @@ export default {
       constants: {
         PHONE_REGEX: /^1[3-9]\d{9}$/, // 手机号正则
         LICENSE_PLATE_REGEX: /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z][A-Z][A-Z0-9]{4}[A-Z0-9挂学警港澳]$/, // 车牌号正则
-        REQUIRED_FIELDS: ['driverName', 'phoneNumber', 'vehicleType', 'licensePlate'], // 必填字段
+        REQUIRED_FIELDS: ['driverName', 'phoneNumber', 'type', 'carNumber'], // 必填字段
       },
 
       // 表单验证规则
@@ -60,14 +60,14 @@ export default {
             trigger: ['blur', 'change'],
           },
         ],
-        vehicleType: [
+        type: [
           {
             required: true,
             message: '请输入车辆类型',
             trigger: ['blur', 'change'],
           },
         ],
-        licensePlate: [
+        carNumber: [
           {
             required: true,
             message: '请输入车牌号',
@@ -87,8 +87,8 @@ export default {
     this.routeParams.id = options.id
     if (this.routeParams.id) {
       this.pageState.isEditMode = true
+      this.loadDriverDetail(this.routeParams.id)
     }
-    this.loadDriverDetail(this.routeParams.id)
   },
 
   methods: {
@@ -98,8 +98,8 @@ export default {
       this.formData = {
         driverName: driverData.realName || '',
         phoneNumber: driverData.mobile || '',
-        vehicleType: driverData.type || '',
-        licensePlate: driverData.carNumber || '',
+        type: driverData.type || '',
+        carNumber: driverData.carNumber || '',
       }
     },
 
@@ -141,8 +141,8 @@ export default {
           memberUserId: 1,
           username: this.formData.driverName, // 司机姓名 -> realName
           mobile: this.formData.phoneNumber, // 手机号 -> mobile
-          type: this.formData.vehicleType, // 车辆类型 -> type
-          carNumber: this.formData.licensePlate, // 车牌号 -> carNumber
+          type: this.formData.type, // 车辆类型 -> type
+          carNumber: this.formData.carNumber, // 车牌号 -> carNumber
           // accountStatus: 0, // 默认启用状态
           // status: 1, // 默认空闲状态
           // isDel: 0, // 默认未删除
@@ -234,7 +234,7 @@ export default {
           <view class="input-field flex-col">
             <u--input
               v-model="formData.driverName"
-              placeholder="小红"
+              placeholder="请输入司机姓名"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
               :custom-style="{
@@ -268,7 +268,7 @@ export default {
           <view class="input-field flex-col">
             <u--input
               v-model="formData.phoneNumber"
-              placeholder="19512344321"
+              placeholder="请输入手机号"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
               :custom-style="{
@@ -285,7 +285,7 @@ export default {
 
         <!-- 车辆类型 -->
         <u-form-item
-          prop="vehicleType"
+          prop="type"
           :required="true"
           :border-bottom="false"
           class="form-item-custom"
@@ -302,8 +302,8 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.vehicleType"
-              placeholder="大卡车"
+              v-model="formData.type"
+              placeholder="请输入车辆类型"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
               :custom-style="{
@@ -318,7 +318,7 @@ export default {
 
         <!-- 车牌号 -->
         <u-form-item
-          prop="licensePlate"
+          prop="carNumber"
           :required="true"
           :border-bottom="false"
           class="form-item-custom"
@@ -335,8 +335,8 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.licensePlate"
-              placeholder="浙A 666666"
+              v-model="formData.carNumber"
+              placeholder="请输入车牌号"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
               :custom-style="{
