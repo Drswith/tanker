@@ -174,7 +174,7 @@ export default {
         setTimeout(() => {
           if (this.isEdit) {
             uni.reLaunch({
-              url: `/pages/order-center/detail/index?orderId=${response.id}`,
+              url: `/pages/order-center/detail/index?orderId=${this.orderId}`,
             })
           }
           else {

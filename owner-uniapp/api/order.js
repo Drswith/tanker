@@ -157,7 +157,7 @@ export const orderApi = {
    * 更新订单
    */
   updateOrder(data) {
-    return request.post('/api/order/update_order', data)
+    return request.put('/api/order/update_order', data)
   },
 
   /**
