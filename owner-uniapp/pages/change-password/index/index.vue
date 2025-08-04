@@ -1,19 +1,15 @@
 <script>
-const operateType = {
-  Change: 'change',
-  Reset: 'reset',
-}
+import { userApi } from '@/api/user'
+import { setToken, setTokenInfos, setUserInfo } from '@/utils/auth'
 
 export default {
   data() {
     return {
-      operateType: Object.freeze(operateType),
       // 表单数据
       formData: {
-        phoneNumber: '', // 手机号
+        mobile: '', // 手机号
         verifyCode: '', // 验证码
-        oldPassword: '',
-        newPassword: '',
+        password: '',
         confirmPassword: '',
       },
 
@@ -28,85 +24,59 @@ export default {
       // 常量配置
       constants: {
         CODE_COUNTDOWN_TIME: 60, // 验证码倒计时时间（秒）
-        PHONE_REGEX: /^1[3-9]\d{9}$/, // 手机号正则
-        REQUIRED_FIELDS: ['phoneNumber', 'companyName', 'contactPerson'], // 必填字段
       },
 
       // 表单验证规则
       rules: {
-        // phoneNumber: [
-        //   {
-        //     required: true,
-        //     message: '请输入手机号码',
-        //     trigger: ['blur', 'change'],
-        //   },
-        //   {
-        //     pattern: /^1[3-9]\d{9}$/,
-        //     message: '请输入正确的手机号码',
-        //     trigger: ['blur', 'change'],
-        //   },
-        // ],
-        // verifyCode: [
-        //   {
-        //     required: true,
-        //     message: '请输入验证码',
-        //     trigger: ['blur', 'change'],
-        //   },
-        //   {
-        //     min: 4,
-        //     max: 6,
-        //     message: '验证码长度为4-6位',
-        //     trigger: ['blur', 'change'],
-        //   },
-        // ],
-        // companyName: [
-        //   {
-        //     required: true,
-        //     message: '请输入公司名称',
-        //     trigger: ['blur', 'change'],
-        //   },
-        // ],
-        // contactPerson: [
-        //   {
-        //     required: true,
-        //     message: '请输入联系人姓名',
-        //     trigger: ['blur', 'change'],
-        //   },
-        // ],
+        mobile: [
+          {
+            required: true,
+            message: '请输入手机号码',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        verifyCode: [
+          {
+            required: true,
+            message: '请输入验证码',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        password: [
+          {
+            required: true,
+            message: '请输入新密码',
+            trigger: ['blur', 'change'],
+          },
+        ],
+        confirmPassword: [
+          {
+            required: true,
+            message: '请输入确认密码',
+            trigger: ['blur', 'change'],
+          },
+          {
+            // 自定义验证函数，见上说明
+            validator: (rule, value, callback) => {
+              // 上面有说，返回true表示校验通过，返回false表示不通过
+              // uni.$u.test.mobile()就是返回true或者false的
+              return value === this.formData.password
+            },
+            message: '确认密码与新密码不一致',
+            // 触发器可以同时用blur和change
+            trigger: ['change', 'blur'],
+          },
+        ],
       },
 
-      // 路由参数
-      routeParams: {
-        operateType: operateType.Change,
-      },
-    }
-  },
-  onLoad(options) {
-    console.log(options)
-    if (options?.operateType && [operateType.Change, operateType.Reset].includes(options.operateType)) {
-      this.routeParams.operateType = options.operateType
-    }
-    console.log(this.routeParams.operateType)
-    if (this.routeParams.operateType === operateType.Reset) {
-      uni.setNavigationBarTitle({
-        title: '重置密码',
-      })
     }
   },
   methods: {
     // 发送验证码
     async sendVerificationCode() {
-      if (!this.formData.phoneNumber) {
+      if (!this.formData.mobile) {
         uni.showToast({
           title: '请先输入手机号',
-          icon: 'none',
-        })
-        return
-      }
-
-      if (!this.constants.PHONE_REGEX.test(this.formData.phoneNumber)) {
-        uni.showToast({
-          title: '请输入正确的手机号',
           icon: 'none',
         })
         return
@@ -131,8 +101,7 @@ export default {
       }, 1000)
 
       try {
-        // TODO: 调用发送验证码接口
-        // await this.httpApi.sendVerificationCode({ phone: this.formData.phoneNumber });
+        await userApi.getVerifyCode({ mobile: this.formData.mobile })
         uni.showToast({
           title: '验证码已发送',
           icon: 'success',
@@ -150,32 +119,13 @@ export default {
       }
     },
 
-    // 营业执照上传后处理
-    afterReadLicense(event) {
-      const { file } = event
-      this.licenseFileList = [file]
-      this.formData.businessLicense = file.url || file.path
-
-      // TODO: 上传到服务器
-      uni.showToast({
-        title: '营业执照上传成功',
-        icon: 'success',
-      })
-    },
-
-    // 删除营业执照
-    deleteLicense() {
-      this.licenseFileList = []
-      this.formData.businessLicense = ''
-    },
-
     // 表单验证
     validateForm() {
       return this.$refs.uForm.validate()
     },
 
-    // 提交注册
-    async submitRegistration() {
+    // 提交修改密码
+    async submitChangePassword() {
       try {
         const valid = await this.validateForm()
         if (!valid) {
@@ -192,9 +142,9 @@ export default {
           icon: 'success',
         })
 
-        // 延迟跳转到登录页面
+        // 延迟跳转
         setTimeout(() => {
-          this.navigateToLogin()
+          uni.navigateBack()
         }, 1500)
       }
       catch (error) {
@@ -208,12 +158,6 @@ export default {
       }
     },
 
-    // 跳转到登录页面
-    navigateToLogin() {
-      uni.navigateTo({
-        url: '/pages/login/index/index',
-      })
-    },
   },
 }
 </script>
@@ -230,114 +174,85 @@ export default {
         :label-style="{ fontSize: '32rpx', fontWeight: '600', color: '#4D4E46', marginBottom: '16rpx' }"
         error-type="toast"
       >
-        <template v-if="routeParams.operateType === operateType.Reset">
-          <!-- 手机号 -->
-          <u-form-item
-            prop="phoneNumber"
-            :border-bottom="false"
-            class="form-item-custom"
-          >
-            <template #label>
-              <view class="field-label-required">
-                <text class="required-asterisk">
-                  *
-                </text>
-                <text class="field-label">
-                  手机号
-                </text>
-              </view>
-            </template>
-            <view class="input-field flex-col">
-              <u--input
-                v-model="formData.phoneNumber"
-                placeholder="请输入手机号码"
-                placeholder-style="color: #999999; font-size: 28rpx;"
-                border="none"
-                :custom-style="{
-                  backgroundColor: 'transparent',
-                  padding: '0',
-                  fontSize: '28rpx',
-                  lineHeight: '40rpx',
-                }"
-                maxlength="11"
-                type="number"
-              />
-            </view>
-          </u-form-item>
-
-          <!-- 验证码 -->
-          <u-form-item
-            prop="verificationCode"
-            :border-bottom="false"
-            class="form-item-custom"
-          >
-            <template #label>
-              <view class="field-label-required">
-                <text class="required-asterisk">
-                  *
-                </text>
-                <text class="field-label">
-                  验证码
-                </text>
-              </view>
-            </template>
-            <view class="input-field input-field--with-button flex-row justify-between">
-              <u--input
-                v-model="formData.verificationCode"
-                placeholder="请输入验证码"
-                placeholder-style="color: #999999; font-size: 28rpx;"
-                border="none"
-                :custom-style="{
-                  backgroundColor: 'transparent',
-                  padding: '0',
-                  fontSize: '28rpx',
-                  lineHeight: '40rpx',
-                  flex: '1',
-                }"
-                maxlength="6"
-                type="number"
-              />
-              <text
-                class="get-code-btn"
-                :style="{ opacity: pageState.canSendCode ? 1 : 0.6 }"
-                @click="sendVerificationCode"
-              >
-                {{ pageState.canSendCode ? '获取验证码' : `${pageState.codeCountdown}s` }}
+        <!-- 手机号 -->
+        <u-form-item
+          prop="mobile"
+          :border-bottom="false"
+          class="form-item-custom"
+        >
+          <template #label>
+            <view class="field-label-required">
+              <text class="required-asterisk">
+                *
               </text>
-            </view>
-          </u-form-item>
-        </template>
-        <template v-else>
-          <!-- 旧密码 -->
-          <u-form-item
-            prop="oldPassword"
-            :border-bottom="false"
-            class="form-item-custom"
-          >
-            <template #label>
               <text class="field-label">
-                旧密码
+                手机号
               </text>
-            </template>
-            <view class="input-field flex-col">
-              <u--input
-                v-model="formData.oldPassword"
-                placeholder="请输入旧密码"
-                placeholder-style="color: #999999; font-size: 28rpx;"
-                border="none"
-                :custom-style="{
-                  backgroundColor: 'transparent',
-                  padding: '0',
-                  fontSize: '28rpx',
-                  lineHeight: '40rpx',
-                }"
-              />
             </view>
-          </u-form-item>
-        </template>
+          </template>
+          <view class="input-field flex-col">
+            <u--input
+              v-model="formData.mobile"
+              placeholder="请输入手机号码"
+              placeholder-style="color: #999999; font-size: 28rpx;"
+              border="none"
+              :custom-style="{
+                backgroundColor: 'transparent',
+                padding: '0',
+                fontSize: '28rpx',
+                lineHeight: '40rpx',
+              }"
+              maxlength="11"
+              type="number"
+            />
+          </view>
+        </u-form-item>
+
+        <!-- 验证码 -->
+        <u-form-item
+          prop="verificationCode"
+          :border-bottom="false"
+          class="form-item-custom"
+        >
+          <template #label>
+            <view class="field-label-required">
+              <text class="required-asterisk">
+                *
+              </text>
+              <text class="field-label">
+                验证码
+              </text>
+            </view>
+          </template>
+          <view class="input-field input-field--with-button flex-row justify-between">
+            <u--input
+              v-model="formData.verificationCode"
+              placeholder="请输入验证码"
+              placeholder-style="color: #999999; font-size: 28rpx;"
+              border="none"
+              :custom-style="{
+                backgroundColor: 'transparent',
+                padding: '0',
+                fontSize: '28rpx',
+                lineHeight: '40rpx',
+                flex: '1',
+              }"
+              maxlength="6"
+              type="number"
+            />
+            <text
+              class="get-code-btn"
+              :style="{ opacity: pageState.canSendCode ? 1 : 0.6 }"
+              @click="sendVerificationCode"
+            >
+              {{ pageState.canSendCode ? '获取验证码' : `${pageState.codeCountdown}s` }}
+            </text>
+          </view>
+        </u-form-item>
+
         <!-- 新密码 -->
         <u-form-item
-          prop="newPassword"
+          prop="password"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -348,7 +263,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.newPassword"
+              v-model="formData.password"
               placeholder="请输入新密码"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"

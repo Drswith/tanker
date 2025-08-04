@@ -159,7 +159,7 @@
     {
       "path": "pages/change-password/index/index",
       "style": {
-        "navigationBarTitleText": "修改密码",
+        "navigationBarTitleText": "重置密码",
         "navigationStyle": "default"
       }
     },
