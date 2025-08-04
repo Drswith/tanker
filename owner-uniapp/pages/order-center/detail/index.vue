@@ -1062,23 +1062,17 @@ font-style: normal;
   border: 1rpx solid #b7eb8f;
 }
 
-/* 底部占位空间 */
-.bottom-placeholder {
-  height: 160rpx; /* 为固定按钮留出空间 */
-}
-
 /* 固定底部按钮 */
 .fixed-bottom-actions {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 160rpx;
   display: flex;
   background-color: #ffffff;
   border-top: 1rpx solid #e5e5e5;
-  padding: 30rpx;
-  padding-bottom: calc(30rpx + env(safe-area-inset-bottom)); /* 适配安全区域 */
+  padding: 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); /* 适配安全区域 */
   z-index: 999;
   justify-content: space-between;
   flex-direction: row;
