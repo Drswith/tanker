@@ -429,7 +429,7 @@ export default {
           orderNo: this.orderData.orderNo,
           payType: this.selectedPayMethod === 'bank' ? PayType.BANK : PayType.ALIPAY, // 只有支付宝和银行支付调用这个函数
           payImg: [this.uploadedVoucher], // 上传的支付凭证URL
-          price: this.orderInfo.price,
+          // price: this.orderInfo.price,
         }
 
         console.log('提交转账凭证:', submitData)
@@ -441,12 +441,13 @@ export default {
         uni.showToast({
           title: '提交成功，等待审核',
           icon: 'success',
+          duration: 1500,
         })
 
         setTimeout(() => {
-          // 订单详情
-          uni.navigateTo({
-            url: `/pages/order-center/order-detail/index?orderId=${this.orderData.id}`,
+          // 订单列表
+          uni.switchTab({
+            url: `/pages/order-center/list/index`,
           })
         }, 1500)
       }
