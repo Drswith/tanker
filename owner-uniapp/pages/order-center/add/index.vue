@@ -9,93 +9,94 @@ export default {
       // 表单数据
       formData: {
         id: null,
-        name: '测试姓名',
-        phone: '19899999999',
+        takeName: `测试姓名${new Date().getTime()}`,
+        takeMobile: '19899999999',
         isDefault: true,
-        address: '测试地址123',
+        address: `测试地址123${new Date().getTime()}`,
         userAddressId: 1,
 
-        quantity: 5,
-        unit: '吨',
-        originCity: '杭州',
-        shippingLocationId: 2,
-        driverUserId: 1, // 司机ID
-        driverName: '张三',
+        buyCount: 0,
+        shippingLocationName: '',
+        shippingLocationAddress: '',
+        shippingLocationId: null,
+
+        driverUserId: null, // 司机ID
+        driverName: `张三${new Date().getTime()}`,
         driverPhone: '15012341232',
-        plateNumber: '浙A123',
-        vehicleType: '大货车',
-        totalCost: 0.0,
+        plateNumber: `浙A${new Date().getTime()}`,
+        type: '大货车',
+        price: 0.0,
       },
       rules: {
-        name: [
-          {
-            required: true,
-            message: '请输入收货人姓名',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        phone: [
-          {
-            required: true,
-            message: '请输入手机号',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        address: [
-          {
-            required: true,
-            message: '请输入收货地址',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        quantity: [
-          {
-            required: true,
-            message: '请输入购买数量',
-            trigger: ['blur', 'change'],
-          },
-          {
-            type: 'number',
-            min: 1,
-            message: '购买数量必须大于0',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        originCity: [
-          {
-            required: true,
-            message: '请选择发货地址',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        driverName: [
-          {
-            required: true,
-            message: '请输入司机姓名',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        driverPhone: [
-          {
-            required: true,
-            message: '请输入司机手机号',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        plateNumber: [
-          {
-            required: true,
-            message: '请输入车牌号',
-            trigger: ['blur', 'change'],
-          },
-        ],
-        vehicleType: [
-          {
-            required: true,
-            message: '请选择车辆类型',
-            trigger: ['blur', 'change'],
-          },
-        ],
+        // name: [
+        //   {
+        //     required: true,
+        //     message: '请输入收货人姓名',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
+        // phone: [
+        //   {
+        //     required: true,
+        //     message: '请输入手机号',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
+        // address: [
+        //   {
+        //     required: true,
+        //     message: '请输入收货地址',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
+        // buyCount: [
+        //   {
+        //     required: true,
+        //     message: '请输入购买数量',
+        //     trigger: ['blur', 'change'],
+        //   },
+        //   {
+        //     type: 'number',
+        //     min: 1,
+        //     message: '购买数量必须大于0',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
+        // shippingLocationName: [
+        //   {
+        //     required: true,
+        //     message: '请选择发货地址',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
+        // driverName: [
+        //   {
+        //     required: true,
+        //     message: '请输入司机姓名',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
+        // driverPhone: [
+        //   {
+        //     required: true,
+        //     message: '请输入司机手机号',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
+        // plateNumber: [
+        //   {
+        //     required: true,
+        //     message: '请输入车牌号',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
+        // type: [
+        //   {
+        //     required: true,
+        //     message: '请选择车辆类型',
+        //     trigger: ['blur', 'change'],
+        //   },
+        // ],
       },
 
       submitting: false, // 提交状态
@@ -217,42 +218,27 @@ export default {
     buildOrderData() {
       return {
         id: Number(this.orderId) || null,
+
         // 收货信息
-        takeName: this.formData.name, // 收货人姓名
-        takeMobile: this.formData.phone, // 收货人手机号
+        takeName: this.formData.takeName, // 收货人姓名
+        takeMobile: this.formData.takeMobile, // 收货人手机号
         address: this.formData.address, // 详细地址(收货地址，卸货位置)
         userAddressId: this.formData.userAddressId,
 
         // 货物信息
-        buyCount: Number(this.formData.quantity), // 购买数量
-        price: Number(this.formData.totalCost), // 价格
+        buyCount: Number(this.formData.buyCount), // 购买数量
 
         // 发货信息
-        shippingLocationName: this.formData.originCity, // 发货地名称
-        shippingLocationAddress: this.formData.originCity, // 发货详细地址
+        shippingLocationName: this.formData.shippingLocationName, // 发货地名称
+        shippingLocationAddress: this.formData.shippingLocationAddress, // 发货详细地址
         shippingLocationId: this.formData.shippingLocationId, // 发货地ID
 
         // 司机信息
         driverUserId: this.formData.driverUserId, // 司机ID
         driverName: this.formData.driverName, // 司机姓名
-        driverMobile: this.formData.driverPhone, // 司机手机号
-        carNumber: this.formData.plateNumber, // 车牌号
-        type: this.formData.vehicleType, // 车类型
-
-        // 订单状态和时间
-        // status: 0, // 订单状态 0 已创建待支付
-        // placeOrderTime: new Date().toISOString(), // 下单时间
-
-        // 其他必要字段
-        // isDel: 0, // 0 未删除
-        // isEvaluate: 0, // 0 未评价
-        // orderCount: 1, // 订单数量
-
-        // 扩展数据
-        // extData: {
-        //   unit: this.formData.unit, // 单位
-        //   isDefault: this.formData.isDefault, // 是否默认地址
-        // },
+        driverMobile: this.formData.driverMobile, // 司机手机号
+        carNumber: this.formData.carNumber, // 车牌号
+        type: this.formData.type, // 车类型
       }
     },
 
@@ -263,19 +249,20 @@ export default {
         const order = await orderApi.getOrderDetail(this.orderId)
         console.log(order)
         this.formData = {
-          name: order.takeName,
-          phone: order.takeMobile,
+          takeName: order.takeName,
+          takeMobile: order.takeMobile,
           address: order.address,
           userAddressId: order.userAddressId,
-          quantity: order.buyCount,
-          totalCost: order.price,
-          originCity: order.shippingLocationAddress,
+          buyCount: order.buyCount,
+          price: order.price,
+          shippingLocationName: order.shippingLocationName,
+          shippingLocationAddress: order.shippingLocationAddress,
           shippingLocationId: order.shippingLocationId,
           driverUserId: order.driverUserId,
           driverName: order.driverName,
-          driverPhone: order.driverMobile,
-          plateNumber: order.carNumber,
-          vehicleType: order.type,
+          driverMobile: order.driverMobile,
+          carNumber: order.carNumber,
+          type: order.type,
         }
       }
       catch (error) {
@@ -344,8 +331,8 @@ export default {
 
     // 选择用户地址
     selectUserAddress(address) {
-      this.formData.name = address.name
-      this.formData.phone = address.mobile
+      this.formData.takeName = address.name
+      this.formData.takeMobile = address.mobile
       this.formData.address = address.address
       this.formData.userAddressId = address.id
       this.formData.isDefault = address.isDefault || false
@@ -354,7 +341,8 @@ export default {
 
     // 选择发货地址
     selectShippingAddress(address) {
-      this.formData.originCity = address.name || address.address
+      this.formData.shippingLocationName = address.name
+      this.formData.shippingLocationAddress = address.address
       this.formData.shippingLocationId = address.id
       this.showShippingAddressModal = false
     },
@@ -400,8 +388,8 @@ export default {
       this.formData.driverUserId = driver.id
       this.formData.driverName = driver.username
       this.formData.driverPhone = driver.mobile
-      this.formData.plateNumber = driver.carNumber
-      this.formData.vehicleType = driver.type
+      this.formData.carNumber = driver.carNumber
+      this.formData.type = driver.type
       this.showDriverModal = false
     },
 
@@ -430,10 +418,10 @@ export default {
           <!-- 姓名和电话 -->
           <view class="contact-info flex-row justify-between">
             <text class="contact-name">
-              {{ formData.name }}
+              {{ formData.takeName }}
             </text>
             <text class="contact-phone">
-              {{ formData.phone }}
+              {{ formData.takeMobile }}
             </text>
           </view>
           <!-- 地址信息 -->
@@ -461,7 +449,7 @@ export default {
 
         <!-- 购买数量 -->
         <u-form-item
-          prop="quantity"
+          prop="buyCount"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -472,7 +460,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.quantity"
+              v-model="formData.buyCount"
               placeholder="购买数量"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
@@ -493,7 +481,7 @@ export default {
 
         <!-- 发货地址 -->
         <u-form-item
-          prop="originCity"
+          prop="shippingLocationName"
           :border-bottom="false"
           class="form-item-custom shipping-address-item"
         >
@@ -506,15 +494,15 @@ export default {
             <view class="shipping-address-content">
               <text
                 class="shipping-address-text"
-                :class="{ 'placeholder-text': !formData.originCity }"
+                :class="{ 'placeholder-text': !formData.shippingLocationName }"
               >
-                {{ formData.originCity || '请选择发货地址' }}
+                {{ formData.shippingLocationName || '请选择发货地址' }}
               </text>
               <u-icon name="arrow-down-fill" size="14" color="#999999" />
             </view>
             <!-- 隐藏的输入框用于表单验证 -->
             <input
-              v-model="formData.originCity"
+              v-model="formData.shippingLocationName"
               style="display: none;"
               border="none"
             />
@@ -559,7 +547,7 @@ export default {
 
         <!-- 司机手机号 -->
         <u-form-item
-          prop="driverPhone"
+          prop="driverMobile"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -570,7 +558,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.driverPhone"
+              v-model="formData.driverMobile"
               placeholder="司机手机号"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
@@ -590,7 +578,7 @@ export default {
 
         <!-- 车牌号 -->
         <u-form-item
-          prop="plateNumber"
+          prop="carNumber"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -601,7 +589,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.plateNumber"
+              v-model="formData.carNumber"
               placeholder="请输入车牌号"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
@@ -619,7 +607,7 @@ export default {
 
         <!-- 车辆类型 -->
         <u-form-item
-          prop="vehicleType"
+          prop="type"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -630,7 +618,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.vehicleType"
+              v-model="formData.type"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
               :custom-style="{
@@ -653,7 +641,7 @@ export default {
         总共费用
       </text>
       <text class="total-cost">
-        ¥{{ formData.totalCost }}
+        ¥{{ formData.price }}
       </text>
       <view
         class="confirm-order-btn flex-col"
