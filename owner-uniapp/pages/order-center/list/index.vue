@@ -201,29 +201,29 @@ export default {
     // 验收授权
     async handleCheckOrder(order) {
       console.log('order', order)
-      uni.navigateTo({
-        url: `/pages/order-center/check/index?orderId=${order.id}`,
+      // uni.navigateTo({
+      //   url: `/pages/order-center/check/index?orderId=${order.id}`,
+      // })
+      uni.showLoading({
+        title: '获取链接中',
       })
-      // uni.showLoading({
-      //   title: '获取链接中',
-      // })
-      // this.checkOrderLinkLoading = true
-      // const res = await orderApi.getOrderCheckLink({
-      //   orderNo: order.orderNo,
-      // })
-      // this.checkOrderLinkLoading = false
-      // uni.hideLoading()
-      // if (res) {
-      //   this.checkOrderLink = res
-      // }
-      // else {
-      //   uni.showToast({
-      //     title: '获取链接失败',
-      //     icon: 'none',
-      //   })
-      // }
-      // this.showCheckOrderModal = true
-      // this.shareOrder = order
+      this.checkOrderLinkLoading = true
+      const res = await orderApi.getOrderCheckLink({
+        orderNo: order.orderNo,
+      })
+      this.checkOrderLinkLoading = false
+      uni.hideLoading()
+      if (res) {
+        this.checkOrderLink = res
+      }
+      else {
+        uni.showToast({
+          title: '获取链接失败',
+          icon: 'none',
+        })
+      }
+      this.showCheckOrderModal = true
+      this.shareOrder = order
     },
     // 确认收货
     handleConfirmOrder(order) {
