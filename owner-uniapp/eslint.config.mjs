@@ -28,5 +28,6 @@ export default uniHelper({
     'no-extend-native': 'off',
     'vue/no-v-text-v-html-on-component': 'off',
     'node/prefer-global/process': 'off',
+    'vue/html-self-closing': 'off',
   },
 })
