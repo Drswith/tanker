@@ -6,6 +6,7 @@ import { getToken, getUserInfo, setUserInfo } from '@/utils/auth'
 export default {
   data() {
     return {
+      OrderStatus: Object.freeze(OrderStatus),
       userInfo: {
         id: null,
         username: '',
@@ -178,9 +179,14 @@ export default {
       </view>
 
       <view class="order-center-section flex-col">
-        <text class="section-title">
-          订单中心
-        </text>
+        <view class="section-title-container">
+          <view class="section-title">
+            订单中心
+          </view>
+          <view class="section-title-view-more" @click="goToOrderList(2)">
+            查看更多
+          </view>
+        </view>
         <view class="order-status-list flex-row justify-between">
           <view
             v-for="(item, index) in gridOptions"

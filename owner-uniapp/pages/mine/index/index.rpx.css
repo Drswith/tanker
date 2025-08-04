@@ -61,12 +61,25 @@
   padding: 32rpx 42rpx 26rpx 32rpx;
 }
 
+.section-title-container {
+  display: flex;
+  justify-content: space-between;
+}
+
 .section-title {
   overflow-wrap: break-word;
   color: rgba(77, 78, 70, 1);
   font-size: 32rpx;
   font-family: PingFangSC-Semibold;
   font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 44rpx;
+}
+.section-title-view-more{
+  overflow-wrap: break-word;
+  color: #FF9E00;
+  font-size: 28rpx;
   text-align: left;
   white-space: nowrap;
   line-height: 44rpx;
