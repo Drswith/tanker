@@ -91,6 +91,12 @@ export default {
     coverViewStyle() {
       return `background-color: red;${this.styleCss()}`
     },
+    scrollViewStyle() {
+      return {
+        width: '100%',
+        height: `${this.menuHeight}px`,
+      }
+    },
     list() {
       if (!this.orderData)
         return []
@@ -153,12 +159,6 @@ export default {
       }
       else {
         return this.originCss()// `width: calc(100% - 20px);`
-      }
-    },
-    scrollViewStyle() {
-      return {
-        width: '100%',
-        height: `${this.menuHeight}px`,
       }
     },
     targetCss() {
