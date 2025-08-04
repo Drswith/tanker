@@ -136,9 +136,7 @@ export default {
 
     // 返回上一页
     navigateBack() {
-      uni.switchTab({
-        url: '/pages/mine/index/index',
-      })
+      uni.navigateBack()
     },
   },
 }
