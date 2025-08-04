@@ -1,4 +1,5 @@
 <script>
+import { orderApi, OrderStatus, OrderStatusText } from '@/api/order'
 import { userApi } from '@/api/user'
 import { getToken, getUserInfo, setUserInfo } from '@/utils/auth'
 
@@ -21,26 +22,31 @@ export default {
           icon:
             '/static/images/mine-wait.png',
           label: '待接单',
+          status: OrderStatus.Paid,
         },
         {
           icon:
             '/static/images/mine-sign.png',
           label: '待签署',
+          status: OrderStatus.Accepted,
         },
         // {
         //   icon:
         //     '/static/images/mine-signed.png',
         //   label: '待签署',
+        //   status: OrderStatus.Accepted,
         // },
         {
           icon:
             '/static/images/mine-trans.png',
           label: '运输中',
+          status: OrderStatus.DriverSigned,
         },
         {
           icon:
             '/static/images/mine-finished.png',
           label: '已完成',
+          status: OrderStatus.GpsReceived,
         },
       ],
       constants: {},
@@ -78,6 +84,13 @@ export default {
       finally {
         this.pageState.isLoading = false
       }
+    },
+
+    goToOrderList(index) {
+      console.log(this.gridOptions[index].status)
+      uni.reLaunch({
+        url: `/pages/order-center/list/index?orderStatus=${this.gridOptions[index].status}`,
+      })
     },
 
     // 跳转到用户信息页面
@@ -173,6 +186,7 @@ export default {
             v-for="(item, index) in gridOptions"
             :key="index"
             class="order-status-item flex-col"
+            @click="goToOrderList(index)"
           >
             <image
               class="status-icon"
