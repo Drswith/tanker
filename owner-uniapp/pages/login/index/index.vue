@@ -235,8 +235,9 @@ export default {
     },
 
     // 切换协议同意状态
-    toggleAgreement() {
-      this.isAgreed = !this.isAgreed
+    toggleAgreement(e) {
+      let values = e.detail.value
+      console.log(values)
     },
   },
 }
@@ -433,26 +434,27 @@ export default {
         </text>
       </view>
 
-      <!-- 协议条款 -->
-      <view class="agreement-container flex-row align-center">
-        <view class="radio-container" @click="toggleAgreement">
-          <view class="radio-icon" :class="{ checked: isAgreed }">
-            <view v-if="isAgreed" class="radio-dot" />
-          </view>
+      <label class="agreement-container flex-row align-center">
+        <view>
+          <checkbox-group class="radio-container" @change="toggleAgreement">
+            <label>
+              <checkbox color="#FF9500" class="radio-icon" value="cb" :checked="isAgreed" />
+            </label>
+          </checkbox-group>
         </view>
         <view class="agreement-text-container flex-row flex-wrap">
           <text class="agreement-text">
             如您点击授权，您将同意并接受
-            <text class="agreement-link" @click="openUserAgreement">
+            <text class="agreement-link" @click.stop="openUserAgreement">
               《用户服务协议》
             </text>
             、
-            <text class="agreement-link" @click="openPrivacyPolicy">
+            <text class="agreement-link" @click.stop="openPrivacyPolicy">
               《隐私政策》
             </text>
           </text>
         </view>
-      </view>
+      </label>
     </view>
   </view>
 </template>
