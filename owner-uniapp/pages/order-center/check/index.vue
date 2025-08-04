@@ -1,8 +1,9 @@
 <script>
 import { orderApi, OrderStatusText } from '@/api/order'
+import StatusTag from './components/StatusTag.vue'
 
 export default {
-  components: {},
+  components: { StatusTag },
   props: {},
   data() {
     return {
@@ -171,7 +172,35 @@ export default {
       </view>
 
       <!-- 待收货信息卡片 -->
-      <view class="info-card delivery-card">
+      <view class="info-card">
+        <view class="card-header">
+          <StatusTag
+            :status="orderData.status"
+            :text="statusText"
+          />
+        </view>
+
+        <view class="card-content">
+          <view class="info-row">
+            <text class="info-label">
+              {{ orderData.memberName }}
+            </text>
+            <text class="info-value">
+              {{ orderData.memberMobile }}
+            </text>
+          </view>
+
+          <view class="info-row">
+            <text class="info-label">
+              收货地址：
+            </text>
+            <text class="info-value">
+              {{ orderData.address }}
+            </text>
+          </view>
+        </view>
+      </view>
+      <!-- <view class="info-card delivery-card">
         <view class="card-header">
           <text class="card-title">
             {{ statusText }}
@@ -195,7 +224,7 @@ export default {
             </text>
           </view>
         </view>
-      </view>
+      </view> -->
 
       <!-- 订单详情 -->
       <view class="detail-section">
@@ -384,27 +413,32 @@ export default {
 
 .content-container {
   flex: 1;
-  padding: 32rpx;
-  gap: 32rpx;
+  // padding: 32rpx;
+  // gap: 32rpx;
+  padding-bottom: 200rpx;
 }
 
 .tip-banner {
-  background: linear-gradient(90deg, #1890ff 0%, #40a9ff 100%);
-  border-radius: 16rpx;
-  padding: 24rpx 32rpx;
-  margin-bottom: 16rpx;
+  background-color: #FF901E;
+  padding: 16rpx 32rpx;
 }
 
 .tip-text {
-  font-size: 28rpx;
-  color: #ffffff;
-  text-align: center;
+  font-weight: 400;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  line-height: 34rpx;
+  text-align: left;
+  font-style: normal;
 }
 
 .info-card {
+ position: relative;
   background-color: #ffffff;
-  border-radius: 16rpx;
-  padding: 32rpx;
+  // border-radius: 16rpx;
+  // padding: 32rpx;
+  padding: 32rpx 32rpx 32rpx 32rpx;
+  overflow: hidden;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
@@ -414,18 +448,40 @@ export default {
 
 .card-header {
   margin-bottom: 24rpx;
+  display: flex;
 }
 
 .card-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #52c41a;
+font-family: PingFangSC, PingFang SC;
+font-weight: 600;
+font-size: 28rpx;
+color: #4D4E46;
+line-height: 40rpx;
+text-align: left;
+font-style: normal;
 }
 
 .card-content {
-  gap: 16rpx;
+  // gap: 16rpx;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 28rpx;
+  color: #4D4E46;
+  line-height: 40rpx;
+  text-align: left;
+  font-style: normal;
+  position: relative;
+  margin-bottom: 42rpx;
 }
-
+.arrow-icon {
+  width: 16rpx;
+  height: 32rpx;
+  // margin: 30rpx 0 32rpx 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0;
+}
 .info-row {
   display: flex;
   align-items: center;
@@ -594,21 +650,23 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
+  display: flex;
   background-color: #ffffff;
   border-top: 1rpx solid #e5e5e5;
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  padding: 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); /* 适配安全区域 */
   z-index: 999;
+  justify-content: flex-end;
+  flex-direction: row;
+  align-items: center;
 }
 
 .confirm-btn {
-  width: 100%;
-  height: 80rpx;
-  background-color: #ffa940;
-  border-radius: 8rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: rgba(255, 158, 0, 1);
+  border-radius: 24px;
+  padding: 26rpx 80rpx 26rpx 80rpx;
+  transition: all 0.3s ease;
+
 }
 
 .confirm-btn.submitting {
