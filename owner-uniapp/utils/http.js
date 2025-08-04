@@ -53,6 +53,8 @@ http.interceptors.request.use(
   },
 )
 
+let loginPromise = null
+
 // 添加响应拦截器 - 处理业务逻辑
 http.interceptors.response.use(
   (response) => {
@@ -72,39 +74,38 @@ http.interceptors.response.use(
         clearTokenInfos()
         clearUserInfo()
 
-        // #ifdef H5
-        uni.showToast({
-          title: data.errMsg || '请先登录!',
-          icon: 'none',
-        })
-
-        // 延迟跳转到登录页
-        setTimeout(() => {
-          uni.navigateTo({
-            url: '/pages/login/index/index',
+        if (!loginPromise) {
+          loginPromise = new Promise((resolve, reject) => {
+            uni.showModal({
+              title: '提示',
+              content: data.errMsg || '请先登录!',
+              success(res) {
+                if (res.confirm) {
+                  console.log('用户点击确定')
+                  uni.navigateTo({
+                    url: '/pages/login/index/index',
+                  }).then(() => {
+                    resolve()
+                  }).catch((err) => {
+                    reject(err)
+                  })
+                }
+                else if (res.cancel) {
+                  console.log('用户点击取消')
+                  reject(new Error('用户取消登录'))
+                }
+              },
+              fail(err) {
+                reject(err)
+              },
+              complete() {
+                loginPromise = null
+              },
+            })
           })
-        }, 800)
-        // #endif
+        }
 
-        // #ifdef MP-WEIXIN
-        uni.showModal({
-          title: '提示',
-          content: data.errMsg || '请先登录!',
-          success(res) {
-            if (res.confirm) {
-              console.log('用户点击确定')
-              uni.navigateTo({
-                url: '/pages/login/index/index',
-              })
-            }
-            else if (res.cancel) {
-              console.log('用户点击取消')
-            }
-          },
-        })
-        // #endif
-
-        return Promise.reject(new Error(data.errMsg || '未授权'))
+        return loginPromise
       }
 
       // 处理403禁止访问
