@@ -917,7 +917,7 @@ export default {
   background-color: #ffffff;
   // border-radius: 16rpx;
   // padding: 32rpx;
-  padding: 60rpx 32rpx 0 32rpx;
+  padding: 48rpx 32rpx 0 32rpx;
   border-radius: 60rpx 60rpx 0rpx 0rpx;
   overflow: hidden;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
