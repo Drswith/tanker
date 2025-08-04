@@ -418,7 +418,7 @@ export default {
           <view class="input-field flex-col" @click="selectRegion">
             <view class="address-input-field">
               <view>{{ regionDisplayText }}</view>
-              <u-icon name="arrow-down-fill" size="28" />
+              <u-icon name="arrow-down-fill" size="14" />
             </view>
           </view>
         </u-form-item>
