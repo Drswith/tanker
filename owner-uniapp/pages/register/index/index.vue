@@ -7,11 +7,11 @@ export default {
     return {
       // 表单数据
       formData: {
-        phoneNumber: '', // 手机号
-        verificationCode: '', // 验证码
-        invitationCode: '', // 邀请码
+        mobile: '', // 手机号
+        verifyCode: '', // 验证码（用于前端显示，提交时作为查询参数）
+        inviteCode: '', // 邀请码
         companyName: '', // 公司名称
-        contactPerson: '', // 联系人
+        realName: '', // 联系人（真实姓名）
         companyAddress: '', // 公司地址
         businessLicense: '', // 营业执照
       },
@@ -31,19 +31,19 @@ export default {
       constants: {
         CODE_COUNTDOWN_TIME: 60, // 验证码倒计时时间（秒）
         PHONE_REGEX: /^1[3-9]\d{9}$/, // 手机号正则
-        REQUIRED_FIELDS: ['phoneNumber', 'companyName', 'contactPerson'], // 必填字段
+        REQUIRED_FIELDS: ['mobile', 'companyName', 'realName'], // 必填字段
       },
 
       // 表单验证规则
       rules: {
-        phoneNumber: [
+        mobile: [
           {
             required: true,
             message: '请输入手机号码',
             trigger: ['blur', 'change'],
           },
         ],
-        verificationCode: [
+        verifyCode: [
           {
             required: true,
             message: '请输入验证码',
@@ -63,7 +63,7 @@ export default {
             trigger: ['blur', 'change'],
           },
         ],
-        contactPerson: [
+        realName: [
           {
             required: true,
             message: '请输入联系人姓名',
@@ -77,7 +77,7 @@ export default {
   methods: {
     // 发送验证码
     async sendVerificationCode() {
-      if (!this.formData.phoneNumber) {
+      if (!this.formData.mobile) {
         uni.showToast({
           title: '请先输入手机号',
           icon: 'none',
@@ -85,7 +85,7 @@ export default {
         return
       }
 
-      if (!this.constants.PHONE_REGEX.test(this.formData.phoneNumber)) {
+      if (!this.constants.PHONE_REGEX.test(this.formData.mobile)) {
         uni.showToast({
           title: '请输入正确的手机号',
           icon: 'none',
@@ -113,7 +113,7 @@ export default {
 
       try {
         // TODO: 调用发送验证码接口
-        await userApi.getVerifyCode({ mobile: this.formData.phoneNumber })
+        await userApi.getVerifyCode({ mobile: this.formData.mobile })
         uni.showToast({
           title: '验证码已发送',
           icon: 'success',
@@ -196,17 +196,27 @@ export default {
     // 提交注册
     async submitRegistration() {
       try {
-        const valid = await this.validateForm()
-        if (!valid) {
-          return
-        }
+        // const valid = await this.validateForm()
+        // if (!valid) {
+        //   return
+        // }
 
         this.pageState.isLoading = true
 
-        await userApi.register(this.formData)
+        // 构建用户数据对象，排除verificationCode
+        const userData = {
+          mobile: this.formData.mobile,
+          inviteCode: this.formData.inviteCode,
+          companyName: this.formData.companyName,
+          realName: this.formData.realName,
+          companyAddress: this.formData.companyAddress,
+          businessLicense: this.formData.businessLicense,
+        }
+
+        await userApi.register(userData, this.formData.verifyCode)
 
         uni.showToast({
-          title: '注册成功',
+          title: '已提交，待审核',
           icon: 'success',
         })
 
@@ -262,8 +272,7 @@ export default {
       >
         <!-- 手机号 -->
         <u-form-item
-          prop="phoneNumber"
-          :required="true"
+          prop="mobile"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -279,7 +288,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.phoneNumber"
+              v-model="formData.mobile"
               placeholder="请输入手机号码"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
@@ -297,7 +306,7 @@ export default {
 
         <!-- 验证码 -->
         <u-form-item
-          prop="verificationCode"
+          prop="verifyCode"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -313,7 +322,7 @@ export default {
           </template>
           <view class="input-field input-field--with-button flex-row justify-between">
             <u--input
-              v-model="formData.verificationCode"
+              v-model="formData.verifyCode"
               placeholder="请输入验证码"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
@@ -339,7 +348,7 @@ export default {
 
         <!-- 邀请码 -->
         <u-form-item
-          prop="invitationCode"
+          prop="inviteCode"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -350,7 +359,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.invitationCode"
+              v-model="formData.inviteCode"
               placeholder="请输入邀请码"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"
@@ -367,7 +376,6 @@ export default {
         <!-- 公司名称 -->
         <u-form-item
           prop="companyName"
-          :required="true"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -399,8 +407,7 @@ export default {
 
         <!-- 联系人 -->
         <u-form-item
-          prop="contactPerson"
-          :required="true"
+          prop="realName"
           :border-bottom="false"
           class="form-item-custom"
         >
@@ -416,7 +423,7 @@ export default {
           </template>
           <view class="input-field flex-col">
             <u--input
-              v-model="formData.contactPerson"
+              v-model="formData.realName"
               placeholder="请输入联系人姓名"
               placeholder-style="color: #999999; font-size: 28rpx;"
               border="none"

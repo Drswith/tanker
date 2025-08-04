@@ -19,8 +19,9 @@ export const userApi = {
   },
 
   // 注册
-  register(data) {
-    return request.post('/api/auth/register', data)
+  register(data, verifyCode) {
+    const url = verifyCode ? `/api/auth/register?verifyCode=${verifyCode}` : '/api/auth/register'
+    return request.post(url, data)
   },
 
   // 登出
