@@ -249,9 +249,8 @@ export default {
 
     // 忘记密码
     forgotPassword() {
-      uni.showToast({
-        title: '功能开发中',
-        icon: 'none',
+      uni.navigateTo({
+        url: '/pages/change-password/index/index?operateType=reset',
       })
     },
 
