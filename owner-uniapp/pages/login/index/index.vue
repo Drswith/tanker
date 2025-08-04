@@ -13,11 +13,9 @@ export default {
 
       // 表单数据
       formData: {
-        phoneNumber: '15145645622', // 手机号
-        password: '123456', // 密码
-        // phoneNumber: '', // 手机号
-        // password: '', // 密码
-        verificationCode: '', // 验证码
+        phoneNumber: '', // 手机号
+        password: '', // 密码
+        verifyCode: '', // 验证码
       },
 
       // 页面状态
@@ -30,7 +28,6 @@ export default {
 
       // 常量配置
       constants: {
-        PHONE_REGEX: /^1[3-9]\d{9}$/, // 手机号正则
         CODE_COUNTDOWN_TIME: 60, // 验证码倒计时时间（秒）
       },
 
@@ -42,11 +39,6 @@ export default {
             message: '请输入手机号码',
             trigger: ['blur', 'change'],
           },
-          {
-            pattern: /^1[3-9]\d{9}$/,
-            message: '请输入正确的手机号码',
-            trigger: ['blur', 'change'],
-          },
         ],
         password: [
           {
@@ -54,21 +46,11 @@ export default {
             message: '请输入密码',
             trigger: ['blur', 'change'],
           },
-          {
-            min: 6,
-            message: '密码长度不能少于6位',
-            trigger: ['blur', 'change'],
-          },
         ],
-        verificationCode: [
+        verifyCode: [
           {
             required: true,
             message: '请输入验证码',
-            trigger: ['blur', 'change'],
-          },
-          {
-            len: 6,
-            message: '验证码长度为6位',
             trigger: ['blur', 'change'],
           },
         ],
@@ -88,7 +70,7 @@ export default {
       else {
         return {
           phoneNumber: this.rules.phoneNumber,
-          verificationCode: this.rules.verificationCode,
+          verifyCode: this.rules.verifyCode,
         }
       }
     },
@@ -100,7 +82,7 @@ export default {
       this.loginType = type
       // 清空表单数据
       this.formData.password = ''
-      this.formData.verificationCode = ''
+      this.formData.verifyCode = ''
       // 清除验证错误
       this.$nextTick(() => {
         this.$refs.uForm.clearValidate()
@@ -117,14 +99,6 @@ export default {
       if (!this.formData.phoneNumber) {
         uni.showToast({
           title: '请先输入手机号',
-          icon: 'none',
-        })
-        return
-      }
-
-      if (!this.constants.PHONE_REGEX.test(this.formData.phoneNumber)) {
-        uni.showToast({
-          title: '请输入正确的手机号',
           icon: 'none',
         })
         return
@@ -203,35 +177,27 @@ export default {
         else {
           const res = await userApi.smsLogin({
             mobile: this.formData.phoneNumber,
-            verifyCode: this.formData.verificationCode,
+            verifyCode: this.formData.verifyCode,
           })
           console.log('登录结果', res)
-          const { token, profile, tokenInfos } = res
+          const { token, token_infos, ...profile } = res
           if (!token) {
             throw new Error('登录失败')
           }
           setToken(token)
-          setTokenInfos(tokenInfos)
-          setUserInfo(profile)
+          setTokenInfos(token_infos)
+          setUserInfo({ ...profile })
         }
 
-        uni.showToast({
-          title: '登录成功',
-          icon: 'success',
-          duration: 1000,
+        uni.reLaunch({
+          url: '/pages/home/index/index',
         })
-
-        // 延迟跳转到首页
-        setTimeout(() => {
-          uni.switchTab({
-            url: '/pages/home/index/index',
-          })
-        }, 1000)
       }
       catch (error) {
         console.log(error)
+
         uni.showToast({
-          title: error.errMsg || error.message || '登录失败，请重试',
+          title: error[0]?.message || error.errMsg || error.message || '登录失败，请重试',
           icon: 'none',
         })
       }
@@ -250,7 +216,7 @@ export default {
     // 忘记密码
     forgotPassword() {
       uni.navigateTo({
-        url: '/pages/change-password/index/index?operateType=reset',
+        url: '/pages/change-password/index/index',
       })
     },
 
@@ -338,7 +304,7 @@ export default {
         <!-- 验证码登录 -->
         <template v-if="loginType === 'sms'">
           <u-form-item
-            prop="verificationCode"
+            prop="verifyCode"
             :required="true"
             :border-bottom="false"
             class="form-item-custom"
@@ -355,7 +321,7 @@ export default {
             </template>
             <view class="input-field input-field--with-button flex-row justify-between">
               <u--input
-                v-model="formData.verificationCode"
+                v-model="formData.verifyCode"
                 placeholder="请输入验证码"
                 placeholder-style="color: #999999; font-size: 28rpx;"
                 border="none"
