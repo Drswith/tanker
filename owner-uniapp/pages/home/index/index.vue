@@ -280,6 +280,11 @@ export default {
           <view v-if="pageState.isLoading" class="loading-container">
             <uni-load-more icon-type="circle" status="loading" />
           </view>
+
+          <view v-else-if="orderList.length === 0" class="empty-container">
+            <text>暂无订单</text>
+          </view>
+
           <view v-else class="">
             <view class="title">
               当前订单
@@ -432,6 +437,14 @@ export default {
 		align-items: center;
 		min-height: 20vh;
 	}
+
+  .empty-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20vh;
+  }
+
   .title {
     font-weight: 600;
     font-size: 32rpx;
