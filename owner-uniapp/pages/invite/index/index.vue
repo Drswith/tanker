@@ -1,10 +1,12 @@
 <script>
+const mockImg = 'http://ottms.innoforce.cc/files/fef53f78-6644-4c97-9b4d-4dc83c0bcbd0.png'
+
 export default {
   components: {
   },
   data() {
     return {
-      shareImage: '',
+      shareImage: 'http://ottms.innoforce.cc/files/fef53f78-6644-4c97-9b4d-4dc83c0bcbd0.png',
       shareText: '邀请海报台可替换；\n海报必需内容：邀请者昵称、邀请码、二维码',
       inviterName: 'Xxxxx',
       inviteCode: 'QY8928',
@@ -12,8 +14,20 @@ export default {
   },
   onLoad() {
     // 页面加载时的逻辑
+    this.getShareImage().then((res) => {
+      this.shareImage = res
+    })
   },
   methods: {
+
+    getShareImage() {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(mockImg)
+        }, 500)
+      })
+    },
+
     // 分享到微信
     shareToWeChat() {
 
@@ -96,31 +110,18 @@ export default {
     <view class="share-content flex-col">
       <!-- 分享图片 -->
       <view class="share-image-wrapper">
-        <image class="share-image" :src="shareImage || '/static/images/kache.png'" mode="aspectFit" />
-        <!-- 二维码 -->
-        <view class="qr-code">
-          <image class="qr-image" src="/static/images/icon/qr-code.svg" />
-        </view>
-        <!-- 邀请信息 -->
-        <view class="invite-info">
-          <text class="invite-text">
-            邀请你加入 Xxxxx
-          </text>
-          <text class="invite-code">
-            邀请码：{{ inviteCode }}
-          </text>
-        </view>
+        <image :show-menu-by-longpress="true" class="share-image" :src="shareImage " mode="aspectFit" />
       </view>
     </view>
 
     <!-- 分享操作区域 -->
     <view class="share-actions flex-col">
-      <text class="share-title">
+      <!-- <text class="share-title">
         分享到:
-      </text>
+      </text> -->
 
       <!-- 分享按钮组 -->
-      <view class="share-buttons flex-row">
+      <!-- <view class="share-buttons flex-row">
         <view class="share-button flex-col" @click="shareToWeChat">
           <image class="share-icon" src="/static/images/icon/wechat.svg" />
           <text class="share-label">
@@ -148,10 +149,10 @@ export default {
             下载图片
           </text>
         </view>
-      </view>
+      </view> -->
 
       <button class="primary-button" open-type="share">
-        取消
+        分享到
       </button>
     </view>
   </view>

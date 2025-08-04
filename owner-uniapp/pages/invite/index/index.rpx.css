@@ -9,7 +9,7 @@
 .share-image-wrapper {
   width: 100%;
   position: relative;
-  background: linear-gradient(135deg, #ff9e00, #ffab00);
+  /* background: linear-gradient(135deg, #ff9e00, #ffab00); */
   border-radius: 16rpx;
   overflow: hidden;
   margin-bottom: 60rpx;
@@ -69,7 +69,8 @@
   background-color: rgba(255, 255, 255, 1);
   border-radius: 30rpx 30rpx 0 0;
   padding: 40rpx 32rpx 60rpx;
-  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1); */
+  
 }
 
 .share-title {
