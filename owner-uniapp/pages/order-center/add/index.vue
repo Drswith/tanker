@@ -641,7 +641,7 @@ export default {
         总共费用
       </text>
       <text class="total-cost">
-        ¥{{ formData.price }}
+        ¥{{ formData.price ? formData.price : 0.0 }}
       </text>
       <view
         class="confirm-order-btn flex-col"

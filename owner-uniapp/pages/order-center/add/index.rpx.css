@@ -128,13 +128,19 @@
 
 /* 底部操作栏 */
 .bottom-action-bar {
-  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
-  background-color: rgba(255, 255, 255, 1);
-  width: 100%;
-  padding: 32rpx 32rpx 32rpx 32rpx;
   position: fixed;
   bottom: 0;
   left: 0;
+  right: 0;
+  display: flex;
+  background-color: #ffffff;
+  border-top: 1rpx solid #e5e5e5;
+  padding: 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); /* 适配安全区域 */
+  z-index: 999;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
 }
 
 .cost-label {
