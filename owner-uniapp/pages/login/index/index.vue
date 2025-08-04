@@ -13,8 +13,10 @@ export default {
 
       // 表单数据
       formData: {
-        phoneNumber: '', // 手机号
-        password: '', // 密码
+        phoneNumber: '15145645622', // 手机号
+        password: '123456', // 密码
+        // phoneNumber: '', // 手机号
+        // password: '', // 密码
         verifyCode: '', // 验证码
       },
 
@@ -236,8 +238,9 @@ export default {
 
     // 切换协议同意状态
     toggleAgreement(e) {
-      let values = e.detail.value
-      console.log(values)
+      const arr = e.detail.value
+      console.log(arr)
+      this.isAgreed = arr.includes('agree')
     },
   },
 }
@@ -438,7 +441,7 @@ export default {
         <view>
           <checkbox-group class="radio-container" @change="toggleAgreement">
             <label>
-              <checkbox color="#FF9500" class="radio-icon" value="cb" :checked="isAgreed" />
+              <checkbox color="#FF9500" class="radio-icon" value="agree" :checked="isAgreed" />
             </label>
           </checkbox-group>
         </view>
