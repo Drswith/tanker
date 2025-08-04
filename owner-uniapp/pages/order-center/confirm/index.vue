@@ -43,26 +43,45 @@ export default {
 
       // GPS设备信息
       gpsDevices: [
-        {
-          id: 1,
-          nfcCode: '187239739712937129893',
-          qrCode: '18723973971',
-          serialNumber: '39739712',
-          // 核验项核验状态
-          nfcVerified: 'pending', // verified: 核验成功, failed: 核验失败, pending: 待核验
-          qrVerified: 'pending',
-          serialVerified: 'pending',
-        },
-        {
-          id: 2,
-          nfcCode: '293712983123123123',
-          qrCode: '973971218723',
-          serialNumber: '9089000',
-          // 核验项核验状态
-          nfcVerified: 'pending', // verified: 核验成功, failed: 核验失败, pending: 待核验
-          qrVerified: 'pending',
-          serialVerified: 'pending',
-        },
+        // {
+        //   id: 124,
+        //   creationTime: '2025-08-04 14:08:52',
+        //   lastModificationTime: '2025-08-04 14:08:52',
+        //   extData: null,
+        //   orderNo: '2025-07-11549',
+        //   nfcCode: 'fdYrw234', // NFC码
+        //   nfcName: null,
+        //   qrCode: 'fdrpKX7Y', // 二维码
+        //   qrCodeImg: 'http://ottms.innoforce.cc/files/qrcode/40364aa7-c326-4f11-b427-2ea49b551263.jpg',
+        //   leadSealNumber: 'bm0Hf43N', // 铅封码
+        //   userId: 1,
+        //   userRealName: '王五',
+        //   carNumber: '浙A123',
+        //   // 核验项核验状态
+        //   nfcVerified: 'pending', // verified: 核验成功, failed: 核验失败, pending: 待核验
+        //   qrVerified: 'pending',
+        //   serialVerified: 'pending',
+        // },
+        // {
+        //   id: 1,
+        //   nfcCode: '187239739712937129893',
+        //   qrCode: '18723973971',
+        //   leadSealNumber: '39739712',
+        //   // 核验项核验状态
+        //   nfcVerified: 'pending', // verified: 核验成功, failed: 核验失败, pending: 待核验
+        //   qrVerified: 'pending',
+        //   serialVerified: 'pending',
+        // },
+        // {
+        //   id: 2,
+        //   nfcCode: '293712983123123123',
+        //   qrCode: '973971218723',
+        //   leadSealNumber: '9089000',
+        //   // 核验项核验状态
+        //   nfcVerified: 'pending', // verified: 核验成功, failed: 核验失败, pending: 待核验
+        //   qrVerified: 'pending',
+        //   serialVerified: 'pending',
+        // },
       ],
 
       // 页面状态
@@ -244,6 +263,13 @@ export default {
         orderNo,
       })
       console.log('查询铅封码:', res)
+      this.gpsDevices = res.map(item => ({
+        ...item,
+        // 注入前端核验状态字段
+        nfcVerified: 'pending',
+        qrVerified: 'pending',
+        serialVerified: 'pending',
+      }))
     },
 
     // 更新位置
@@ -425,7 +451,7 @@ export default {
       let failMessage = ''
 
       if (verifyType === 'serial') {
-        targetCode = device.serialNumber
+        targetCode = device.leadSealNumber
         successMessage = '编码核验成功'
         failMessage = '编码核验失败'
         isSuccess = inputCode === targetCode
@@ -681,7 +707,7 @@ export default {
                 编码：
               </view>
               <view class="info-value">
-                {{ device.serialNumber }}
+                {{ device.leadSealNumber }}
               </view>
 
               <u-tag size="mini" :text="getDeviceStatusText(device.serialVerified)" :type="getDeviceStatusTagType(device.serialVerified)" plain plain-fill />
