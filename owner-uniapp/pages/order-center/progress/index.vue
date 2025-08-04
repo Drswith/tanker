@@ -27,7 +27,7 @@ export default {
   },
   data() {
     return {
-      proportionvc: 0.5, // 抽屉初始显示的位置，内容的百分比
+      proportionvc: 0.3, // 抽屉初始显示的位置，内容的百分比
       handleHeight: 20, // 抽屉顶部边框高度，可以设置0，隐藏
       mExpand: false,
       dragLength: 100,
@@ -38,7 +38,10 @@ export default {
       show: false,
       scrollTop: 0, // 支付宝使用
       mscrollTop: 0,
-      title: 'Hello',
+
+      // 地图参数
+      // longitude: 116.3974770000, //故宫
+      // latitude: 39.9086920000,//故宫
       longitude: myLocation.longitude,
       latitude: myLocation.latitude,
       covers: [
@@ -69,12 +72,6 @@ export default {
       ],
       polyline: [],
 
-      autoplay: true,
-      interval: 3000,
-      duration: 1000,
-      indicatorDots: true,
-      circular: true,
-
       // 路由参数
       routeParams: {
         orderId: null,
@@ -87,14 +84,12 @@ export default {
         isLoading: false,
         submitting: false,
       },
+
     }
   },
   computed: {
-    scrollViewStyle() {
-      return {
-        width: '100%',
-        height: `${this.menuHeight}px`,
-      }
+    coverViewStyle() {
+      return `background-color: red;${this.styleCss()}`
     },
     list() {
       if (!this.orderData)
@@ -150,23 +145,7 @@ export default {
   onReady() {
     this.$refs.drag.initTop()
   },
-
   methods: {
-    async initMarkLine() {
-      const polyline = await getPolyline({
-        from: start,
-        to: dest,
-        config: {
-          color: '#FF9E00',
-          width: 6,
-          dottedLine: false,
-        },
-      })
-
-      this.polyline = polyline
-      console.log('this.polyline', this.polyline)
-    },
-
     // nvue对top动画支持不够，使用css的其他的动画转换
     styleCss() {
       if (this.mExpand) {
@@ -176,34 +155,22 @@ export default {
         return this.originCss()// `width: calc(100% - 20px);`
       }
     },
+    scrollViewStyle() {
+      return {
+        width: '100%',
+        height: `${this.menuHeight}px`,
+      }
+    },
     targetCss() {
       return 'transform: translateY(100%);transition-property: transform;transition-duration: 1s;'
     },
     originCss() {
       return 'transform: translateY(0px);transition-property: transform;transition-duration: 1s;'
     },
-    getStyleObject() {
-      if (this.mExpand) {
-        return {
-          transform: 'translateY(100%)',
-          transitionProperty: 'transform',
-          transitionDuration: '1s',
-        }
-      }
-      else {
-        return {
-          transform: 'translateY(0px)',
-          transitionProperty: 'transform',
-          transitionDuration: '1s',
-        }
-      }
-    },
 
     onChange(e) {
-      let {
-        index,
-      } = e.detail
-      console.warn(index)
+      const { index } = e.detail
+      console.error(index)
       uni.showToast({
         title: `你点击了${index}`,
       })
@@ -260,6 +227,21 @@ export default {
     mapTap(event) {
       console.log(event)
     },
+
+    async initMarkLine() {
+      const polyline = await getPolyline({
+        from: start,
+        to: dest,
+        config: {
+          color: '#FF9E00',
+          width: 6,
+          dottedLine: false,
+        },
+      })
+
+      this.polyline = polyline
+      console.log('this.polyline', this.polyline)
+    },
     // 加载订单详情
     async loadOrderDetail() {
       try {
@@ -278,98 +260,87 @@ export default {
         this.pageState.isLoading = false
       }
     },
+
   },
 }
 </script>
 
 <template>
   <view>
-    <!-- 主要内容 -->
-    <view>
-      <!-- <text>vue 展示expand的使用和当内容过长，展开后的控制思路</text> -->
+    <!-- <text>vue 展示expand的使用和当内容过长，展开后的控制思路</text> -->
 
-      <!-- #ifdef APP-PLUS -->
-      <cover-view @click="expandDrawer()">
-        <!-- 展开收缩 -->
-      </cover-view>
-      <!-- #endif -->
-      <!-- #ifndef APP-PLUS -->
-      <map
-        id="map1"
-        ref="map1"
-        class="map-view"
-        :show-location="true"
-        :latitude="latitude"
-        :longitude="longitude"
-        :markers="covers"
-        :polyline="polyline"
-        :show-compass="true"
-        @tap="mapTap"
-      >
-        <cover-view @click="expandDrawer()">
-          <!-- 展开收缩 -->
-        </cover-view>
-      </map>
-      <!-- #endif -->
+    <!-- #ifdef APP-PLUS -->
+    <cover-view @click="expandDrawer()">
+      展开收缩
+    </cover-view>
+    <!-- #endif -->
+    <!-- #ifndef APP-PLUS -->
+    <map
+      id="map1"
+      ref="map1"
+      class="map-view"
+      :show-location="false"
+      :latitude="latitude"
+      :longitude="longitude"
+      :markers="covers"
+      :polyline="polyline"
+      :show-compass="true"
+      scale="14"
+      @tap="mapTap"
+    >
+      <cover-view @click="expandDrawer()">展开收缩</cover-view>
+      <!-- 替代解决nvue动画属性top不兼容问题  vue可行，nvue的uni还是不兼容 使用其他替代方案 -->
+      <cover-view v-if="false" ref="Item" class="tipNvue" :style="coverViewStyle" @click="expandDrawer">11111111111111</cover-view>
+    </map>
+    <!-- #endif -->
 
-      <ww-bottom-drawerapp
-        ref="drag" :proportion-show="proportionvc" :drag-handle-height="handleHeight" :is-expand="mExpand"
-        :can-drag="canDarg()" :drag-length="dragLength" :transition-time="transitionTime"
-        :menu-height="menuHeight" @callExpand="onCallExpand"
-      >
-        <slot>
-          <!-- 填充内容 -->
-          <scroll-view
-            :scroll-top="scrollTop" :scroll-y="mExpand" :style="scrollViewStyle"
-            @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
-          >
-            <!-- 加载状态 -->
-            <view v-if="pageState.isLoading" class="loading-container">
-              <text class="loading-text">
-                加载中...
-              </text>
-            </view>
-            <view v-else class="time-line">
-              <TimeLine :list="list" :current-index="currentIndex" />
-            </view>
-          </scroll-view>
+    <ww-bottom-drawerapp
+      ref="drag" :proportion-show="proportionvc" :drag-handle-height="handleHeight" :is-expand="mExpand"
+      :can-drag="canDarg()" :drag-length="dragLength" :transition-time="transitionTime"
+      :menu-height="menuHeight" @callExpand="onCallExpand"
+    >
+      <slot>
+        <!-- 填充内容 -->
+        <scroll-view
+          :scroll-top="scrollTop" :scroll-y="mExpand" :style="scrollViewStyle"
+          @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll"
+        >
+          <!-- <uni-grid :column="4" :highlight="false" :show-border="false" @change="onChange">
+            <uni-grid-item v-for="(item, index) in 80" :key="index" :index="index">
+              <view class="grid-item-box" style="background-color: #fff;">
+                <uni-icons type="image" :size="30" color="#777" />
+                <text class="text">
+                  文本信息
+                </text>
+              </view>
+            </uni-grid-item>
+          </uni-grid> -->
+          <view v-if="pageState.isLoading" class="loading-container">
+            <uni-load-more icon-type="circle" status="loading" />
+          </view>
+          <view v-else class="time-line">
+            <TimeLine :list="list" :current-index="currentIndex" />
+          </view>
+        </scroll-view>
         <!-- end -->
-        </slot>
-      </ww-bottom-drawerapp>
-    </view>
+      </slot>
+    </ww-bottom-drawerapp>
   </view>
 </template>
 
-<style>
-page {
-  background-color: #F8F8F8;
-}
-</style>
+<style scoped>
+ ::v-deep .drag-handle{
+    background-color: #fff;
+  }
 
-<style lang="scss" scoped>
-::v-deep .drag-handle{
+  ::v-deep .drawer-content{
+    background-color: #fff;
+    border-radius: 60rpx 60rpx 0 0;
+  }
+  ::v-deep .drag-content{
   background-color: #fff;
-}
-
-::v-deep .drawer-content{
-  background-color: #fff;
-  border-radius: 60rpx 60rpx 0 0;
-}
-::v-deep .drag-content{
- background-color: #fff;
-  border-radius: 60rpx 60rpx 0 0;
-}
-.loading-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		min-height: 50vh;
-	}
-
-	.loading-text {
-		font-size: 28rpx;
-		color: #666666;
-	}
+    border-radius: 60rpx 60rpx 0 0;
+  }
 
 	.tipNvue {
 		display: flex;
@@ -386,7 +357,6 @@ page {
 
 	.grid-item-box {
 		flex: 1;
-    /* position: relative; */
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
@@ -406,6 +376,13 @@ page {
 		display: block;
 		line-height: 100rpx;
 		text-align: center;
+	}
+
+  .loading-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 20vh;
 	}
   .time-line{
     padding: 16rpx 32rpx 32rpx 32rpx;
