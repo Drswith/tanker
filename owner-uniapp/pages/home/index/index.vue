@@ -253,12 +253,14 @@ export default {
       :menu-height="menuHeight" @callExpand="onCallExpand"
     >
       <slot>
-        <button class="float-btn" @click="navgateToAddOrderCenter">
-          <image
-            class="float-btn-icon"
-            src="/static/images/upload-plus.png"
-          />
-        </button>
+        <cover-view>
+          <button class="float-btn" @click.stop="navgateToAddOrderCenter">
+            <cover-image
+              class="float-btn-icon"
+              src="/static/images/upload-plus.png"
+            />
+          </button>
+        </cover-view>
 
         <!-- 填充内容 -->
         <scroll-view

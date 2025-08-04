@@ -700,7 +700,7 @@ export default {
 
     <!-- 确认收货弹窗 -->
     <u-modal
-      v-model="confirmModal.show"
+      :show="confirmModal.show"
       :title="confirmModal.title"
       :show-cancel-button="true"
       :show-confirm-button="true"
@@ -712,7 +712,7 @@ export default {
 
     <!-- 继续确认弹窗 -->
     <u-modal
-      v-model="continueModal.show"
+      :show="continueModal.show"
       :title="continueModal.title"
       :show-cancel-button="true"
       :show-confirm-button="true"
