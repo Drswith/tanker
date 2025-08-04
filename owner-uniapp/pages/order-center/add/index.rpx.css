@@ -226,3 +226,183 @@
   font-family: PingFangSC-Semibold;
   font-weight: 600;
 }
+
+/* ========================================
+   地址选择弹窗样式
+   ======================================== */
+.address-modal-content {
+  padding: 32rpx 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.address-list {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.address-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  /* border-bottom: 1px solid rgba(238, 238, 238, 1); */
+  transition: background-color 0.2s ease;
+}
+
+
+.address-item:last-child {
+  border-bottom: none;
+}
+
+.address-item-selected {
+  background-color: rgba(255, 158, 0, 0.05);
+  border-color: rgba(255, 158, 0, 0.2);
+}
+
+.address-item-content {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.address-item-radio {
+  margin-left: 24rpx;
+  flex-shrink: 0;
+}
+
+.radio-icon {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  /* border: 2px solid rgba(204, 204, 204, 1); */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.radio-checked {
+  /* border-color: rgba(255, 158, 0, 1); */
+  /* background-color: rgba(255, 158, 0, 1); */
+}
+
+/* 用户地址项样式 */
+.address-item .contact-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.address-item .contact-name {
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 40rpx;
+}
+
+.address-item .contact-phone {
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-weight: normal;
+  line-height: 40rpx;
+}
+
+.address-item .address-detail {
+  width: 100%;
+  height: auto;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.address-item .address-tag {
+  color: rgba(255, 158, 0, 1);
+  font-size: 24rpx;
+  font-weight: normal;
+  margin-right: 8rpx;
+}
+
+.address-item .address-text {
+  color: rgba(77, 78, 70, 1);
+  font-size: 26rpx;
+  font-weight: normal;
+  line-height: 36rpx;
+}
+
+/* 发货地址选择区域样式 */
+.shipping-address-item {
+  cursor: pointer;
+}
+
+.shipping-address-field {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+
+
+.shipping-address-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  min-height: 40rpx;
+}
+
+.shipping-address-text {
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  color: rgba(77, 78, 70, 1);
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+}
+
+.placeholder-text {
+  color: #999999 !important;
+}
+
+/* 发货地址项样式 */
+.shipping-name {
+  margin-bottom: 8rpx;
+  width: 100%;
+}
+
+.shipping-title {
+  color: rgba(77, 78, 70, 1);
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 40rpx;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.shipping-description {
+  margin-top: 8rpx;
+  width: 100%;
+}
+
+.description-text {
+  color: rgba(102, 102, 102, 1);
+  font-size: 24rpx;
+  font-weight: normal;
+  line-height: 34rpx;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* 空状态样式 */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200rpx;
+}
+
+.empty-text {
+  color: rgba(153, 153, 153, 1);
+  font-size: 28rpx;
+  font-weight: normal;
+}

@@ -102,6 +102,12 @@ export default {
       isLoading: false, // 加载状态
       isEdit: false, // 是否编辑模式
       orderId: null, // 订单ID（编辑时使用）
+
+      // 地址选择相关
+      userAddressList: [], // 用户地址列表
+      shippingAddressList: [], // 发货地址列表
+      showUserAddressModal: false, // 显示用户地址选择弹窗
+      showShippingAddressModal: false, // 显示发货地址选择弹窗
     }
   },
   onLoad(options) {
@@ -109,11 +115,15 @@ export default {
       this.isEdit = true
       this.orderId = options.orderId
       this.loadDetail()
+
       // 修改页面标题
       uni.setNavigationBarTitle({
         title: '修改订单',
       })
     }
+
+    this.loadUserAddressList()
+    this.loadShippingAddressList()
   },
   methods: {
     // 确认下单
@@ -267,22 +277,84 @@ export default {
         this.isLoading = false
       }
     },
+
+    // 加载用户地址列表
+    async loadUserAddressList() {
+      try {
+        this.isLoading = true
+        const addressList = await orderApi.getOrderUserAddressList()
+        this.userAddressList = addressList || []
+        console.log('用户地址列表:', addressList)
+      }
+      catch (error) {
+        console.error('加载地址列表失败:', error)
+        this.userAddressList = []
+        uni.showToast({
+          title: '加载地址列表失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.isLoading = false
+      }
+    },
+
+    // 加载发货地址列表
+    async loadShippingAddressList() {
+      try {
+        this.isLoading = true
+        const addressList = await orderApi.getOrderShippingAddressList()
+        this.shippingAddressList = addressList || []
+        console.log('发货地址列表:', addressList)
+      }
+      catch (error) {
+        console.error('加载发货地址列表失败:', error)
+        this.shippingAddressList = []
+        uni.showToast({
+          title: '加载发货地址列表失败',
+          icon: 'none',
+        })
+      }
+      finally {
+        this.isLoading = false
+      }
+    },
+
     // 选择收货地址
     selectDeliveryAddress() {
-      // TODO: 跳转到地址选择页面
-      uni.showToast({
-        title: '地址选择功能开发中',
-        icon: 'none',
-      })
+      this.showUserAddressModal = true
     },
 
     // 选择发货地址
     selectOriginAddress() {
-      // TODO: 跳转到发货地址选择页面
-      uni.showToast({
-        title: '发货地址选择功能开发中',
-        icon: 'none',
-      })
+      this.showShippingAddressModal = true
+    },
+
+    // 选择用户地址
+    selectUserAddress(address) {
+      this.formData.name = address.name || address.takeName
+      this.formData.phone = address.phone || address.takeMobile
+      this.formData.address = address.address
+      this.formData.userAddressId = address.id
+      this.formData.isDefault = address.isDefault || false
+      this.showUserAddressModal = false
+    },
+
+    // 选择发货地址
+    selectShippingAddress(address) {
+      this.formData.originCity = address.name || address.address
+      this.formData.shippingLocationId = address.id
+      this.showShippingAddressModal = false
+    },
+
+    // 关闭用户地址选择弹窗
+    closeUserAddressModal() {
+      this.showUserAddressModal = false
+    },
+
+    // 关闭发货地址选择弹窗
+    closeShippingAddressModal() {
+      this.showShippingAddressModal = false
     },
   },
 }
@@ -370,30 +442,29 @@ export default {
         <u-form-item
           prop="originCity"
           :border-bottom="false"
-          class="form-item-custom"
+          class="form-item-custom shipping-address-item"
         >
           <template #label>
             <text class="field-label">
               发货地址
             </text>
           </template>
-          <view class="input-field flex-col">
+          <view class="input-field flex-col shipping-address-field" @click="selectOriginAddress">
+            <view class="shipping-address-content">
+              <text 
+                class="shipping-address-text" 
+                :class="{ 'placeholder-text': !formData.originCity }"
+              >
+                {{ formData.originCity || '请选择发货地址' }}
+              </text>
+              <u-icon name="arrow-down-fill" size="14" color="#999999" />
+            </view>
+            <!-- 隐藏的输入框用于表单验证 -->
             <u--input
               v-model="formData.originCity"
-              placeholder="发货地址"
-              placeholder-style="color: #999999; font-size: 28rpx;"
+              style="display: none;"
               border="none"
-              :custom-style="{
-                backgroundColor: 'transparent',
-                padding: '0',
-                fontSize: '28rpx',
-                lineHeight: '40rpx',
-              }"
-            >
-              <template slot="suffix">
-                <u-icon name="arrow-down-fill" size="28" />
-              </template>
-            </u--input>
+            />
           </view>
         </u-form-item>
       </view>
@@ -428,7 +499,7 @@ export default {
               }"
             >
               <template slot="suffix">
-                <u-icon name="arrow-down-fill" size="28" />
+                <u-icon name="arrow-down-fill" size="14" />
               </template>
             </u--input>
           </view>
@@ -543,6 +614,124 @@ export default {
         </text>
       </view>
     </view>
+
+    <!-- 用户地址选择弹窗 -->
+    <u-modal
+      :show="showUserAddressModal"
+      title="选择收货地址"
+      :show-cancel-button="true"
+      cancel-text="取消"
+      :show-confirm-button="false"
+      width="680rpx"
+      border-radius="24rpx"
+      :duration="200"
+      @cancel="closeUserAddressModal"
+    >
+      <view class="address-modal-content">
+        <scroll-view scroll-y class="address-list" style="height: 600rpx;">
+          <view
+            v-for="(address, index) in userAddressList"
+            :key="index"
+            class="address-item"
+            :class="{ 'address-item-selected': formData.userAddressId === address.id }"
+            @click="selectUserAddress(address)"
+          >
+            <view class="address-item-content">
+              <view class="contact-info">
+                <text class="contact-name">
+                  {{ address.name }}
+                </text>
+                <text class="contact-phone">
+                  {{ address.mobile }}
+                </text>
+              </view>
+              <view class="address-detail">
+                <text v-if="address.isDefault" class="address-tag">
+                  【默认】
+                </text>
+                <text class="address-text">
+                  {{ address.address }}
+                </text>
+              </view>
+            </view>
+            <view class="address-item-radio">
+              <view
+                class="radio-icon"
+                :class="{ 'radio-checked': formData.userAddressId === address.id }"
+              >
+                <u-icon
+                  v-if="formData.userAddressId === address.id"
+                  name="checkmark"
+                  color="#FF9E00"
+                  size="16"
+                />
+              </view>
+            </view>
+          </view>
+          <view v-if="userAddressList.length === 0" class="empty-state">
+            <text class="empty-text">
+              暂无收货地址
+            </text>
+          </view>
+        </scroll-view>
+      </view>
+    </u-modal>
+
+    <!-- 发货地址选择弹窗 -->
+    <u-modal
+      :show="showShippingAddressModal"
+      title="选择发货地址"
+      :show-cancel-button="true"
+      cancel-text="取消"
+      :show-confirm-button="false"
+      width="680rpx"
+      :duration="200"
+      border-radius="24rpx"
+      @cancel="closeShippingAddressModal"
+    >
+      <view class="address-modal-content">
+        <scroll-view scroll-y class="address-list" style="height: 600rpx;">
+          <view
+            v-for="(address, index) in shippingAddressList"
+            :key="index"
+            class="address-item"
+            :class="{ 'address-item-selected': formData.shippingLocationId === address.id }"
+            @click="selectShippingAddress(address)"
+          >
+            <view class="address-item-content">
+              <view class="shipping-name">
+                <text class="shipping-title">
+                  {{ address.name }}
+                </text>
+              </view>
+              <view v-if="address.description" class="shipping-description">
+                <text class="description-text">
+                  {{ address.description }}
+                </text>
+              </view>
+            </view>
+            <view class="address-item-radio">
+              <view
+                class="radio-icon"
+                :class="{ 'radio-checked': formData.shippingLocationId === address.id }"
+              >
+                <u-icon
+                  v-if="formData.shippingLocationId === address.id"
+                  name="checkmark"
+                  color="#FF9E00"
+                  size="16"
+                />
+              </view>
+            </view>
+          </view>
+          <view v-if="shippingAddressList.length === 0" class="empty-state">
+            <text class="empty-text">
+              暂无发货地址
+            </text>
+          </view>
+        </scroll-view>
+      </view>
+    </u-modal>
   </view>
 </template>
 
