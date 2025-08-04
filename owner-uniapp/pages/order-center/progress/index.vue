@@ -288,9 +288,9 @@ export default {
       scale="14"
       @tap="mapTap"
     >
-      <cover-view @click="expandDrawer()">展开收缩</cover-view>
+      <!-- <cover-view @click="expandDrawer()">展开收缩</cover-view> -->
       <!-- 替代解决nvue动画属性top不兼容问题  vue可行，nvue的uni还是不兼容 使用其他替代方案 -->
-      <cover-view v-if="false" ref="Item" class="tipNvue" :style="coverViewStyle" @click="expandDrawer">11111111111111</cover-view>
+      <!-- <cover-view v-if="false" ref="Item" class="tipNvue" :style="coverViewStyle" @click="expandDrawer">11111111111111</cover-view> -->
     </map>
     <!-- #endif -->
 
