@@ -155,11 +155,15 @@ export default {
     // 获取地图坐标数据
     async getMap() {
       try {
-        const data = await mapApi.getMapCoordinates({})
-        console.log('地图坐标数据', data)
-        this.latitude = Number(data[0]?.position[0]) || this.latitude
-        this.longitude = Number(data[0]?.position[1]) || this.longitude
-        this.covers = data
+        const coordinates = await mapApi.getMapCoordinates({})
+        if (!coordinates || coordinates?.length === 0) {
+          return
+        }
+        console.log('地图坐标数据', coordinates)
+        const [latitude, longitude] = coordinates?.[0]?.position || []
+        this.latitude = Number(latitude) || this.latitude
+        this.longitude = Number(longitude) || this.longitude
+        this.covers = coordinates
           .map((item, index) => {
             const latitude = Number(item.position[0])
             const longitude = Number(item.position[1])
