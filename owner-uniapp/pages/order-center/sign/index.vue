@@ -69,11 +69,15 @@ export default {
     //   })
     // },
     async signContract() {
+      uni.showLoading({
+        title: '签署中...',
+      })
       try {
         await orderApi.signContract({
           id: Number.parseInt(this.contractId),
           imgPath: this.signUrl,
         })
+        uni.hideLoading()
         uni.showToast({
           title: '签署成功!',
           icon: 'success',
@@ -82,7 +86,7 @@ export default {
           uni.switchTab({
             url: '/pages/order-center/list/index',
           })
-        }, 1000)
+        }, 1500)
       }
       catch (error) {
         console.error(error)
@@ -90,6 +94,9 @@ export default {
           title: error.message,
           icon: 'none',
         })
+      }
+      finally {
+        uni.hideLoading()
       }
     },
 
