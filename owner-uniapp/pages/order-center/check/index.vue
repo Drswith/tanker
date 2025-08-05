@@ -10,7 +10,7 @@ export default {
       // 路由参数
       routeParams: {
         orderId: null,
-        checkLink: null,
+        uuid: null,
       },
       // 订单数据
       orderData: null,
@@ -50,17 +50,34 @@ export default {
   },
   watch: {},
   onLoad(options) {
-    this.routeParams.orderId = options.orderId
-    this.routeParams.checkLink = options.checkLink
+    // 处理可能被编码的路由参数
+    this.routeParams.orderId = this.decodeParam(options.orderId)
+    this.routeParams.uuid = this.decodeParam(options.uuid)
 
     if (this.routeParams.orderId) {
       // 加载订单详情
       this.loadOrderDetail()
     }
   },
-  created() {},
-  mounted() {},
   methods: {
+    // 解码路由参数
+    decodeParam(param) {
+      if (!param)
+        return param
+
+      try {
+        // 尝试解码参数
+        const decoded = decodeURIComponent(param)
+        // 如果解码后的值与原值不同，说明原来是编码的
+        return decoded
+      }
+      catch (error) {
+        // 如果解码失败，返回原值
+        console.warn('参数解码失败:', param, error)
+        return param
+      }
+    },
+
     // 加载订单详情
     async loadOrderDetail() {
       try {
@@ -102,7 +119,7 @@ export default {
 
     // 验证授权
     async verifyLink() {
-      if (!this.routeParams.checkLink) {
+      if (!this.routeParams.uuid) {
         uni.showToast({
           title: '请先获取验收授权链接',
           icon: 'none',
@@ -120,10 +137,10 @@ export default {
         const { orderId } = this.routeParams
         const { orderNo } = this.orderData
 
-        await orderApi.verifyOrderCheckLink({
+        await orderApi.verifyOrderuuid({
           id: orderId,
           orderNo,
-          uuid: this.routeParams.checkLink,
+          uuid: this.routeParams.uuid,
         })
 
         uni.showToast({
