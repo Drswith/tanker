@@ -1,5 +1,6 @@
 <script>
 import { driverApi } from '@/api/driver'
+import { getUserId } from '@/utils/auth'
 
 export default {
   data() {
@@ -82,7 +83,11 @@ export default {
       },
     }
   },
-
+  computed: {
+    userId() {
+      return getUserId()
+    },
+  },
   onLoad(options) {
     this.routeParams.id = options.id
     if (this.routeParams.id) {
@@ -138,7 +143,7 @@ export default {
 
         // 构建API请求数据，映射表单字段到API字段
         const driverData = {
-          memberUserId: 1,
+          memberUserId: this.userId,
           username: this.formData.driverName, // 司机姓名 -> realName
           mobile: this.formData.phoneNumber, // 手机号 -> mobile
           type: this.formData.type, // 车辆类型 -> type

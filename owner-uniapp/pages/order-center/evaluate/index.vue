@@ -1,5 +1,6 @@
 <script>
 import { orderApi } from '@/api/order'
+import { getUserId } from '@/utils/auth'
 
 export default {
   data() {
@@ -73,7 +74,11 @@ export default {
       },
     }
   },
-
+  computed: {
+    userId() {
+      return getUserId()
+    },
+  },
   onLoad(options) {
     this.routeParams.orderId = options.orderId
     if (this.routeParams.orderId) {
@@ -132,7 +137,7 @@ export default {
         const evaluateData = {
           orderNo: this.orderData.orderNo,
           driverId: this.orderData.driverUserId,
-          userId: 1, // 当前用户ID，实际应从用户状态获取
+          userId: this.userId,
           score: this.formData.score,
           content: this.formData.content,
           img: this.formData.img,
