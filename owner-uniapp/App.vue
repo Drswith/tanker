@@ -20,8 +20,8 @@ export default {
 
     delayedSearchTimeOutMs: 500, // 搜索延时
   },
-  onLaunch() {
-    console.log('App Launch')
+  onLaunch(options) {
+    console.log('App Launch', options)
     this.globalData.os = checkSystem()
   },
   onShow() {
