@@ -53,8 +53,16 @@ export default {
       constants: {},
     }
   },
+  computed: {
+    isLogin() {
+      const token = getToken()
+      return !!token
+    },
+  },
   onShow() {
-    this.loadUserProfile()
+    if (this.isLogin) {
+      this.loadUserProfile()
+    }
   },
   methods: {
     // 加载用户信息
@@ -96,6 +104,13 @@ export default {
 
     // 跳转到用户信息页面
     goToUserInfo() {
+      if (!this.isLogin) {
+        uni.reLaunch({
+          url: '/pages/login/index/index',
+        })
+        return
+      }
+
       uni.navigateTo({
         url: `/pages/mine/info/index?userId=${this.userInfo.id}`,
       })
@@ -165,10 +180,10 @@ export default {
         </view>
         <view class="user-details flex-col">
           <text class="username">
-            {{ userInfo.nickname || userInfo.username || '用户名称' }}
+            {{ isLogin ? userInfo.username || '用户名称' : '未登录' }}
           </text>
           <text class="user-mobile">
-            {{ userInfo.mobile || '暂无手机号' }}
+            {{ isLogin ? userInfo.mobile || '暂无手机号' : '点击登录' }}
           </text>
         </view>
         <image
@@ -177,123 +192,125 @@ export default {
           src="/static/images/mine-arrow.png"
         />
       </view>
-
-      <view class="order-center-section flex-col">
-        <view class="section-title-container">
-          <view class="section-title">
-            订单中心
+      <template v-if="isLogin">
+        <view class="order-center-section flex-col">
+          <view class="section-title-container">
+            <view class="section-title">
+              订单中心
+            </view>
+            <view class="section-title-view-more" @click="goToOrderList(2)">
+              查看更多
+            </view>
           </view>
-          <view class="section-title-view-more" @click="goToOrderList(2)">
-            查看更多
+          <view class="order-status-list flex-row justify-between">
+            <view
+              v-for="(item, index) in gridOptions"
+              :key="index"
+              class="order-status-item flex-col"
+              @click="goToOrderList(index)"
+            >
+              <image
+                class="status-icon"
+                referrerpolicy="no-referrer"
+                :src="item.icon"
+              />
+              <text class="status-label">
+                {{ item.label }}
+              </text>
+            </view>
           </view>
         </view>
-        <view class="order-status-list flex-row justify-between">
-          <view
-            v-for="(item, index) in gridOptions"
-            :key="index"
-            class="order-status-item flex-col"
-            @click="goToOrderList(index)"
-          >
-            <image
-              class="status-icon"
-              referrerpolicy="no-referrer"
-              :src="item.icon"
-            />
-            <text class="status-label">
-              {{ item.label }}
-            </text>
-          </view>
+      </template>
+    </view>
+    <template v-if="isLogin">
+      <view class="invite-section flex-row" @click="goToInvite">
+        <view class="invite-info flex-col">
+          <text class="invite-title">
+            邀请好友
+          </text>
+          <text class="invite-code">
+            邀请码：{{ userInfo.inviter || '暂无邀请码' }}
+          </text>
         </view>
-      </view>
-    </view>
-
-    <view class="invite-section flex-row" @click="goToInvite">
-      <view class="invite-info flex-col">
-        <text class="invite-title">
-          邀请好友
-        </text>
-        <text class="invite-code">
-          邀请码：{{ userInfo.inviter || '暂无邀请码' }}
-        </text>
-      </view>
-      <view class="invite-button flex-col">
-        <text class="invite-btn-text">
-          立即邀请
-        </text>
-      </view>
-      <image
-        class="invite-bg-image"
-        referrerpolicy="no-referrer"
-        src="/static/images/mine-invite-box.png"
-      />
-    </view>
-    <view class="features-section flex-col">
-      <text class="section-title">
-        其他功能
-      </text>
-      <view class="feature-item flex-row " @click="goToInviteList">
+        <view class="invite-button flex-col">
+          <text class="invite-btn-text">
+            立即邀请
+          </text>
+        </view>
         <image
-          class="feature-icon"
+          class="invite-bg-image"
           referrerpolicy="no-referrer"
-          src="/static/images/mine-invite-list.png"
+          src="/static/images/mine-invite-box.png"
         />
-        <text class="feature-label">
-          邀请记录
-        </text>
       </view>
-      <view class="feature-item flex-row " @click="goToAddressList">
-        <image
-          class="feature-icon"
-          referrerpolicy="no-referrer"
-          src="/static/images/mine-address.png"
-        />
-        <text class="feature-label">
-          收货地址
+      <view class="features-section flex-col">
+        <text class="section-title">
+          其他功能
         </text>
-      </view>
-      <view class="feature-item flex-row " @click="goToDriverList">
-        <image
-          class="feature-icon"
-          referrerpolicy="no-referrer"
-          src="/static/images/mine-driver.png"
-        />
-        <text class="feature-label">
-          合作司机
-        </text>
-      </view>
-      <view class="feature-item flex-row " @click="goToChangePassword">
-        <image
-          class="feature-icon"
-          referrerpolicy="no-referrer"
-          src="/static/images/mine-password.png"
-        />
-        <text class="feature-label">
-          修改密码
-        </text>
-      </view>
-      <view class="feature-item flex-row " @click="makePhoneCall">
-        <image
-          class="feature-icon"
-          referrerpolicy="no-referrer"
-          src="/static/images/mine-call.png"
-        />
-        <text class="feature-label">
-          电话客服
-        </text>
-      </view>
-      <button open-type="contact" bindcontact="handleContact" session-from="sessionFrom" class="contact-btn">
-        <view class="feature-item flex-row ">
+        <view class="feature-item flex-row " @click="goToInviteList">
           <image
             class="feature-icon"
             referrerpolicy="no-referrer"
-            src="/static/images/mine-feedback.png"
+            src="/static/images/mine-invite-list.png"
           />
           <text class="feature-label">
-            咨询反馈
+            邀请记录
           </text>
         </view>
-      </button>
-    </view>
+        <view class="feature-item flex-row " @click="goToAddressList">
+          <image
+            class="feature-icon"
+            referrerpolicy="no-referrer"
+            src="/static/images/mine-address.png"
+          />
+          <text class="feature-label">
+            收货地址
+          </text>
+        </view>
+        <view class="feature-item flex-row " @click="goToDriverList">
+          <image
+            class="feature-icon"
+            referrerpolicy="no-referrer"
+            src="/static/images/mine-driver.png"
+          />
+          <text class="feature-label">
+            合作司机
+          </text>
+        </view>
+        <view class="feature-item flex-row " @click="goToChangePassword">
+          <image
+            class="feature-icon"
+            referrerpolicy="no-referrer"
+            src="/static/images/mine-password.png"
+          />
+          <text class="feature-label">
+            修改密码
+          </text>
+        </view>
+        <view class="feature-item flex-row " @click="makePhoneCall">
+          <image
+            class="feature-icon"
+            referrerpolicy="no-referrer"
+            src="/static/images/mine-call.png"
+          />
+          <text class="feature-label">
+            电话客服
+          </text>
+        </view>
+        <button open-type="contact" bindcontact="handleContact" session-from="sessionFrom" class="contact-btn">
+          <view class="feature-item flex-row ">
+            <image
+              class="feature-icon"
+              referrerpolicy="no-referrer"
+              src="/static/images/mine-feedback.png"
+            />
+            <text class="feature-label">
+              咨询反馈
+            </text>
+          </view>
+        </button>
+      </view>
+    </template>
   </view>
 </template>
 
