@@ -72,7 +72,7 @@
 
 ### 4.4 API调用规范
 
-- 使用 `utils/request.js` 进行网络请求
+- 使用 `utils/http.js` 进行网络请求
 - API接口统一在 `api/` 目录下管理
 - 错误处理必须统一处理
 
