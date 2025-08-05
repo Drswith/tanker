@@ -1,6 +1,7 @@
 <script>
 import { orderApi } from '@/api/order.js'
 import { payApi, PayType } from '@/api/pay.js'
+import { getUserId } from '@/utils/auth'
 import { request } from '@/utils/http'
 
 export default {
@@ -40,7 +41,7 @@ export default {
         price: null,
         bankAccount: '', // 银行收款账号
         bankName: '',
-        alipayAccount: '',
+        zfbAccount: '',
       },
       voucherFileList: [], // 使用u-upload组件的文件列表
       uploadedVoucher: null, // 上传的支付凭证
@@ -68,6 +69,9 @@ export default {
     }
   },
   computed: {
+    userId() {
+      return getUserId()
+    },
     // 计算底部按钮文案
     confirmButtonText() {
       switch (this.selectedPayMethod) {
@@ -108,14 +112,10 @@ export default {
         }
 
         // 根据订单详情设置支付金额
-        if (response.price) {
-          this.orderInfo.price = Number(response.price)
-        }
+        this.orderInfo.price = Number(response.price)
 
         // 设置订单号
-        if (response.orderNo) {
-          this.orderInfo.orderNo = response.orderNo
-        }
+        this.orderInfo.orderNo = response.orderNo
 
         // 获取支付配置信息
         await this.getPayConfig()
@@ -179,7 +179,7 @@ export default {
 
           // 支付宝转账信息
           if (response.zfbAccount) {
-            this.orderInfo.alipayAccount = response.zfbAccount // 支付宝账号
+            this.orderInfo.zfbAccount = response.zfbAccount // 支付宝账号
           }
 
           // 支付宝二维码
@@ -276,43 +276,39 @@ export default {
       })
     },
 
-    // 微信支付
-    async wxPay() {
-      // 获取微信支付需要的信息
-      const response = await payApi.wxPay({
-        id: this.orderData.id,
-        orderNo: this.orderData.orderNo,
-        userId: 1,
+    // 二次确认微信支付结果 - 非必需，看业务是否需要
+    pollWechatPayResult() {
+      // 返回promise, 超时时间 60秒， 2秒轮询一次wxPayCallback
+      return new Promise((resolve, reject) => {
+        // mock 支付成功
+        setTimeout(() => {
+          resolve({
+            code: 200,
+            msg: '支付成功',
+          })
+        }, 1000)
+
+        // const pollInterval = setInterval(
+        //   async () => {
+        //     const response = await payApi.wxPayCallback({
+        //       orderNo: this.orderData.orderNo,
+        //     })
+        //     console.log('轮询微信支付回调:', response)
+        //     if (response.code === 200) {
+        //       clearInterval(pollInterval)
+        //       resolve(response)
+        //     }
+        //   },
+        //   2000,
+        // )
+
+        // // 超时时间 60秒
+        // setTimeout(() => {
+        //   clearInterval(pollInterval)
+        //   reject(new Error('轮询超时'))
+        // }, 60000)
       })
-      console.log('微信支付:', response)
-      return response
     },
-
-    // 轮询微信支付结果
-    // pollWechatPayResult() {
-    //   // 返回promise, 超时时间 60秒， 2秒轮询一次wxPayCallback
-    //   return new Promise((resolve, reject) => {
-    //     const pollInterval = setInterval(
-    //       async () => {
-    //         const response = await payApi.wxPayCallback({
-    //           orderNo: this.orderData.orderNo,
-    //         })
-    //         console.log('轮询微信支付回调:', response)
-    //         if (response.code === 200) {
-    //           clearInterval(pollInterval)
-    //           resolve(response)
-    //         }
-    //       },
-    //       2000,
-    //     )
-
-    //     // 超时时间 60秒
-    //     setTimeout(() => {
-    //       clearInterval(pollInterval)
-    //       reject(new Error('轮询超时'))
-    //     }, 60000)
-    //   })
-    // },
 
     // 确认支付 - 微信
     async confirmWechatPayment() {
@@ -320,18 +316,25 @@ export default {
         title: '支付中...',
       })
 
-      const res = await this.wxPay()
+      // 获取调起微信支付需要的订单对象
+      const orderInfo = await payApi.wxPay({
+        // ip: null, // ip不用 只传订单号就行 IP后端这边获取
+        orderNo: this.orderData.orderNo,
+        userId: this.userId,
+      })
 
-      // 订单对象，从服务器获取
-      let orderInfo = {
-        appid: 'wx499********7c70e', // 应用ID（AppID）
-        partnerid: '148*****52', // 商户号（PartnerID）
-        prepayid: 'wx202254********************fbe90000', // 预支付交易会话ID
-        package: 'Sign=WXPay', // 固定值
-        noncestr: 'c5sEwbaNPiXAF3iv', // 随机字符串
-        timestamp: 1597935292, // 时间戳（单位：秒）
-        sign: 'A842B45937F6EFF60DEC7A2EAA52D5A0', // 签名，这里用的 MD5 签名
-      }
+      console.log('微信支付参数:', orderInfo)
+
+      // 订单对象数据结构如下
+      // orderInfo = {
+      //   appid: 'wx499********7c70e', // 应用ID（AppID）
+      //   partnerid: '148*****52', // 商户号（PartnerID）
+      //   prepayid: 'wx202254********************fbe90000', // 预支付交易会话ID
+      //   package: 'Sign=WXPay', // 固定值
+      //   noncestr: 'c5sEwbaNPiXAF3iv', // 随机字符串
+      //   timestamp: 1597935292, // 时间戳（单位：秒）
+      //   sign: 'A842B45937F6EFF60DEC7A2EAA52D5A0', // 签名，这里用的 MD5 签名
+      // }
 
       uni.getProvider({
         service: 'payment',
@@ -342,8 +345,21 @@ export default {
               provider: 'wxpay', // 固定值为"wxpay"
               orderInfo,
               success(res) {
-                let rawdata = JSON.parse(res.rawdata)
-                console.log('支付成功')
+                const rawdata = JSON.parse(res.rawdata)
+                console.log('支付成功', rawdata)
+                uni.showToast({
+                  title: '支付成功，等待审核',
+                  icon: 'success',
+                  duration: 1500,
+                })
+
+                setTimeout(() => {
+                  // 订单列表
+                  uni.switchTab({
+                    url: `/pages/order-center/list/index`,
+                  })
+                  uni.hideLoading()
+                }, 1500)
               },
               fail(err) {
                 console.log(`支付失败:${JSON.stringify(err)}`)
@@ -356,6 +372,27 @@ export default {
               },
             })
           }
+        },
+        complete() {
+          // 弹出一个二次确认支付结果modal，防止用户误点击返回按钮
+          uni.showModal({
+            title: '支付结果',
+            content: '是否确认支付结果？',
+            success: (res) => {
+              if (res.confirm) {
+                console.log('用户点击确定')
+                uni.hideLoading()
+                uni.showLoading({
+                  title: '确认中...',
+
+                })
+              }
+              else if (res.cancel) {
+                console.log('用户点击取消')
+                uni.hideLoading()
+              }
+            },
+          })
         },
       })
 
@@ -557,9 +594,9 @@ export default {
           收款账号：
         </text>
         <text class="account-value">
-          {{ orderInfo.alipayAccount }}
+          {{ orderInfo.zfbAccount }}
         </text>
-        <view class="copy-btn" @click="copyText(orderInfo.alipayAccount, '账号')">
+        <view class="copy-btn" @click="copyText(orderInfo.zfbAccount, '账号')">
           <text class="copy-icon">
             复制
           </text>
