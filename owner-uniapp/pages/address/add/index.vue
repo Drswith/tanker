@@ -32,8 +32,6 @@ export default {
 
       // 常量配置
       constants: {
-        PHONE_REGEX: /^1[3-9]\d{9}$/, // 手机号正则
-        POSTAL_CODE_REGEX: /^\d{6}$/, // 邮政编码正则
       },
 
       visible: false,
@@ -63,11 +61,6 @@ export default {
             message: '请输入收货人手机号',
             trigger: ['blur', 'change'],
           },
-          {
-            pattern: /^1[3-9]\d{9}$/,
-            message: '请输入正确的手机号码',
-            trigger: ['blur', 'change'],
-          },
         ],
         region: [
           {
@@ -93,11 +86,6 @@ export default {
           {
             required: true,
             message: '请输入邮政编码',
-            trigger: ['blur', 'change'],
-          },
-          {
-            pattern: /^\d{6}$/,
-            message: '请输入正确的邮政编码',
             trigger: ['blur', 'change'],
           },
         ],
