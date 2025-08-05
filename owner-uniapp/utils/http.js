@@ -56,119 +56,36 @@ http.interceptors.request.use(
 // 防止并行请求发生401重复弹窗
 let loginPromise = null
 
-// 添加响应拦截器 - 处理业务逻辑
-http.interceptors.response.use(
-  (response) => {
-    const { data, status } = response
+// 错误处理工具函数
+function handleError(error, showToast = true) {
+  let message = '请求失败'
+  let shouldNavigateToLogin = false
 
-    // 打印响应日志（开发环境）
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[HTTP Response] ${status}`, data)
+  // 业务错误码处理（优先级更高）
+  if (error.businessCode) {
+    const errorMsg = error.businessMessage || error.message
+
+    switch (error.businessCode) {
+      case 401:
+        message = errorMsg || '请先登录!'
+        shouldNavigateToLogin = true
+        break
+      case 403:
+        message = errorMsg || '没有权限访问'
+        break
+      case 404:
+        message = errorMsg || '请求的资源不存在'
+        break
+      case 500:
+        message = errorMsg || '服务器内部错误'
+        break
+      default:
+        message = errorMsg || '请求失败'
     }
-
-    // 处理业务状态码
-    if (data && typeof data === 'object') {
-      const errorMsg = data.errMsg || data.message
-
-      // 处理401未授权
-      if (data.code === 401) {
-        // 清除本地token
-        clearToken()
-        clearTokenInfos()
-        clearUserInfo()
-
-        if (!loginPromise) {
-          loginPromise = new Promise((resolve, reject) => {
-            uni.showModal({
-              title: '提示',
-              content: data.errMsg || '请先登录!',
-              success(res) {
-                if (res.confirm) {
-                  console.log('用户点击确定')
-                  uni.navigateTo({
-                    url: '/pages/login/index/index',
-                    success() {
-                      resolve()
-                    },
-                    fail(err) {
-                      reject(err)
-                    },
-                    complete() {
-                      loginPromise = null
-                    },
-                  })
-                }
-                else if (res.cancel) {
-                  console.log('用户点击取消')
-                  loginPromise = null
-                  reject(new Error('用户取消登录'))
-                }
-              },
-            })
-          })
-        }
-
-        return loginPromise
-      }
-
-      // 处理403禁止访问
-      if (data.code === 403) {
-        uni.showToast({
-          title: errorMsg || '没有权限访问',
-          icon: 'none',
-        })
-        return Promise.reject(new Error(errorMsg || '禁止访问'))
-      }
-
-      // 处理404未找到
-      if (data.code === 404) {
-        uni.showToast({
-          title: errorMsg || '请求的资源不存在',
-          icon: 'none',
-        })
-        return Promise.reject(new Error(errorMsg || '资源不存在'))
-      }
-
-      // 处理500服务器错误
-      if (data.code === 500) {
-        uni.showToast({
-          title: errorMsg || '服务器内部错误',
-          icon: 'none',
-        })
-        return Promise.reject(new Error(errorMsg || '服务器错误'))
-      }
-
-      // 处理其他错误状态码
-      if (data.code && data.code !== 200) {
-        uni.showToast({
-          title: errorMsg || '请求失败',
-          icon: 'none',
-        })
-        return Promise.reject(new Error(errorMsg || '请求失败'))
-      }
-
-      // 成功响应，返回数据部分
-      return data.data !== undefined ? data.data : data
-    }
-
-    // 非JSON响应，直接返回
-    return data
-  },
-  (error) => {
-    console.error('[HTTP Response Error]', error)
-
-    // 网络错误处理
-    if (!error.response) {
-      uni.showToast({
-        title: '网络连接失败，请检查网络',
-        icon: 'none',
-      })
-      return Promise.reject(new Error('网络连接失败'))
-    }
-
-    // HTTP状态码错误处理
+  }
+  // HTTP状态码错误处理
+  else if (error.response && error.response.status) {
     const { status } = error.response
-    let message = '请求失败'
 
     switch (status) {
       case 400:
@@ -176,6 +93,7 @@ http.interceptors.response.use(
         break
       case 401:
         message = '未授权，请重新登录'
+        shouldNavigateToLogin = true
         break
       case 403:
         message = '拒绝访问'
@@ -207,13 +125,98 @@ http.interceptors.response.use(
       default:
         message = `连接错误${status}`
     }
+  }
+  // 网络错误处理
+  else if (!error.response) {
+    message = '网络连接失败，请检查网络'
+  }
 
+  // 处理401登录逻辑
+  if (shouldNavigateToLogin) {
+    // 清除本地token
+    clearToken()
+    clearTokenInfos()
+    clearUserInfo()
+
+    if (!loginPromise) {
+      loginPromise = new Promise((resolve, reject) => {
+        uni.showModal({
+          title: '提示',
+          content: message,
+          success(res) {
+            if (res.confirm) {
+              console.log('用户点击确定')
+              uni.navigateTo({
+                url: '/pages/login/index/index',
+                success() {
+                  resolve()
+                },
+                fail(err) {
+                  reject(err)
+                },
+                complete() {
+                  loginPromise = null
+                },
+              })
+            }
+            else if (res.cancel) {
+              console.log('用户点击取消')
+              loginPromise = null
+              reject(new Error('用户取消登录'))
+            }
+          },
+        })
+      })
+    }
+    return loginPromise
+  }
+
+  // 显示错误提示
+  if (showToast) {
     uni.showToast({
       title: message,
       icon: 'none',
     })
+  }
 
-    return Promise.reject(error)
+  return Promise.reject(error)
+}
+
+// 添加响应拦截器 - 统一处理响应和错误
+http.interceptors.response.use(
+  (response) => {
+    const { data, status } = response
+
+    // 打印响应日志（开发环境）
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[HTTP Response] ${status}`, data)
+    }
+
+    // 处理业务响应
+    if (data && typeof data === 'object' && data.code !== undefined) {
+      // 成功响应
+      if (data.code === 200) {
+        return data.data !== undefined ? data.data : data
+      }
+
+      // 业务错误，创建带有业务错误码的错误对象
+      const businessError = new Error(data.errMsg || data.message || '请求失败')
+      businessError.businessCode = data.code
+      businessError.businessMessage = data.errMsg || data.message
+      businessError.response = response
+
+      // 抛出错误，由错误拦截器统一处理
+      throw businessError
+    }
+
+    // 非标准业务响应，直接返回
+    return data
+  },
+  (error) => {
+    console.error('[HTTP Response Error]', error)
+
+    // 统一错误处理
+    return handleError(error)
   },
 )
 

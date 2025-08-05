@@ -89,7 +89,7 @@ class UniAxios {
       }
       catch (error) {
         if (interceptor.rejected) {
-          chain[1] = await interceptor.rejected(error)
+          return await interceptor.rejected(error)
         }
         else {
           throw error
@@ -98,6 +98,27 @@ class UniAxios {
     }
 
     return chain[0]
+  }
+
+  // 执行响应错误拦截器
+  async runResponseErrorInterceptors(error) {
+    // 过滤掉被移除的拦截器
+    const validErrorInterceptors = this.interceptors.response.handlers.filter(handler => handler !== null)
+    
+    for (const interceptor of validErrorInterceptors) {
+      if (interceptor.rejected) {
+        try {
+          return await interceptor.rejected(error)
+        }
+        catch (e) {
+          // 如果拦截器也抛出错误，继续到下一个拦截器
+          error = e
+        }
+      }
+    }
+
+    // 如果所有拦截器都没有处理错误，抛出最后的错误
+    throw error
   }
 
   // 核心请求方法
@@ -146,20 +167,7 @@ class UniAxios {
       }
 
       // 执行响应拦截器的错误处理
-      const validErrorInterceptors = this.interceptors.response.handlers.filter(handler => handler !== null)
-      
-      for (const interceptor of validErrorInterceptors) {
-        if (interceptor.rejected) {
-          try {
-            return await interceptor.rejected(error)
-          }
-          catch (e) {
-            // 继续抛出错误
-          }
-        }
-      }
-
-      throw error
+      return await this.runResponseErrorInterceptors(error)
     }
   }
 
