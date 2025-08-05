@@ -1,6 +1,6 @@
 <script>
 import { userApi } from '@/api/user'
-import { setToken, setTokenInfos, setUserInfo } from '@/utils/auth'
+import { setToken, setTokenInfos, setUserId, setUserInfo } from '@/utils/auth'
 
 export default {
   data() {
@@ -175,6 +175,7 @@ export default {
           setToken(token)
           setTokenInfos(tokenInfos)
           setUserInfo(profile)
+          setUserId(profile.id)
         }
         else {
           const res = await userApi.smsLogin({
@@ -189,6 +190,7 @@ export default {
           setToken(token)
           setTokenInfos(token_infos)
           setUserInfo({ ...profile })
+          setUserId(profile.id)
         }
 
         uni.reLaunch({
