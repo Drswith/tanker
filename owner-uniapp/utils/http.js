@@ -53,6 +53,7 @@ http.interceptors.request.use(
   },
 )
 
+// 防止并行请求发生401重复弹窗
 let loginPromise = null
 
 // 添加响应拦截器 - 处理业务逻辑
@@ -67,6 +68,8 @@ http.interceptors.response.use(
 
     // 处理业务状态码
     if (data && typeof data === 'object') {
+      const errorMsg = data.errMsg || data.message
+
       // 处理401未授权
       if (data.code === 401) {
         // 清除本地token
@@ -84,22 +87,22 @@ http.interceptors.response.use(
                   console.log('用户点击确定')
                   uni.navigateTo({
                     url: '/pages/login/index/index',
-                  }).then(() => {
-                    resolve()
-                  }).catch((err) => {
-                    reject(err)
+                    success() {
+                      resolve()
+                    },
+                    fail(err) {
+                      reject(err)
+                    },
+                    complete() {
+                      loginPromise = null
+                    },
                   })
                 }
                 else if (res.cancel) {
                   console.log('用户点击取消')
+                  loginPromise = null
                   reject(new Error('用户取消登录'))
                 }
-              },
-              fail(err) {
-                reject(err)
-              },
-              complete() {
-                loginPromise = null
               },
             })
           })
@@ -111,38 +114,37 @@ http.interceptors.response.use(
       // 处理403禁止访问
       if (data.code === 403) {
         uni.showToast({
-          title: data.errMsg || '没有权限访问',
+          title: errorMsg || '没有权限访问',
           icon: 'none',
         })
-        return Promise.reject(new Error(data.errMsg || '禁止访问'))
+        return Promise.reject(new Error(errorMsg || '禁止访问'))
       }
 
       // 处理404未找到
       if (data.code === 404) {
         uni.showToast({
-          title: data.errMsg || '请求的资源不存在',
+          title: errorMsg || '请求的资源不存在',
           icon: 'none',
         })
-        return Promise.reject(new Error(data.errMsg || '资源不存在'))
+        return Promise.reject(new Error(errorMsg || '资源不存在'))
       }
 
       // 处理500服务器错误
       if (data.code === 500) {
         uni.showToast({
-          title: data.errMsg || '服务器内部错误',
+          title: errorMsg || '服务器内部错误',
           icon: 'none',
         })
-        return Promise.reject(new Error(data.errMsg || '服务器错误'))
+        return Promise.reject(new Error(errorMsg || '服务器错误'))
       }
 
       // 处理其他错误状态码
       if (data.code && data.code !== 200) {
-        const errorMsg = data.errMsg || data.message || '请求失败'
         uni.showToast({
-          title: errorMsg,
+          title: errorMsg || '请求失败',
           icon: 'none',
         })
-        return Promise.reject(new Error(errorMsg))
+        return Promise.reject(new Error(errorMsg || '请求失败'))
       }
 
       // 成功响应，返回数据部分
