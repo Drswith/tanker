@@ -9,8 +9,8 @@ import $time from '@/common/js/time.js'
 
 import uView from '@/uni_modules/uview-ui'
 
-// 接口
-import httpApi from '@/utils/httpApi.js'
+// http请求工具封装
+import http, { request } from '@/utils/http.js'
 
 import App from './App'
 
@@ -35,7 +35,8 @@ uni.$u.setConfig({
 })
 
 Vue.prototype.constants = constants
-Vue.prototype.httpApi = httpApi
+Vue.prototype.$http = http
+Vue.prototype.$request = request
 Vue.prototype.$com = $com
 Vue.prototype.$time = $time
 Vue.prototype.$lodash = lodash
